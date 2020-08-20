@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "366231350683",
+    "firebase_url": "https://nubextalkforandroid.firebaseio.com",
+    "project_id": "nubextalkforandroid",
+    "storage_bucket": "nubextalkforandroid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366231350683:android:713eee1cc31f1113c2853e",
+        "android_client_info": {
+          "package_name": "x.com.nubextalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366231350683-hhdtg93knsdv07p83gsi8hbkmqcboiu8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "x.com.nubextalk",
+            "certificate_hash": "946f597544ef28eb78dc881caa09d9589c810cef"
+          }
+        },
+        {
+          "client_id": "366231350683-f05b7lv7t3bmjiqv68mgstodr9iv8unb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiOMxY-mwccvG0SLNDKn_-6lstNp1Y8rM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366231350683-f05b7lv7t3bmjiqv68mgstodr9iv8unb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

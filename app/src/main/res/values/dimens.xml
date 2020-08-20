@@ -1,0 +1,45 @@
+<resources>
+    <dimen name="elevation_ss">2dp</dimen>
+    <dimen name="elevation_xs">4dp</dimen>
+    <dimen name="elevation_s">8dp</dimen>
+    <dimen name="elevation_m">10dp</dimen>
+    <dimen name="elevation_l">12dp</dimen>
+
+    <dimen name="padding_xs">2dp</dimen>
+    <dimen name="padding_s">4dp</dimen>
+    <dimen name="padding_m">8dp</dimen>
+    <dimen name="padding_l">12dp</dimen>
+    <dimen name="padding_xl">16dp</dimen>
+    <dimen name="padding_Ml">20dp</dimen>
+    <dimen name="padding_Gl">46dp</dimen>
+
+    <dimen name="margin_xs">2dp</dimen>
+    <dimen name="margin_s">4dp</dimen>
+    <dimen name="margin_m">8dp</dimen>
+    <dimen name="margin_l">12dp</dimen>
+    <dimen name="margin_lx2">24dp</dimen>
+    <dimen name="margin_xl">16dp</dimen>
+    <dimen name="margin_Ml">36dp</dimen>
+    <dimen name="margin_Gl">46dp</dimen>
+
+    <dimen name="radius_xs">4dp</dimen>
+    <dimen name="radius_s">6dp</dimen>
+    <dimen name="radius_m">10dp</dimen>
+    <dimen name="radius_l">16dp</dimen>
+
+    <dimen name="txt_xs">6dp</dimen>
+    <dimen name="txt_s">8dp</dimen>
+    <dimen name="txt_sm">10dp</dimen>
+    <dimen name="txt_m">12dp</dimen>
+    <dimen name="txt_l">14dp</dimen>
+    <dimen name="txt_xl">16dp</dimen>
+    <dimen name="txt_Ml">26dp</dimen>
+    <dimen name="txt_Gl">34dp</dimen>
+    <dimen name="txt_GGl">54dp</dimen>
+    <dimen name="txt_GGGl">74dp</dimen>
+
+    <dimen name="_xs">4dp</dimen>
+    <dimen name="_s">4dp</dimen>
+    <dimen name="_m">8dp</dimen>
+    <dimen name="_l">12dp</dimen>
+</resources>

@@ -27,6 +27,17 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * HTTP 통신 모듈(Async)
+ * 사용법 :
+ *  1. new HttpManager( <url>, <Context>, <Handler> )
+ *  2. new HttpManager( <url>, <Context>, <PassData>, <Handler> )
+ *
+ *  PC 크롬을 이용하여 Debug
+ *      - 크롬 브라우저 주소창 chrome://inspect
+ *      - Debug할 앱 선택, Debug 팝업
+ *      - Network 탭에서 확인
+ */
 public class HttpManager extends AsyncTask<String, Integer, String> {
 
     String strUrl;
@@ -35,13 +46,11 @@ public class HttpManager extends AsyncTask<String, Integer, String> {
     Object passData;
     Context ctx;
 
-    public HttpManager(String url, Handler handler) {
-        this.ctx = null;
-        this.handler = handler;
-        this.passData = "";
-        execute(url);
-    }
-
+    /**
+     * @param url : 요청할 URL
+     * @param ctx : Conext
+     * @param handler : Callback Handler
+     */
     public HttpManager(String url, Context ctx, Handler handler) {
         this.ctx = ctx;
         this.handler = handler;
@@ -49,6 +58,13 @@ public class HttpManager extends AsyncTask<String, Integer, String> {
         execute(url);
     }
 
+    /**
+     *
+     * @param url : 요청할 URL
+     * @param ctx : Conext
+     * @param passData : Callback Handler 까지 넘길 Data
+     * @param handler : Callback Handler
+     */
     public HttpManager(String url, Context ctx, Object passData, Handler handler) {
         this.ctx = ctx;
         this.handler = handler;

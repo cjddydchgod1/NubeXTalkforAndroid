@@ -14,6 +14,19 @@ import com.bartoszlipinski.viewpropertyobjectanimator.ViewPropertyObjectAnimator
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Animation Module
+ *  - make로 Animation 정의
+ *  - start로 Animation 동작
+ *  - Animation Listener
+ *
+ * 사용법
+ *  new AnimManager(
+ *      AnimManager.make(<View>, <Duration>).alpha(1).setInterpolator(<Interporator>),
+ *      AnimManager.make(<View>, <Duration>).alpha(0).setInterpolator(<Interporator>),
+ *      ...
+ *  ).start(<TOGETHER / SEQ>)
+ * */
 public class AnimManager implements Animator.AnimatorListener {
     private AnimatorSet mAnimatorSet;
     private List<Animator> animSets = new ArrayList<>();
@@ -22,13 +35,16 @@ public class AnimManager implements Animator.AnimatorListener {
     public static final int SHORTEST = 300;
     public static final int SHORT = 800;
     public static final int LONG  = 1600;
-    public static final String ANIM_SHORTEST    = "0";
-    public static final String ANIM_SHORT       = "1";
-    public static final String ANIM_LONG        = "2";
-    public static final int TOGETHER    = 0;
-    public static final int SEQ         = 1;
+    public static final String ANIM_SHORTEST    = "0";  //Animation Duration
+    public static final String ANIM_SHORT       = "1";  //Animation Duration
+    public static final String ANIM_LONG        = "2";  //Animation Duration
+    public static final int TOGETHER    = 0;            //All Animation Play Together
+    public static final int SEQ         = 1;            //All Animation Play Sequence
 
-    /** Constructor **/
+    /**
+     *
+     * @param animataions
+     */
     public AnimManager(ViewPropertyObjectAnimator... animataions){
         for(ViewPropertyObjectAnimator anim : animataions){
             animSets.add(anim.get());
@@ -119,7 +135,20 @@ public class AnimManager implements Animator.AnimatorListener {
         return this;
     }
 
-    /** Animation Factory **/
+    /**
+     * Animation Factory 생성법 (ViewPropertyObjectAnimator)
+     * ex : AnimManager.make(<View>, <Duration>).alpha(1).setInterpolator(<Interporator>)
+     *
+     * 지원 Animation
+     *  - Alpha, scaleX, scaleY, scrollY, height ... 등
+     *
+     * Interporator(분개) : Animation 시점시점과 종료시점까지의 변화 과정에 대한 궤적 값
+     *  - 8가지 Interporator (AccelerateDecelerate, Accelerate, Aniticipate, Overshoot, Bounce, Cycle, Decelerate, Linear)
+     *  - 참조 : https://medium.com/@gus0000123/android-animation-interpolar-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-8d228f4fc3c3
+     *
+     * 자세한 사용법은 아래 라이브러리 홈페이지 참조
+     *      https://github.com/blipinsk/ViewPropertyObjectAnimator
+     */
     public static ViewPropertyObjectAnimator make(View view){
         return ViewPropertyObjectAnimator.animate(view);
     }

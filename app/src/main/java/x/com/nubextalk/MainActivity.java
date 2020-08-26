@@ -9,6 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+/**
+ * Github Commint Message는 다음을 따라주시길 바랍니다.
+ *
+ * ex:)
+ * [이종호] 2020.08.26
+ * 1. 메세지1
+ * 2. 메세지2
+ * ....
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override

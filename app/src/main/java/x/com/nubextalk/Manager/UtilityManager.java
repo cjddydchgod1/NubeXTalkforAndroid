@@ -1,3 +1,8 @@
+/*
+ * Created By Jong Ho, Lee on  2020.
+ * Copyright 테크하임(주). All rights reserved.
+ */
+
 package x.com.nubextalk.Manager;
 
 import android.content.Context;
@@ -5,13 +10,10 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 import io.realm.RealmConfiguration;
-import x.com.nubextalk.R;
 
 
 public class UtilityManager {
@@ -90,34 +92,6 @@ public class UtilityManager {
                 return 2;
         }
         return 0;
-    }
-
-    /**
-     * 로딩 Dialog 생성
-     *
-     * @param context
-     * @return
-     */
-    public static MaterialDialog showLoadingDialog(Context context){
-        return new MaterialDialog.Builder(context)
-                .title(R.string.dlg_title_load)
-                .content(R.string.dlg_desc_load)
-                .progress(true, 0)
-                .canceledOnTouchOutside(false)
-                .cancelable(false)
-                .show();
-    }
-
-    /**
-     * 로딩 Dialog 해제
-     *
-     * @param dialog
-     * @return
-     */
-    public static MaterialDialog dismissLoadingDlg(MaterialDialog dialog){
-        if(dialog == null){ return null; }
-        dialog.dismiss();
-        return null;
     }
 
     /**

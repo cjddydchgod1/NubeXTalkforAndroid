@@ -1,6 +1,8 @@
+<!--
+  ~ Created By Jong Ho, Lee on  2020.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
 <resources>
     <string name="app_name">NubeX Talk</string>
-
-    <string name="dlg_title_load">Loading</string>
-    <string name="dlg_desc_load">Please wait…</string>
 </resources>

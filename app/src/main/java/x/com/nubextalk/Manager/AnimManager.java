@@ -1,3 +1,8 @@
+/*
+ * Created By Jong Ho, Lee on  2020.
+ * Copyright 테크하임(주). All rights reserved.
+ */
+
 package x.com.nubextalk.Manager;
 
 import android.animation.Animator;
@@ -171,14 +176,34 @@ public class AnimManager implements Animator.AnimatorListener {
     }
 
     /** Methods **/
+
+    /**
+     * dp 값을 px 값으로 변환
+     * @param ctx
+     * @param val
+     * @return
+     */
     public static int dpToPx(Context ctx, int val) {
         return (int) (val * Resources.getSystem().getDisplayMetrics().density);
     }
 
+
+    /**
+     * px 값을 dp 값으로 변환
+     * @param ctx
+     * @param val
+     * @return
+     */
     public static int pxToDp(Context ctx, int val) {
         return (int) (val / Resources.getSystem().getDisplayMetrics().density);
     }
 
+    /**
+     * 화면의 크기 구하기
+     *
+     * @param wm
+     * @return
+     */
     public static DisplayMetrics getWindowMetrics(WindowManager wm){
         DisplayMetrics dp = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dp);

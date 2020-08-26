@@ -1,0 +1,41 @@
+3rd-Party 라이브러리 목록
+
+1. implementation 'com.google.code.gson:gson:2.8.6'
+    - Java Objects와 JSON의 변환 및 여러가지 기능을 제공하는 라이브러리
+    - 현 프로젝트에서는 주로 Firebase Database를 로컬 Realm Database로 변환하여 저장 및 반대로 업로드할 때 사용
+    - 참조 : https://github.com/google/gson
+
+2. implementation 'gun0912.ted:tedpermission:2.1.1'
+    - Android 권한 관리 라이브러리
+    - Android 사용자 권한 응답형 UI 제공 및 권한 체크 등 권한 관리 라이브러리
+    - 참조 : https://github.com/ParkSangGwon/TedPermission
+
+3. implementation 'com.github.ar-android:AQuery:1.0.3'
+    - jQuery 문법처럼 Android 코드 작성할수 있게 해주는 라이브러리
+    - 주로 ImageView에 Image를 로딩할 때 많이 사용한다
+    - 참조 : https://github.com/ar-android/AQuery
+
+4. implementation 'com.bartoszlipinski:viewpropertyobjectanimator:1.4.5'
+    - Animation 보조 라이브러리
+    - 현 프로젝트에서 AnimManager.java 로 애니메이션 사용
+    - 현 프로젝트 x.com.Example.Example_AnimManaer.java 소스 참조
+    - 참조 : https://github.com/blipinsk/ViewPropertyObjectAnimator
+
+5. implementation 'org.jsoup:jsoup:1.12.1'
+    - HTML Parsing Library
+    - 현 프로젝트 x.com.Example.Example_Jsoup.java 소스 참조
+    - 공식 홈페이지 : https://jsoup.org/cookbook/introduction/parsing-a-document
+
+6. implementation 'com.joanzapata.iconify:android-iconify:2.2.2'
+    - Vector Icon, ttf Icon 등을 TextView, Button, ToggleButton 등 Rendering을 지원하는 라이브러리
+    - 현 프로젝트에서 FontAwesome Icon과 같이 사용
+    - 현 프로젝트 x.com.Emaple_Font.java 소스 참조
+    - 참조 : https://github.com/JoanZapata/android-iconify
+    - 참조(FontAwesome) : https://fontawesome.com/icons?d=gallery&m=free
+
+7. Realm DataBase
+    - 공식 홈페이지 : https://realm.io/docs/java/latest/
+
+8. Firebase Android
+    - 공식 홈페이지 : https://firebase.google.com/docs?authuser=0
+

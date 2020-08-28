@@ -6,20 +6,16 @@
 package x.com.nubextalk.Example;
 
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 
 import com.joanzapata.iconify.widget.IconTextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import x.com.nubextalk.Manager.AnimManager;
-import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.R;
 
 public class Example_AnimManager extends AppCompatActivity implements View.OnClickListener {

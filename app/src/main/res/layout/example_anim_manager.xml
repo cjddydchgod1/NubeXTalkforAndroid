@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="{fas-circle}"
-            android:textSize="@dimen/txt_GGl" />
+            android:textSize="@dimen/txt_GGGl" />
     </RelativeLayout>
 
 </LinearLayout>

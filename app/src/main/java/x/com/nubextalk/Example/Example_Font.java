@@ -22,6 +22,7 @@ import com.joanzapata.iconify.widget.IconTextView;
  * - 카테고리 Solid     : fas-
  * - 카테고리 Regular   : far-
  * - 카테고리 Brand     : fab-
+ * - 카테고리 WIR       : wir-
  *
  *  FontAwesome Icon Sheet 참조
  *  https://fontawesome.com/icons?d=gallery&m=free

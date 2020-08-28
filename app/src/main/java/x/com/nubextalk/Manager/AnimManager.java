@@ -144,10 +144,10 @@ public class AnimManager implements Animator.AnimatorListener {
      * Animation Factory 생성법 (ViewPropertyObjectAnimator)
      * ex : AnimManager.make(<View>, <Duration>).alpha(1).setInterpolator(<Interporator>)
      *
-     * 지원 Animation
+     * 지원 Animation(attribute)
      *  - Alpha, scaleX, scaleY, scrollY, height ... 등
      *
-     * Interporator(분개) : Animation 시점시점과 종료시점까지의 변화 과정에 대한 궤적 값
+     * Interporator(분개) : Animation 시점시점과 종료시점까지의 변화 과정에 대한 벡터 궤적 값
      *  - 8가지 Interporator (AccelerateDecelerate, Accelerate, Aniticipate, Overshoot, Bounce, Cycle, Decelerate, Linear)
      *  - 참조 : https://medium.com/@gus0000123/android-animation-interpolar-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-8d228f4fc3c3
      *

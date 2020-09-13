@@ -45,4 +45,11 @@
 
     <color name="cInvalid">#D50000</color>
     <color name="cValid">#00C853</color>
+
+    <color name="mainBackground">#F3F3F3</color>
+    <color name="actionBar">#A8C3B3</color>
+    <color name="menuBar">#B0C2C4</color>
+    <color name="menuBarUnSelected">#D7E2E2</color>
+    <color name="chatRemain">#F4E558</color>
+
 </resources>

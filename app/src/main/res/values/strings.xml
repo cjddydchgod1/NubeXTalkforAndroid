@@ -11,4 +11,6 @@
     values-round/strings.xml for round devices.
     -->
     <string name="version">version 1.0.0</string>
+    <string name="profileimage">ProfileImage</string>
+    <string name="profilestatus">profileStatus</string>
 </resources>

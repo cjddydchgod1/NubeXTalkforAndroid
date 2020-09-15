@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import x.com.nubextalk.item.Profile;
 
 public class FriendListAdapter extends RecyclerView.Adapter {
-    private static final String TAG = MainActivity.class.getSimpleName();
     private final LinkedList<Profile> friendList;
     private LayoutInflater mInflater;
 
@@ -38,10 +37,11 @@ public class FriendListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // LinkedList에서 하나씩.
+
         // Header가 아니고 친구라면
         // holder가 RecyclerViewHolder이므로 FriendViewHolder 클래스로 변환해준다.
         FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
-        Log.d(TAG, "밑이다~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+        Log.e("Adapter", "item");
         Profile mCurrent = friendList.get(position);
         friendViewHolder.profileName.setText(mCurrent.getName());
         friendViewHolder.profileImage.setImageResource(mCurrent.getProfileImage());

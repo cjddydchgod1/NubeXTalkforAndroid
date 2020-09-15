@@ -21,6 +21,7 @@
             <ImageView
                 android:layout_width="70dp"
                 android:layout_height="50dp"
+                android:contentDescription="@string/app_name"
                 android:src="@drawable/nube_x_logo"/>
         </androidx.appcompat.widget.Toolbar>
         <View
@@ -41,13 +42,15 @@
                     android:id="@+id/myProfileImage"
                     android:layout_width="@dimen/profile_image"
                     android:layout_height="@dimen/profile_image"
+                    android:contentDescription="@string/profileimage"
                     android:src="@drawable/baseline_account_circle_black_24dp" />
                 <ImageView
                     android:id="@+id/myProfileStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/profilestatus"
                     android:src="@drawable/baseline_fiber_manual_record_black_24dp"
-                    android:layout_gravity="right|bottom"/>
+                    android:layout_gravity="end|bottom"/>
             </FrameLayout>
             <TextView
                 android:id="@+id/myProfileName"
@@ -56,12 +59,13 @@
                 android:text="@string/app_name"
                 android:paddingStart="@dimen/padding_l"
                 android:layout_gravity="center"/>
-        </LinearLayout>
-        <include layout="@layout/content_friendlist"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/myProfile"/>
 
+        </LinearLayout>
+        <fragment
+            android:id="@+id/mainFrameLayout"
+            android:name="x.com.nubextalk.MainFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
 
     </LinearLayout>

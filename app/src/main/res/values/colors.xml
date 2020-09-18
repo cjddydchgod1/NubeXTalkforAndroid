@@ -5,8 +5,9 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimary">#A8C3B3</color>
     <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorPrimaryLight">#F3F3F3</color>
     <color name="colorAccent">#03DAC5</color>
 
     <color name="cGradientStart">#000000</color>

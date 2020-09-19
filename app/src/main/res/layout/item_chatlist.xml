@@ -9,7 +9,7 @@
     android:layout_marginTop="15dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/chat_picture"
+        android:id="@+id/chat_list_chat_picture"
         android:layout_width="72dp"
         android:layout_height="72dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -17,16 +17,16 @@
         tools:src="@drawable/exmaple_profile" />
 
     <ImageView
-        android:id="@+id/friend_status"
+        android:id="@+id/chat_list_friend_status"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/chat_picture"
-        app:layout_constraintEnd_toEndOf="@id/chat_picture"
+        app:layout_constraintBottom_toBottomOf="@id/chat_list_chat_picture"
+        app:layout_constraintEnd_toEndOf="@id/chat_list_chat_picture"
         tools:src="@drawable/oval_status_on" />
 
 
     <TextView
-        android:id="@+id/chat_name"
+        android:id="@+id/chat_list_friend_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -34,22 +34,22 @@
         android:text="Person Name"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/chat_picture"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/chat_last_message"
+        android:id="@+id/chat_list_last_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="Chat content..."
         android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@+id/chat_picture"
-        app:layout_constraintTop_toBottomOf="@+id/chat_name" />
+        app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
+        app:layout_constraintTop_toBottomOf="@+id/chat_list_friend_name" />
 
     <TextView
-        android:id="@+id/chat_time"
+        android:id="@+id/chat_list_chat_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -60,7 +60,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/chat_remain"
+        android:id="@+id/chat_list_chat_remain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -71,6 +71,27 @@
         android:text="6"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_time" />
+        app:layout_constraintTop_toBottomOf="@+id/chat_list_chat_time" />
+
+    <ImageView
+        android:id="@+id/chat_list_notify_status"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_friend_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_sound_off" />
+
+    <ImageView
+        android:id="@+id/chat_list_fixtop_status"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_notify_status"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_pushpin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

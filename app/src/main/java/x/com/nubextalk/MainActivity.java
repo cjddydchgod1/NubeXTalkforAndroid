@@ -23,7 +23,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import x.com.nubextalk.databinding.ActivityMainBinding;
 import x.com.nubextalk.item.Profile;
 
 /**

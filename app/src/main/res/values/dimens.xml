@@ -4,6 +4,32 @@
   -->
 
 <resources>
+    <dimen name="profile_image_s">64dp</dimen>
+    <dimen name="profile_image_m">72dp</dimen>
+    <dimen name="profile_image_l">100dp</dimen>
+
+    <dimen name="status_s">16dp</dimen>
+    <dimen name="status_m">18dp</dimen>
+    <dimen name="status_l">25dp</dimen>
+
+    <dimen name="icon_size_xs">18dp</dimen>
+    <dimen name="icon_size_s">24dp</dimen>
+    <dimen name="icon_size_m">36dp</dimen>
+    <dimen name="icon_size_l">48dp</dimen>
+    <dimen name="icon_size_xl">60dp</dimen>
+    <dimen name="icon_size_Ml">72dp</dimen>
+
+    <dimen name="sp_txt_xs">6sp</dimen>
+    <dimen name="sp_txt_s">8sp</dimen>
+    <dimen name="sp_txt_sm">10sp</dimen>
+    <dimen name="sp_txt_m">12sp</dimen>
+    <dimen name="sp_txt_l">14sp</dimen>
+    <dimen name="sp_txt_xl">16sp</dimen>
+    <dimen name="sp_txt_Ml">26sp</dimen>
+    <dimen name="sp_txt_Gl">34sp</dimen>
+    <dimen name="sp_txt_GGl">54sp</dimen>
+    <dimen name="sp_txt_GGGl">74sp</dimen>
+
     <dimen name="elevation_ss">2dp</dimen>
     <dimen name="elevation_xs">4dp</dimen>
     <dimen name="elevation_s">8dp</dimen>

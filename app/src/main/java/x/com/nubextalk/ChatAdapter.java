@@ -38,7 +38,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ChatAdapter.ChatViewHolder holder, int position) {
-        // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 하단 좌측에 표시
+        // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
         if(mChatData.get(position).getId() == this.id){
             holder.my_chat.setText(mChatData.get(position).getChat());
             holder.my_time.setText(mChatData.get(position).getTime());

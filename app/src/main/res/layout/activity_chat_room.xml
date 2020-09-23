@@ -12,7 +12,7 @@
         android:id="@+id/toolbar_chat_room"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/colorPrimaryLight"
+        android:background="@color/cBackground"
         app:layout_constraintTop_toTopOf="parent" >
 
         <TextView
@@ -20,8 +20,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="20dp"
-            android:text="Title"/>
+            android:textSize="@dimen/txt_Ml"
+            android:text=""/>
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -40,7 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation = "horizontal"
-        android:background="#B0C2C4"
+        android:background="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_room_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,10 +48,11 @@
 
         <com.joanzapata.iconify.widget.IconButton
             android:id="@+id/mediaButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
+            android:layout_width="@dimen/icon_size_l"
+            android:layout_height="@dimen/icon_size_l"
+            android:layout_marginLeft="@dimen/margin_l"
             android:background="@android:color/transparent"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -59,22 +60,21 @@
         <EditText
             android:id="@+id/editChat"
             android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            android:background="@drawable/edit_text_background"
-            android:scrollHorizontally="false"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_m"
+            android:padding="@dimen/padding_m"
+            android:background="@drawable/bg_chat_edit_text"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sendButton"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/mediaButton"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.joanzapata.iconify.widget.IconButton
             android:id="@+id/sendButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginRight="10dp"
+            android:layout_width="@dimen/icon_size_l"
+            android:layout_height="@dimen/icon_size_l"
+            android:layout_marginRight="@dimen/margin_l"
             android:background="@android:color/transparent"
             android:onClick="sendChat"
             app:layout_constraintBottom_toBottomOf="parent"

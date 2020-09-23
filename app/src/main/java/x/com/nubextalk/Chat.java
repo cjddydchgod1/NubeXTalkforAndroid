@@ -10,7 +10,6 @@ public class Chat {
     public String profileName;
     public String chat;
     private String time;
-    SimpleDateFormat format1 = new SimpleDateFormat("HH:mm");
 
 
     public Chat(int id, int Image, String name ,String chat){

@@ -23,7 +23,6 @@ tools:context=".Example.Example_HttpManager">
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Http Request" />
-
 </LinearLayout>
 
 <ScrollView

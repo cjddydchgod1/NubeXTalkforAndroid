@@ -5,15 +5,31 @@
 
 package x.com.nubextalk.Manager;
 
+import android.animation.ObjectAnimator;
+import android.animation.StateListAnimator;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.joanzapata.iconify.widget.IconButton;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import x.com.nubextalk.R;
 
 
 public class UtilityManager {
@@ -133,5 +149,19 @@ public class UtilityManager {
      */
     private static double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
+    }
+
+    /**
+     * Vibration 발생 함수
+     * @param context
+     * @param i
+     * @param k
+     */
+    public static void fireVibe(Context context, int i, int k) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(i,k));
+        } else {
+            ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(i);
+        }
     }
 }

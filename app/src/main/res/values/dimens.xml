@@ -47,4 +47,6 @@
     <dimen name="_s">4dp</dimen>
     <dimen name="_m">8dp</dimen>
     <dimen name="_l">12dp</dimen>
+
+    <dimen name="actrionbar_height">44dp</dimen>
 </resources>

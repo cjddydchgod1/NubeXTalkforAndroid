@@ -1,0 +1,20 @@
+{
+  "1" : {
+    "name": "이정규",
+    "profileImg": "https://img.hankyung.com/photo/202004/01.22402844.1-1200x.jpg",
+    "status": 0,
+    "department": "DCS"
+  },
+  "2" : {
+    "name": "야부키나코",
+    "profileImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/181002_%EC%95%BC%EB%B6%80%ED%82%A4_%EB%82%98%EC%BD%94.jpg/413px-181002_%EC%95%BC%EB%B6%80%ED%82%A4_%EB%82%98%EC%BD%94.jpg",
+    "status": 1,
+    "department": "DCS"
+  },
+  "3" : {
+    "name": "최재영",
+    "profileImg": "https://www.nemopan.com/files/attach/images/6294/245/206/014/32d3eb8c0d1b1ff88ccc6f15e0935ce3.jpeg",
+    "status": 2,
+    "department": "KI"
+  }
+}

@@ -34,23 +34,19 @@ public class User extends RealmObject {
     private int status;
     private String department;
 
-    public void User(@NonNull String uid, @NonNull String name, @NonNull String profileImg,
-                     @NonNull int status){
-        this.uid = uid;
-        this.name = name;
-        this.profileImg = profileImg;
-        this.status = status;
-    }
-
     @NonNull
     public String getUid() {
         return uid;
     }
 
+    public void setUid(@NonNull String uid) { this.uid = uid; }
+
     @NonNull
     public String getName() {
         return name;
     }
+
+    public void setName(@NonNull String name) { this.name = name; }
 
     @NonNull
     public String getProfileImg() {
@@ -88,7 +84,7 @@ public class User extends RealmObject {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(UtilityManager.loadJson(context, "")); //json 파일 추가
-            RealmList<Example_Model_Address> list = new RealmList<>();
+            RealmList<User> list = new RealmList<>();
             for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                 String uid = it.next();
                 jsonObject.getJSONObject(uid).put("uid", uid);
@@ -96,8 +92,8 @@ public class User extends RealmObject {
             }
 
             realm.executeTransaction(realm1 -> {
-                realm1.where(Example_Model_Address.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(Example_Model_Address.class, jsonArray);
+                realm1.where(User.class).findAll().deleteAllFromRealm();
+                realm1.createOrUpdateAllFromJson(User.class, jsonArray);
             });
         }
         catch (JSONException e) {
@@ -105,7 +101,7 @@ public class User extends RealmObject {
         }
     }
 
-    public static RealmResults<Example_Model_Address> getAll(Realm realm){
-        return realm.where(Example_Model_Address.class).findAll();
+    public static RealmResults<User> getAll(Realm realm){
+        return realm.where(User.class).findAll();
     }
 }

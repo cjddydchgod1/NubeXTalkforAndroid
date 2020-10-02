@@ -14,18 +14,17 @@ public class ChatRoomMember extends RealmObject {
     @NonNull
     private int uid;
 
-    public void ChatRoomMember(@NonNull int rid, @NonNull int uid) {
-        this.rid = rid;
-        this.uid = uid;
-    }
-
     @NonNull
     public int getRid() {
         return rid;
     }
 
+    public void setRid(int rid) { this.rid = rid; }
+
     @NonNull
     public int getUid() {
         return uid;
     }
+
+    public void setUid(int uid) { this.uid = uid; }
 }

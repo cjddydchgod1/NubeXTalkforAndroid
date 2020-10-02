@@ -36,23 +36,17 @@ public class ChatRoom extends RealmObject {
     @NonNull
     private Date updatedDate;
 
-    public void ChatRoom(@NonNull String rid, @NonNull String roomName,
-                         @NonNull String roomImg, @NonNull Date updatedDate){
-        this.rid = rid;
-        this.roomName = roomName;
-        this.roomImg = roomImg;
-        this.updatedDate = updatedDate;
-    }
-
     @NonNull
     public String getRid() {
         return rid;
     }
 
+    public void setRid(@NonNull String rid) { this.rid = rid; }
+
     @NonNull
-    public String getRoomName() {
-        return roomName;
-    }
+    public String getRoomName() { return roomName; }
+
+    public void setRoomName(@NonNull String roomName) { this.roomName = roomName; }
 
     @NonNull
     public String getRoomImg() {
@@ -96,8 +90,8 @@ public class ChatRoom extends RealmObject {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = null;
         try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "")); //json 파일 추가
-            RealmList<Example_Model_Address> list = new RealmList<>();
+            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_chat_room.json")); //json 파일 추가
+            RealmList<ChatRoom> list = new RealmList<>();
             for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                 String rid = it.next();
                 jsonObject.getJSONObject(rid).put("rid", rid);
@@ -105,8 +99,8 @@ public class ChatRoom extends RealmObject {
             }
 
             realm.executeTransaction(realm1 -> {
-                realm1.where(Example_Model_Address.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(Example_Model_Address.class, jsonArray);
+                realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
+                realm1.createOrUpdateAllFromJson(ChatRoom.class, jsonArray);
             });
         }
         catch (JSONException e) {
@@ -114,8 +108,8 @@ public class ChatRoom extends RealmObject {
         }
     }
 
-    public static RealmResults<Example_Model_Address> getAll(Realm realm){
-        return realm.where(Example_Model_Address.class).findAll();
+    public static RealmResults<ChatRoom> getAll(Realm realm){
+        return realm.where(ChatRoom.class).findAll();
     }
 
 

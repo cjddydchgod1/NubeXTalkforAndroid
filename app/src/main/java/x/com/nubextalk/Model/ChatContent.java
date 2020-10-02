@@ -38,44 +38,46 @@ public class ChatContent extends RealmObject {
     @NonNull
     private Date sendDate;
 
-    public void ChatContent(@NonNull String cid, @NonNull String rid, @NonNull String uid,
-                            @NonNull int type, @NonNull String content, @NonNull Date sendDate) {
-        this.cid = cid;
-        this.rid = rid;
-        this.uid = uid;
-        this.type = type;
-        this.content = content;
-        this.sendDate = sendDate;
-    }
-
     @NonNull
     public String getCid() {
         return cid;
     }
+
+    public void setCid(@NonNull String cid) { this.cid = cid; }
 
     @NonNull
     public String getRid() {
         return rid;
     }
 
+    public void setRid(@NonNull String rid) { this.rid = rid; }
+
     @NonNull
     public String getUid() {
         return uid;
     }
 
+    public void setUid(@NonNull String uid) { this.uid = uid; }
+
     public int getType() {
         return type;
     }
+
+    public void setType(@NonNull int type) { this.type = type; }
 
     @NonNull
     public String getContent() {
         return content;
     }
 
+    public void setContent(@NonNull String content) { this.content = content; }
+
     @NonNull
     public Date getSendDate() {
         return sendDate;
     }
+
+    public void setSendDate(@NonNull Date sendDate) { this.sendDate = sendDate; }
 
     /**
      * Data 초기화 함수
@@ -86,24 +88,25 @@ public class ChatContent extends RealmObject {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = null;
         try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "")); //json 파일 추가
-            RealmList<Example_Model_Address> list = new RealmList<>();
+            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_chat_content.json")); //json 파일 추가
+            RealmList<ChatContent> list = new RealmList<>();
             for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                 String cid = it.next();
                 jsonObject.getJSONObject(cid).put("cid", cid);
                 jsonArray.put(jsonObject.getJSONObject(cid));
             }
 
+
             realm.executeTransaction(realm1 -> {
-                realm1.where(Example_Model_Address.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(Example_Model_Address.class, jsonArray);
+                realm1.where(ChatContent.class).findAll().deleteAllFromRealm();
+                realm1.createOrUpdateAllFromJson(ChatContent.class, jsonArray);
             });
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public static RealmResults<Example_Model_Address> getAll(Realm realm) {
-        return realm.where(Example_Model_Address.class).findAll();
+    public static RealmResults<ChatContent> getAll(Realm realm) {
+        return realm.where(ChatContent.class).findAll();
     }
 }

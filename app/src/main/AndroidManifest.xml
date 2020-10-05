@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Example.Example_Realm"></activity>
-        <activity android:name=".Example.Example_Address">
+        <activity android:name=".Example.Example_Address"></activity>
 
         <activity android:name=".LoadingActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
@@ -30,12 +30,7 @@
 
         </activity>
         <activity android:name=".TestActivity"></activity>
-        <activity android:name=".Example.Example_Realm">
-        </activity>
-        <activity android:name=".Example.Example_Address">
 
-
-        </activity>
         <activity android:name=".Example.Example_Jsoup" />
         <activity android:name=".Example.Example_AnimManager" />
         <activity android:name=".Example.Example_Font" />

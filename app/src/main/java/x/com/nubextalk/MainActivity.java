@@ -8,12 +8,9 @@ package x.com.nubextalk;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-<<<<<<< HEAD
 import android.util.Log;
-=======
 import android.view.Menu;
 import android.view.MenuItem;
->>>>>>> develop
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.gun0912.tedpermission.PermissionListener;
@@ -50,23 +47,15 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
 
-    MainFragment mainFragment;
+    FriendListFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFrameLayout);
+        mainFragment = (FriendListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
         Log.e("main", "MainActivity");
-    }
 
-<<<<<<< HEAD
-    @Override
-    public void onBackPressed() {
-        if (!(mainFragment instanceof MainFragment.IOnBackPressed) || !((MainFragment.IOnBackPressed) mainFragment).onBackPressed()) {
-          super.onBackPressed();
-       }
-=======
         //툴바 설정
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -123,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         return true;
->>>>>>> develop
     }
 
     private void initPermission() {

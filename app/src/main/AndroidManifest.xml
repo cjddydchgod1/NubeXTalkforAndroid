@@ -16,12 +16,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChatListActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".Example.Example_Realm"></activity>
+        <activity android:name=".Example.Example_Address">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         <activity android:name=".Example.Example_Jsoup" />
         <activity android:name=".Example.Example_AnimManager" />
@@ -35,7 +33,19 @@
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
         <activity android:name=".Example.ExampleList"></activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!--툴바 검색을 위한 meta-data-->
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
 
         <service android:name=".Manager.FireBase.FirebaseMsgService">
             <intent-filter>

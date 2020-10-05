@@ -83,7 +83,7 @@ public class User extends RealmObject {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = null;
         try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "")); //json 파일 추가
+            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_user.json")); //json 파일 추가
             RealmList<User> list = new RealmList<>();
             for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                 String uid = it.next();

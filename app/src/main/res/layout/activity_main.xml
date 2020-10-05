@@ -45,16 +45,16 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/myProfileImage"
-                    android:layout_width="@dimen/profile_image"
-                    android:layout_height="@dimen/profile_image"
+                    android:layout_width="@dimen/profile_image_s"
+                    android:layout_height="@dimen/profile_image_s"
                     android:contentDescription="@string/profileimage"
-                    android:src="@drawable/baseline_account_circle_black_24dp" />
+                    android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
                 <ImageView
                     android:id="@+id/myProfileStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/profilestatus"
-                    android:src="@drawable/baseline_fiber_manual_record_black_24dp"
+                    android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp"
                     android:layout_gravity="end|bottom"/>
             </FrameLayout>
             <TextView

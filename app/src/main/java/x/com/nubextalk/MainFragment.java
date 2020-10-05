@@ -1,42 +1,84 @@
 package x.com.nubextalk;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.util.LinkedList;
 
-import x.com.nubextalk.item.Profile;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import x.com.nubextalk.Manager.AnimManager;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.User;
 
-public class MainFragment extends Fragment implements FriendListAdapter.OnItemClickListenerInterface {
+public class MainFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
+    private Realm realm;
+
+    private LinearLayout mBottomWrapper;
     private RecyclerView mRecyclerView;
-    private final LinkedList<Profile> mFriendList = new LinkedList<>();
     private RecyclerView.Adapter mAdapter;
+    private RealmResults<User> mResults;
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         ViewGroup rootview = (ViewGroup) inflater.inflate(R.layout.content_friendlist, container, false);
-        mRecyclerView = rootview.findViewById(R.id.friendRecycleview);
-        mAdapter = new FriendListAdapter(getActivity(), mFriendList, this);
+
+
+        realm           = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
+        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
+
+        mResults = User.getAll(realm);
+        if(mResults.size() == 0){
+            User.init(getActivity(), realm);
+            mResults = User.getAll(realm);
+        }
+
+        mAdapter = new FriendListAdapter(getActivity() ,mResults);
+        ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.scheduleLayoutAnimation();
         Log.e("Fragment", "MainFragment");
         return rootview;
     }
@@ -44,26 +86,41 @@ public class MainFragment extends Fragment implements FriendListAdapter.OnItemCl
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepareData();
-    }
-
-    private void prepareData() {
-        mFriendList.addLast(new Profile(0, 0, "치과"));
-        mFriendList.addLast(new Profile(R.drawable.cat1, R.drawable.baseline_fiber_manual_record_black_24dp, "친구1"));
-        mFriendList.addLast(new Profile(R.drawable.cat2, R.drawable.baseline_fiber_manual_record_black_24dp, "친구2"));
-        mFriendList.addLast(new Profile(0, 0, "안과"));
-        mFriendList.addLast(new Profile(R.drawable.cat3, R.drawable.baseline_fiber_manual_record_black_24dp, "친구3"));
-        mFriendList.addLast(new Profile(R.drawable.cat4, R.drawable.baseline_fiber_manual_record_black_24dp, "친구4"));
-        mFriendList.addLast(new Profile(R.drawable.cat5, R.drawable.baseline_fiber_manual_record_black_24dp, "친구5"));
     }
 
     @Override
-    public void onItemClick(View v, int pos) {
-        Log.e("aa", "aa");
-        FriendListAdapter.FriendViewHolder viewHolder = (FriendListAdapter.FriendViewHolder) mRecyclerView.findViewHolderForAdapterPosition(pos);
-        Intent intent = new Intent(getActivity(), TestActivity.class);
-        intent.putExtra("name", viewHolder.profileName.getText().toString());
-        startActivity(intent);
-        Toast.makeText(getActivity(), viewHolder.profileName.getText().toString(), Toast.LENGTH_SHORT).show();
+    public void onSelected(User address) {
+        Log.e("asdfasdf", "Clicked");
+        initBottomsheet(address);
+        new AnimManager(
+                AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(3000).translationY(0).setInterpolator(new DecelerateInterpolator())
+        ).start(AnimManager.TOGETHER);
     }
+
+    protected void initBottomsheet(User address) {
+        Log.e("clicked!!", "cliked!!!");
+        ((TextView) mBottomWrapper.findViewById(R.id.profileName)).setText(address.getName());
+        ImageView image = mBottomWrapper.findViewById(R.id.profileImage);
+        Glide.with(getContext()).load(address.getProfileImg()).into(image);
+        ImageView status = mBottomWrapper.findViewById(R.id.profileStatus);
+
+        mBottomWrapper.findViewById(R.id.mClose).setOnClickListener(v -> onBackPressed());
+    }
+
+    public interface IOnBackPressed {
+        boolean onBackPressed();
+    }
+
+    public boolean onBackPressed() {
+        if(mBottomWrapper.getTranslationY() == 0) {
+            new AnimManager(
+                    AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
+            ).start(AnimManager.TOGETHER);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 }

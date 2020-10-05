@@ -7,7 +7,6 @@ package x.com.nubextalk;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,15 +14,9 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import x.com.nubextalk.item.Profile;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
@@ -42,8 +35,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFrameLayout);
+        mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFrameLayout);
         Log.e("main", "MainActivity");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!(mainFragment instanceof MainFragment.IOnBackPressed) || !((MainFragment.IOnBackPressed) mainFragment).onBackPressed()) {
+          super.onBackPressed();
+       }
     }
 
     private void initPermission() {

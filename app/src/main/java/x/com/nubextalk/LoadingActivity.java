@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
 
+import x.com.nubextalk.Example.Example_Address;
+
 public class LoadingActivity extends Activity {
 
     private TextView mTextView;

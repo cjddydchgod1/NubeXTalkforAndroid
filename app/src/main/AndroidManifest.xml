@@ -18,34 +18,29 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Example.Example_Realm"></activity>
         <activity android:name=".Example.Example_Address"></activity>
-
-        <activity android:name=".LoadingActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEARCH" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
         <activity android:name=".TestActivity"></activity>
-
         <activity android:name=".Example.Example_Jsoup" />
         <activity android:name=".Example.Example_AnimManager" />
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
-        <activity android:name=".Example.ExampleList"></activity>
+        <activity android:name=".Example.ExampleList" />
+
         <activity android:name=".MainActivity">
-            <!--툴바 검색을 위한 meta-data-->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+        </activity>
+
+        <activity android:name=".LoadingActivity">
+            <!--툴바 검색을 위한 meta-data-->
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+
         </activity>
 
         <service android:name=".Manager.FireBase.FirebaseMsgService">

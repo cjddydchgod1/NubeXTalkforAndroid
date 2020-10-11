@@ -23,4 +23,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_hint">search hint</string>
+    <string-array name="menu_chat_long_click">
+        <item>"알림"</item>
+        <item>"대화상대 추가"</item>
+        <item>"상단 고정"</item>
+        <item>"나가기"</item>
+    </string-array>
 </resources>

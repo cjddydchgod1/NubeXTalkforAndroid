@@ -27,6 +27,7 @@ import io.realm.RealmResults;
 import x.com.nubextalk.Manager.AnimManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm realm;
@@ -94,6 +95,14 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
     protected void initBottomsheet(User address) {
         Log.e("clicked!!", "cliked!!!");
+
+        if(address.getUid().equals("1")){
+            Log.e("내꺼야", "Clicked!!");
+            mBottomWrapper.findViewById(R.id.modifyImage).setVisibility(View.VISIBLE);
+        } else {
+            mBottomWrapper.findViewById(R.id.modifyImage).setVisibility(View.INVISIBLE);
+        }
+
         ((TextView) mBottomWrapper.findViewById(R.id.profileName)).setText(address.getName());
         ImageView image = mBottomWrapper.findViewById(R.id.profileImage);
         Glide.with(getContext()).load(address.getProfileImg()).into(image);

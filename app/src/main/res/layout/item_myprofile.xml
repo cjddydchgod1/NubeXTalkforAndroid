@@ -6,12 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="6dp"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profileConstraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="6dp"
+        android:background="@color/colorPrimary">
 
         <FrameLayout
             android:id="@+id/profileFrameLayout"
@@ -22,15 +23,15 @@
 
             <ImageView
                 android:id="@+id/profileImage"
-                android:layout_width="@dimen/profile_image_s"
-                android:layout_height="@dimen/profile_image_s"
+                android:layout_width="@dimen/profile_image_m"
+                android:layout_height="@dimen/profile_image_m"
                 android:src="@drawable/baseline_account_circle_black_24dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
             <ImageView
                 android:id="@+id/profileStatus"
-                android:layout_width="@dimen/status_s"
-                android:layout_height="@dimen/status_s"
+                android:layout_width="@dimen/status_m"
+                android:layout_height="@dimen/status_m"
                 android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp"
                 android:layout_gravity="right|bottom"/>
         </FrameLayout>
@@ -47,5 +48,14 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#EFFBFC">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="전체"
+            android:paddingStart="@dimen/padding_m" />
+    </LinearLayout>
 </LinearLayout>

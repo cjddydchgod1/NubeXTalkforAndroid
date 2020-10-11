@@ -1,4 +1,9 @@
-package x.com.nubextalk;
+/*
+ * Created By Jong Ho, Lee on  2020.
+ * Copyright 테크하임(주). All rights reserved.
+ */
+
+package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +28,7 @@ import java.util.LinkedList;
 import io.realm.RealmResults;
 import okhttp3.internal.http2.Header;
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.R;
 
 public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -30,6 +36,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private Context mContext;
 
     private onItemSelectedListener listener;
+
     public interface onItemSelectedListener{
         void onSelected(User address);
     }
@@ -49,9 +56,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         View mItemView;
         if(viewType == 0) {
             // 헤더라면
-            mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header, parent, false);
-            Log.e("Adpater", "header onCreate");
-            return new HeaderHolder(mItemView);
+            mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_myprofile, parent, false);
+            Log.e("Adpater", "myprofile onCreate");
+            return new MyProfileViewHolder(mItemView);
         } else {
             // 그 외 친구목록이라면
             mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
@@ -64,12 +71,19 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // LinkedList에서 하나씩.
         User mCurrent = mDataSet.get(position);
-        if(mCurrent.getProfileImg() == "0") { // 리스트는 어떻게 나눌건지 생각해봐야대
-            Log.e("Adpater", "header");
-            HeaderHolder headerHolder = (HeaderHolder) holder;
-            headerHolder.header.setText(mCurrent.getName());
+        // Myprofile
+        if(mCurrent.getUid().equals("1")) {
+            Log.e("Adpater", "myprofile");
+            MyProfileViewHolder myProfileViewHolder = (MyProfileViewHolder) holder;
+
+            myProfileViewHolder.bintTo(mCurrent);
+            myProfileViewHolder.itemView.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
+                if(listener != null){
+                    listener.onSelected(mDataSet.get(position));
+                }
+            });
         } else {
-            // Header가 아니고 친구라면
+            // FriendList
             Log.e("Adapter", "friendlist");
             Log.e("Adapter", mCurrent.getName());
             FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
@@ -92,9 +106,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     // 해당 Adapter에서 사용하고 싶은 item_view가 2개이므로 ViewType을 지정해주어야 한다.
     @Override
     public int getItemViewType(int position) {
-        User profile = mDataSet.get(position);
+        User user = mDataSet.get(position);
         // Header는 이미지를 가지고 있지 않으므로
-        if (profile.getProfileImg() == "0") {
+        if (user.getUid().equals("1")) {
             return 0;
         } else {
             return 1;
@@ -118,7 +132,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         }
         public void bintTo(User user) {
-            profileName.setText(user.getName());
+            String name = user.getDepartment() + " " + user.getName();
+            profileName.setText(name);
             Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
             if(user.getStatus() == 0) { // 초록
                 profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
@@ -129,11 +144,31 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
         }
     }
-    public class HeaderHolder extends RecyclerView.ViewHolder {
-        public final TextView header;
-        public HeaderHolder(@NonNull View itemView) {
+    public class MyProfileViewHolder extends RecyclerView.ViewHolder {
+        public final TextView profileName;
+        public final ImageView profileImage;
+        public final ImageView profileStatus;
+        public MyProfileViewHolder(@NonNull View itemView) {
            super(itemView);
-            header = itemView.findViewById(R.id.separateName);
+           profileName = itemView.findViewById(R.id.profileName);
+           profileImage = itemView.findViewById(R.id.profileImage);
+           profileStatus = itemView.findViewById(R.id.profileStatus);
+
+           // 이미지 동그랗게 만드는 방법.
+           profileImage.setBackground(new ShapeDrawable(new OvalShape()));
+           profileImage.setClipToOutline(true);
+        }
+        public void bintTo(User user) {
+            String name = user.getDepartment() + " " + user.getName();
+            profileName.setText(name);
+            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
+            if(user.getStatus() == 0) { // 초록
+                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+            } else if(user.getStatus() == 1) { // 빨강
+                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+            } else { // 노랑
+                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+            }
         }
     }
 }

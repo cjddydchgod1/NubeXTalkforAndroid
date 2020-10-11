@@ -57,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
     FriendListFragment mainFragment;
 
-    private Realm realm;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
      @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
     }
 
     //툴바 메뉴 설정

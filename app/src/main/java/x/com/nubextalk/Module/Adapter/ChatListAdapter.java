@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import x.com.nubextalk.ChatList;
+import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -39,14 +41,23 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final LayoutInflater mInflater;
     private Realm realm;
     private Context context;
-    private OnItemLongSelectedListner longClickListner;
+    private OnItemLongSelectedListener longClickListener;
+    private OnItemSelectedListener clickListener;
 
-    public interface OnItemLongSelectedListner {
+    public interface OnItemSelectedListener {
+        void onItemSelected(ChatRoom chatRoom);
+    }
+
+    public interface OnItemLongSelectedListener {
         void onItemLongSelected(ChatRoom chatRoom);
     }
 
-    public void setItemLongSelectedListner(OnItemLongSelectedListner listener) {
-        this.longClickListner = listener;
+    public void setItemSelectedListener(OnItemSelectedListener listener){
+        this.clickListener = listener;
+    }
+
+    public void setItemLongSelectedListener(OnItemLongSelectedListener listener) {
+        this.longClickListener = listener;
     }
 
     public ChatListAdapter(Context context, RealmResults<ChatRoom> mChatList) {
@@ -82,15 +93,20 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mHolder.time.setText(df.format(content.getSendDate()));
 
             mHolder.itemView.setOnLongClickListener(v -> {
-                if (longClickListner != null) {
-                    longClickListner.onItemLongSelected(mDataset.get(position));
+                if (longClickListener != null) {
+                    longClickListener.onItemLongSelected(mDataset.get(position));
                 }
                 return false;
+            });
+
+            mHolder.itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onItemSelected(mDataset.get(position));
+                }
             });
             setStatusImg(mHolder, position);
             setChatNotify(mHolder, position);
             setChatFixTop(mHolder, position);
-            setChatIntent(mHolder);
         }
     }
 
@@ -122,13 +138,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     }
 
-    public void setChatIntent(@NonNull ViewItemHolder holder) {
-        holder.chatLayout.setOnClickListener((view) -> {
-            Toast.makeText(context, holder.friendName.getText(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, MainActivity.class);
-            context.startActivity(intent);
-        });
-    }
 
     public void setChatFixTop(@NonNull ViewItemHolder holder, int position) {
         if (!mDataset.get(position).getSettingFixTop()) {

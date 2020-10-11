@@ -35,7 +35,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     private Context mContext;
     private String id ="1234"; //저장된 아이디를 가져와 넣을 예정
-    private Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
+    private Realm realm = Realm.getDefaultInstance();
 
 
 

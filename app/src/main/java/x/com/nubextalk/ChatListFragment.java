@@ -7,6 +7,7 @@ package x.com.nubextalk;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -24,7 +25,8 @@ import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 
-public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListner {
+public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
+        ChatListAdapter.OnItemSelectedListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
     private RealmResults<ChatContent> chatContentResults;
@@ -45,7 +47,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
-        mAdapter.setItemLongSelectedListner(this::onItemLongSelected);
+        mAdapter.setItemLongSelectedListener(this::onItemLongSelected);
+        mAdapter.setItemSelectedListener(this::onItemSelected);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
 
@@ -76,5 +79,12 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                     }
                 }).create().show();
 
+    }
+
+    @Override
+    public void onItemSelected(ChatRoom chatRoom) {
+        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+        intent.putExtra("rid", chatRoom.getRid());
+        startActivity(intent);
     }
 }

@@ -1,5 +1,6 @@
 package x.com.nubextalk;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +35,8 @@ public class ChatRoomActivity extends AppCompatActivity {
     private static AQuery aq;
     private Realm realm;
 
+    String roomId;
+
 
      @Override
     protected void onDestroy() {
@@ -46,6 +49,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        Intent intent = getIntent();
+        roomId = intent.getExtras().getString("rid");
+
+
         // 채팅방 툴바 설정
         Toolbar toolbar_chat_room = findViewById(R.id.toolbar_chat_room);
         setSupportActionBar(toolbar_chat_room);
@@ -56,8 +63,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         TextView title = (TextView)findViewById(R.id.toolbar_chat_room_title);
         title.setText("최재영"); // 채팅방 정보에서 불러올 예
 
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mChat = realm.where(ChatContent.class).equalTo("rid", "1").findAll();
+        realm = Realm.getDefaultInstance();
+        mChat = realm.where(ChatContent.class).equalTo("rid", roomId).findAll();
 
         //Aquery 인스턴스 생성
         aq = new AQuery(this);
@@ -120,7 +127,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             ChatContent chat = new ChatContent();
                             chat.setCid(); // Content ID 자동으로 유니크한 값 설정
                             chat.setUid("1234"); // UID 보내는 사람
-                            chat.setRid("1"); // RID 채팅방 아이디
+                            chat.setRid(roomId); // RID 채팅방 아이디
                             chat.setType(0);
                             chat.setContent(content);
                             chat.setSendDate(date);

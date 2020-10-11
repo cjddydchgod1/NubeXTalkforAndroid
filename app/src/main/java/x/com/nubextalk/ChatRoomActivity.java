@@ -13,23 +13,33 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.joanzapata.iconify.widget.IconButton;
-import java.util.LinkedList;
+
+import java.util.Date;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
 public class ChatRoomActivity extends AppCompatActivity {
-    private final static LinkedList<Chat> mChat = new LinkedList<>();
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private static RealmResults<ChatContent> mChat;
+    private static RecyclerView mRecyclerView;
+    private static RecyclerView.Adapter mAdapter;
     private static EditText mEditChat;
     private static IconButton mSendButton;
     private static IconButton mMediaButton;
 
-    static AQuery aq;
+    private static AQuery aq;
+    private Realm realm;
 
 
-
-
-
+     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +54,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(true);
         TextView title = (TextView)findViewById(R.id.toolbar_chat_room_title);
-        title.setText("최재영");
+        title.setText("최재영"); // 채팅방 정보에서 불러올 예
 
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mChat = realm.where(ChatContent.class).equalTo("rid", "1").findAll();
 
         //Aquery 인스턴스 생성
         aq = new AQuery(this);
@@ -69,7 +81,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
 
         //테스트용 Chat 인스턴스 생성, 채팅방 실행시 데이터를 불러오는 것으로 변경 예정
-        mChat.add(new Chat(4321,R.drawable.common_google_signin_btn_icon_dark, "최재영", "주섭아 밥먹었엉???"));
+//        mChat.add(new Chat(4321,R.drawable.common_google_signin_btn_icon_dark, "최재영", "주섭아 밥먹었엉???"));
+        if(mChat.size() == 0){
+            ChatContent.init(this, realm);
+            mChat = ChatContent.getAll(realm);
+        }
 
 
     }
@@ -81,17 +97,39 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
     // 채팅 메세지를 Chat 클래스를 활용하여 인스턴스를 만들어 리스트에 추가 해줌
     public void sendChat(View view) {
-        String chat;
-        // 아무 내용도 없을 시 메세지를 입력하라고 띄워줌
-        if( (chat= String.valueOf(mEditChat.getText())).equals("")){
-            aq.toast("메세지를 입력하세요");
-        }
-        else{
-            mChat.add(new Chat(1234,R.drawable.common_google_signin_btn_icon_dark, "장주섭", chat));
-            mAdapter.notifyDataSetChanged();
-            mEditChat.setText("");
-        }
+//        String chat;
+//        // 아무 내용도 없을 시 메세지를 입력하라고 띄워줌
+//        if( (chat= String.valueOf(mEditChat.getText())).equals("")){
+//            aq.toast("메세지를 입력하세요");
+//        }
+//        else{
+//            mChat.add(new Chat(1234,R.drawable.common_google_signin_btn_icon_dark, "장주섭", chat));
+//            mAdapter.notifyDataSetChanged();
+//            mEditChat.setText("");
+//        }
+        realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        String content;
+                        if( (content = String.valueOf(mEditChat.getText())).equals("")){
+                            aq.toast("메세지를 입력하세요");
+                        }
+                        else {
+                            Date date = new Date();
 
+                            ChatContent chat = new ChatContent();
+                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                            chat.setUid("1234"); // UID 보내는 사람
+                            chat.setRid("1"); // RID 채팅방 아이디
+                            chat.setType(0);
+                            chat.setContent(content);
+                            chat.setSendDate(date);
+                            realm.copyToRealmOrUpdate(chat);
+                        }
+                        mEditChat.setText("");
 
+                    }
+        });
     }
+
 }

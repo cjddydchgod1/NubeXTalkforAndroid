@@ -19,6 +19,8 @@
         <activity android:name=".Example.Example_Realm">
         </activity>
         <activity android:name=".Example.Example_Address">
+        </activity>
+
 
         <activity
             android:name=".ChatRoomActivity"
@@ -35,7 +37,13 @@
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
         <activity android:name=".Example.ExampleList"></activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service android:name=".Manager.FireBase.FirebaseMsgService">
             <intent-filter>

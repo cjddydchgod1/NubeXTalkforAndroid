@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     //툴바 메뉴 설정
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
         //검색창 입력 리스

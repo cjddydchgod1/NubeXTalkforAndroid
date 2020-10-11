@@ -8,6 +8,7 @@ package x.com.nubextalk;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -46,10 +47,14 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
 
+    FriendListFragment mainFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mainFragment = (FriendListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+        Log.e("main", "MainActivity");
 
         //툴바 설정
         toolbar = findViewById(R.id.toolbar);

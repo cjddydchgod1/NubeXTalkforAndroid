@@ -13,8 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -43,7 +45,7 @@ public class ChatContent extends RealmObject {
         return cid;
     }
 
-    public void setCid(@NonNull String cid) { this.cid = cid; }
+    public void setCid() { this.cid = UUID.randomUUID().toString(); }
 
     @NonNull
     public String getRid() {
@@ -77,7 +79,7 @@ public class ChatContent extends RealmObject {
         return sendDate;
     }
 
-    public void setSendDate(@NonNull Date sendDate) { this.sendDate = sendDate; }
+    public void setSendDate(Date sendDate){ this.sendDate = sendDate; }
 
     /**
      * Data 초기화 함수

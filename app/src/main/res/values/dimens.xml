@@ -75,4 +75,5 @@
     <dimen name="_l">12dp</dimen>
 
     <dimen name="actrionbar_height">44dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

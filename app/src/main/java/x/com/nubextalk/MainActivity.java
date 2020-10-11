@@ -26,6 +26,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
+import x.com.nubextalk.Model.User;
+
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
  * ex:)
@@ -48,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
 
     FriendListFragment mainFragment;
+
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +99,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 
     //툴바 메뉴 설정

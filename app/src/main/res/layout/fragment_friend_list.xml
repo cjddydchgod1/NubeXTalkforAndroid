@@ -66,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/bottomProfileImage"
-                    android:text="수정"
+                    android:text="@string/modify"
                     android:layout_centerHorizontal="true"
                     />
             </RelativeLayout>
@@ -87,17 +87,25 @@
                     android:id="@+id/profileName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="이름"
                     android:textSize="@dimen/txt_Ml"
                     android:textColor="@color/cBlack"
-                    android:textStyle="bold" />
-
-                <TextView
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+                <EditText
                     android:id="@+id/modifyName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/txt_Ml"
+                    android:textColor="@color/cBlack"
+                    android:textStyle="bold"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/modifyButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_l"
-                    android:text="수정" />
+                    android:text="@string/modify" />
             </LinearLayout>
 
                 <Button

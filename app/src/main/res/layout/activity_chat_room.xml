@@ -76,7 +76,6 @@
             android:layout_height="@dimen/icon_size_l"
             android:layout_marginRight="@dimen/margin_l"
             android:background="@android:color/transparent"
-            android:onClick="sendChat"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

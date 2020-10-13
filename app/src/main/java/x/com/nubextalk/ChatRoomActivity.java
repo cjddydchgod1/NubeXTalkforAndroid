@@ -2,8 +2,10 @@ package x.com.nubextalk;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,18 +15,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.joanzapata.iconify.widget.IconButton;
 
 import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
-public class ChatRoomActivity extends AppCompatActivity {
+public class ChatRoomActivity extends AppCompatActivity implements View.OnClickListener {
     private static RealmResults<ChatContent> mChat;
     private static RecyclerView mRecyclerView;
     private static RecyclerView.Adapter mAdapter;
@@ -35,7 +38,10 @@ public class ChatRoomActivity extends AppCompatActivity {
     private static AQuery aq;
     private Realm realm;
 
-    String roomId;
+    private String roomId;
+    private String roomTitle;
+
+
 
 
      @Override
@@ -48,9 +54,15 @@ public class ChatRoomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
+        realm = Realm.getDefaultInstance();
+        aq = new AQuery(this);
 
+
+
+        // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
         roomId = intent.getExtras().getString("rid");
+        roomTitle = realm.where(ChatRoom.class).equalTo("rid",roomId).findFirst().getRoomName();
 
 
         // 채팅방 툴바 설정
@@ -61,13 +73,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(true);
         TextView title = (TextView)findViewById(R.id.toolbar_chat_room_title);
-        title.setText("최재영"); // 채팅방 정보에서 불러올 예
+        title.setText(roomTitle);
 
-        realm = Realm.getDefaultInstance();
+        // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", roomId).findAll();
-
-        //Aquery 인스턴스 생성
-        aq = new AQuery(this);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
         mEditChat = (EditText)findViewById(R.id.editChat);
@@ -79,6 +88,12 @@ public class ChatRoomActivity extends AppCompatActivity {
         mMediaButton.setText("{far-image 35dp #FFFFFF}");
 
 
+        // on click listener 설정
+        mSendButton.setOnClickListener(this);
+        mMediaButton.setOnClickListener(this);
+
+
+
 
         // 리사이클러 뷰와 어댑터를 연결 채팅을 불러 올수 있음
         mRecyclerView = (RecyclerView)findViewById(R.id.chat_room_content);
@@ -87,8 +102,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
-        //테스트용 Chat 인스턴스 생성, 채팅방 실행시 데이터를 불러오는 것으로 변경 예정
-//        mChat.add(new Chat(4321,R.drawable.common_google_signin_btn_icon_dark, "최재영", "주섭아 밥먹었엉???"));
+        //데이터가 없을 경우 테스트 데이터 넣기
         if(mChat.size() == 0){
             ChatContent.init(this, realm);
             mChat = ChatContent.getAll(realm);
@@ -96,24 +110,8 @@ public class ChatRoomActivity extends AppCompatActivity {
 
 
     }
-    // 툴바 메뉴 옵션 설정 함수
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu, menu);
-        return true;
-    }
     // 채팅 메세지를 Chat 클래스를 활용하여 인스턴스를 만들어 리스트에 추가 해줌
     public void sendChat(View view) {
-//        String chat;
-//        // 아무 내용도 없을 시 메세지를 입력하라고 띄워줌
-//        if( (chat= String.valueOf(mEditChat.getText())).equals("")){
-//            aq.toast("메세지를 입력하세요");
-//        }
-//        else{
-//            mChat.add(new Chat(1234,R.drawable.common_google_signin_btn_icon_dark, "장주섭", chat));
-//            mAdapter.notifyDataSetChanged();
-//            mEditChat.setText("");
-//        }
         realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -132,11 +130,39 @@ public class ChatRoomActivity extends AppCompatActivity {
                             chat.setContent(content);
                             chat.setSendDate(date);
                             realm.copyToRealmOrUpdate(chat);
+                            mAdapter.notifyDataSetChanged();
                         }
                         mEditChat.setText("");
-
                     }
         });
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.sendButton:
+                sendChat(v);
+                break;
+            case R.id.mediaButton:
+                break;
+        }
+    }
+    // 툴바 메뉴 옵션 설정 함수
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+    // 툴바의 뒤로가기
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item ){
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }

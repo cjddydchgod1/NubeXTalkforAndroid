@@ -105,3 +105,6 @@ lint/tmp/
 app/libs/
 app/src/androidTest/
 app/src/test/
+
+default.realm
+default.realm.*

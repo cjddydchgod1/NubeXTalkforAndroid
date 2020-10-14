@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 /**
  * HTML, JSON 등의 문서를 Parsing 하는 라이브러리
- * - Document, Element 단위로 Parsing 됨
+ * - Document, Element(s) 단위로 Parsing 됨
  * - Parsing 문법은 CSS Query 기반
  * - 가이드라인 공식 홈페이지 : https://jsoup.org/cookbook/introduction/parsing-a-document
  */
@@ -116,9 +116,6 @@ public class Example_Jsoup extends AppCompatActivity implements View.OnClickList
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
-
-
                     break;
             }
         }

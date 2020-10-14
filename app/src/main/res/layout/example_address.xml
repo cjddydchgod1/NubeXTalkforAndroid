@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created By Jong Ho, Lee on  2020.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".Example.Example_Address">
+
+    <LinearLayout
+        android:id="@+id/btnGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/actrionbar_height"
+            android:layout_alignParentTop="true"
+            android:background="@color/cWhite"
+            android:elevation="1dp"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/btnSort1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:gravity="center"
+                android:paddingRight="@dimen/padding_m"
+                android:text="이름 오름차순 정렬"
+                android:textColor="@color/cBlack"
+                android:textSize="16dp" />
+
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/btnSort2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:gravity="center"
+                android:paddingRight="@dimen/padding_m"
+                android:text="이름 내림차순 정렬"
+                android:textColor="@color/cBlack"
+                android:textSize="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/actrionbar_height"
+            android:layout_alignParentTop="true"
+            android:background="@color/cWhite"
+            android:elevation="1dp"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/btnFilter1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:gravity="center"
+                android:paddingRight="@dimen/padding_m"
+                android:text="식당만 필터링"
+                android:textColor="@color/cBlack"
+                android:textSize="16dp" />
+
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/btnFilter2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:gravity="center"
+                android:paddingRight="@dimen/padding_m"
+                android:text="관광지만 필터링"
+                android:textColor="@color/cBlack"
+                android:textSize="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/actrionbar_height"
+            android:layout_alignParentTop="true"
+            android:background="@color/cWhite"
+            android:elevation="1dp"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:id="@+id/middleTitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:background="@color/cTransparent"
+                android:gravity="right|center_vertical"
+                android:paddingRight="@dimen/padding_l"
+                android:textColor="@color/cContentText"
+                android:textSize="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btnGroup"
+        android:layout_alignParentBottom="true">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/cContent" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/bottomWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/cWhite"
+        android:elevation="@dimen/elevation_l"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_xl"
+        android:translationY="8000dp">
+
+        <LinearLayout
+            android:id="@+id/rowWRapperName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:elevation="@dimen/elevation_ss"
+            android:gravity="center_vertical|left"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/padding_l"
+            android:paddingTop="@dimen/padding_m"
+            android:paddingRight="@dimen/padding_l"
+            android:paddingBottom="@dimen/padding_m">
+
+            <TextView
+                android:id="@+id/rowName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|left"
+                android:textColor="@color/cBlack"
+                android:textSize="@dimen/txt_xl" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|left"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/rowRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/cBlack"
+                    android:textSize="@dimen/txt_m" />
+
+                <RatingBar
+                    android:id="@+id/rowRatingBar"
+                    style="@style/Base.Widget.AppCompat.RatingBar.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_m"
+                    android:max="5"
+                    android:stepSize="0.1" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/rowGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|right"
+                android:textColor="@color/cContentText"
+                android:textSize="@dimen/txt_m" />
+
+
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/rowWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+            </LinearLayout>
+
+
+        </androidx.core.widget.NestedScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|right"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/padding_l"
+            android:paddingTop="@dimen/padding_s"
+            android:paddingRight="@dimen/padding_l"
+            android:paddingBottom="@dimen/padding_s">
+
+            <TextView
+                android:id="@+id/mClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="@dimen/padding_l"
+                android:text="닫기"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/txt_m"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

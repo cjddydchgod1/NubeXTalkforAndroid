@@ -38,4 +38,10 @@
         android:layout_height="wrap_content"
         android:text="JSOUP(HTML Parsing 라이브러리)"/>
 
+    <Button
+        android:id="@+id/btnFunctions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Firebase Function 예제"/>
+
 </LinearLayout>

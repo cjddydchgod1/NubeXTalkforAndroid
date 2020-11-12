@@ -32,17 +32,19 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".Example.Example_FireBaseFunctions"></activity>
-        <activity android:name=".Example.Example_Jsoup" />
-        <activity android:name=".Example.Example_AnimManager" />
-        <activity android:name=".Example.Example_Font" />
-        <activity android:name=".Example.Example_HttpManager" />
-        <activity android:name=".Example.ExampleList">
+        <activity android:name=".Example.Example_FireBaseCloudStore">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".Example.Example_FireBaseFunctions" />
+        <activity android:name=".Example.Example_Jsoup" />
+        <activity android:name=".Example.Example_AnimManager" />
+        <activity android:name=".Example.Example_Font" />
+        <activity android:name=".Example.Example_HttpManager" />
+        <activity android:name=".Example.ExampleList">
         </activity>
         <activity android:name=".MainActivity" />
     </application>

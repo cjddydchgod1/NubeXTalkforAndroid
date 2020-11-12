@@ -24,7 +24,7 @@ import x.com.nubextalk.Model.Config;
 /**
  * Firebase Message Service
  * - onNewToken : Token 이 갱신될때 호출
- * - sendMessage : FCM이 수시신될떄 호출
+ * - onMessageReceived : FCM이 수시신될떄 호출
  * - 참고 : https://firebase.google.com/docs/cloud-messaging/android/client?authuser=0
  */
 public class FirebaseMsgService extends FirebaseMessagingService {
@@ -72,8 +72,8 @@ public class FirebaseMsgService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Map<String, String> data = remoteMessage.getData();
-
         Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date"));
+        // Chatting Message(Notification Message)
+        // System Message
     }
-
 }

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import io.realm.Realm;
+import x.com.nubextalk.Manager.UtilityManager;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
@@ -32,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     private void initPermission() {

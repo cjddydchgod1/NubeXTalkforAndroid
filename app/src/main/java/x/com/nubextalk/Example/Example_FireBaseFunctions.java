@@ -8,6 +8,7 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;

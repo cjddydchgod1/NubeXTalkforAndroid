@@ -51,10 +51,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         if (chatContentResults.size() == 0) ChatContent.init(getContext(), realm);
         if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
-        mAdapter = new ChatListAdapter(getContext(), chatRoomResults);
+        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
         mAdapter.setItemLongSelectedListener(this::onItemLongSelected);
         mAdapter.setItemSelectedListener(this::onItemSelected);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
 
         fab_main = rootView.findViewById(R.id.chat_fab_main);

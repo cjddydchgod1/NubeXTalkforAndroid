@@ -46,12 +46,12 @@ public class ChatAddActivity extends AppCompatActivity implements
 
         realm = Realm.getDefaultInstance();
         realmSearchView = findViewById(R.id.chat_add_member_search_view);
-        mAdapter = new ChatAddSearchAdapter(getBaseContext(), realm, "name");
+        mAdapter = new ChatAddSearchAdapter(this, realm, "name");
         mAdapter.setItemSelectedListener(this::onItemSelected);
         realmSearchView.setAdapter(mAdapter);
 
         selectedMemberView = findViewById(R.id.chat_added_member_view);
-        memberAdapter = new ChatAddMemberAdapter(getBaseContext(), userList);
+        memberAdapter = new ChatAddMemberAdapter(this, userList);
         selectedMemberView.
                 setLayoutManager(new LinearLayoutManager(
                         this, LinearLayoutManager.HORIZONTAL, false));

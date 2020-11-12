@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import x.com.nubextalk.Model.ChatContent;
@@ -26,7 +29,7 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
-        ChatListAdapter.OnItemSelectedListener {
+        ChatListAdapter.OnItemSelectedListener, View.OnClickListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
     private RealmResults<ChatContent> chatContentResults;
@@ -34,6 +37,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
 
+    private FloatingActionButton fab_main, fab_sub1, fab_sub2;
+    private boolean isFabOpen = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,11 +51,18 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         if (chatContentResults.size() == 0) ChatContent.init(getContext(), realm);
         if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
+        mAdapter = new ChatListAdapter(getContext(), chatRoomResults);
         mAdapter.setItemLongSelectedListener(this::onItemLongSelected);
         mAdapter.setItemSelectedListener(this::onItemSelected);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
+
+        fab_main = rootView.findViewById(R.id.chat_fab_main);
+        fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
+        fab_sub2 = rootView.findViewById(R.id.chat_fab_sub2);
+        fab_main.setOnClickListener(this::onClick);
+        fab_sub1.setOnClickListener(this::onClick);
+        fab_sub2.setOnClickListener(this::onClick);
 
         return rootView;
     }
@@ -78,13 +90,48 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                         Toast.makeText(getActivity(), items[pos], Toast.LENGTH_SHORT).show();
                     }
                 }).create().show();
-
     }
 
+    /**
+    * 채팅 목록에서 중 하나 누르면 채팅 activity 로 전환
+    **/
     @Override
-    public void onItemSelected(ChatRoom chatRoom) {
+    public void onItemSelected(@NonNull ChatRoom chatRoom) {
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
         startActivity(intent);
+    }
+
+    @Override
+    public void onClick(@NonNull View v) {
+        switch (v.getId()) {
+            case R.id.chat_fab_main:
+                toggleFab();
+                break;
+
+            case R.id.chat_fab_sub1:
+                toggleFab();
+                startActivity(new Intent(getActivity(), ChatAddActivity.class));
+                break;
+
+            case R.id.chat_fab_sub2:
+                toggleFab();
+                break;
+        }
+    }
+
+    private void toggleFab() {
+        if (isFabOpen) {
+            fab_main.setImageResource(R.drawable.ic_floating_btn_24);
+            fab_sub1.hide();
+            fab_sub2.hide();
+            isFabOpen = false;
+        } else {
+            fab_main.setImageResource(R.drawable.ic_baseline_close_24);
+            fab_sub1.show();
+            fab_sub2.show();
+            isFabOpen = true;
+
+        }
     }
 }

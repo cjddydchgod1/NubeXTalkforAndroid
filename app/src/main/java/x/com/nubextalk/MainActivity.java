@@ -26,14 +26,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatContent;
-import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
-import x.com.nubextalk.Model.User;
-
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
  * ex:)

@@ -57,12 +57,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if(viewType == 0) {
             // 헤더라면
             mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_myprofile, parent, false);
-            Log.e("Adpater", "myprofile onCreate");
             return new MyProfileViewHolder(mItemView);
         } else {
             // 그 외 친구목록이라면
             mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
-            Log.e("Adapter", "friendlist onCreate");
             return new FriendViewHolder(mItemView);
         }
     }
@@ -73,7 +71,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         User mCurrent = mDataSet.get(position);
         // Myprofile
         if(mCurrent.getUid().equals("1")) {
-            Log.e("Adpater", "myprofile");
             MyProfileViewHolder myProfileViewHolder = (MyProfileViewHolder) holder;
 
             myProfileViewHolder.bintTo(mCurrent);
@@ -84,8 +81,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         } else {
             // FriendList
-            Log.e("Adapter", "friendlist");
-            Log.e("Adapter", mCurrent.getName());
             FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
 
             friendViewHolder.bintTo(mCurrent);
@@ -125,17 +120,13 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileName = itemView.findViewById(R.id.profileName);
             profileImage = itemView.findViewById(R.id.profileImage);
             profileStatus = itemView.findViewById(R.id.profileStatus);
-
-            // 이미지 동그랗게 만드는 방법.
-            profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-            profileImage.setClipToOutline(true);
-
         }
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
             Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
-            if(user.getStatus() == 0) { // 초록
+            // 초록
+            if(user.getStatus() == 0) {
                 profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
             } else if(user.getStatus() == 1) { // 빨강
                 profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_red_800_24dp);
@@ -153,10 +144,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
            profileName = itemView.findViewById(R.id.profileName);
            profileImage = itemView.findViewById(R.id.profileImage);
            profileStatus = itemView.findViewById(R.id.profileStatus);
-
-           // 이미지 동그랗게 만드는 방법.
-           profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-           profileImage.setClipToOutline(true);
         }
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();

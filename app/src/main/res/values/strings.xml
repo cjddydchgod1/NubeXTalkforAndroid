@@ -38,5 +38,12 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
     <string name="modify">수정</string>
+    <string name="Chatting">1:1채팅</string>
+    <string name="working">근무</string>
+    <string name="leaving">퇴근</string>
+    <string name="vacation">휴가</string>
+
+
 </resources>

@@ -8,7 +8,6 @@ package x.com.nubextalk.Module.Adapter;
 import android.content.Context;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +17,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aquery.AQuery;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-import io.realm.RealmResults;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
 public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final LayoutInflater mInflater;
-    private ArrayList<User> userList;
+    public ArrayList<User> userList;
     private Context context;
 
     public ChatAddMemberAdapter(Context context, ArrayList<User> userList) {
@@ -92,5 +89,9 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public int getItemCount() {
         return userList.size();
+    }
+
+    public ArrayList<User> getUserList() {
+        return userList;
     }
 }

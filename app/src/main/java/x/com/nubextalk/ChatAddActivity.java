@@ -14,9 +14,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
 import io.realm.Realm;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
 import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
@@ -44,7 +49,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         chatAddCancelButton.setOnClickListener(this::onClick);
 
 
-        realm = Realm.getDefaultInstance();
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
         realmSearchView = findViewById(R.id.chat_add_member_search_view);
         mAdapter = new ChatAddSearchAdapter(this, realm, "name");
         mAdapter.setItemSelectedListener(this::onItemSelected);
@@ -69,7 +74,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
     /**
      * 사용자 아이템 클릭
-     * **/
+     **/
     @Override
     public void onItemSelected(User user) {
         String userName = user.getName();
@@ -81,12 +86,77 @@ public class ChatAddActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chat_add_confirm_btn:
-
+                createNewChat();
                 break;
 
             case R.id.chat_add_cancel_btn:
                 onBackPressed();
                 break;
         }
+    }
+
+    public void createNewChat() {
+        /**확인 버튼을 누르면 새로운 ChatRoom 생성하고 해당 rid 를 ChatRoomMember 에 rid, uid 넣어서 생성**/
+        ArrayList<User> selectedUser = memberAdapter.getUserList();
+        String rid = getRandomString().toString();
+        ChatRoom newChatRoom = new ChatRoom();
+        newChatRoom.setRid(rid);
+        if (selectedUser.size() == 1) { /** 선택된 유저가 한명일 때 **/
+            newChatRoom.setRoomName(selectedUser.get(0).getName());
+            newChatRoom.setRoomImg(selectedUser.get(0).getProfileImg());
+        } else {
+            newChatRoom.setRoomName("새 단체 대화");
+        }
+        newChatRoom.setUpdatedDate(new Date());
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(newChatRoom);
+            }
+        });
+
+        for (User user : selectedUser) {
+            ChatRoomMember chatMember = new ChatRoomMember();
+            chatMember.setRid(rid);
+            chatMember.setUid(user.getUid());
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    /**
+                     * ChatRoomMember 모델이 Primary Key 가 없어서 copyToRealmOrUpdate 함수는
+                     * 사용하지 못하기 때문에 copyToRealm 함수를 사용함.
+                     * 참고: https://stackoverflow.com/questions/40999299/android-create-realm-table-without-primary-key
+                     **/
+                    realm.copyToRealm(chatMember);
+                }
+            });
+        }
+        setResult(RESULT_OK); //MainActivity 로 결과 전달
+        finish();
+    }
+
+    public StringBuffer getRandomString() {
+        StringBuffer temp = new StringBuffer();
+        Random rnd = new Random();
+        rnd.setSeed(System.currentTimeMillis());
+        for (int i = 0; i < 20; i++) {
+            int rIndex = rnd.nextInt(3);
+            switch (rIndex) {
+                case 0:
+                    // a-z
+                    temp.append((char) ((int) (rnd.nextInt(26)) + 97));
+                    break;
+                case 1:
+                    // A-Z
+                    temp.append((char) ((int) (rnd.nextInt(26)) + 65));
+                    break;
+                case 2:
+                    // 0-9
+                    temp.append((rnd.nextInt(10)));
+                    break;
+            }
+        }
+        return temp;
     }
 }

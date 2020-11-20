@@ -53,7 +53,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         ViewGroup rootview = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
 
-        realm           = Realm.getDefaultInstance();
+        realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
         mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
 

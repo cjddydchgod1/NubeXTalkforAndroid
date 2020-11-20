@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
@@ -44,7 +45,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
-        realm = Realm.getDefaultInstance();
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
         chatContentResults = ChatContent.getAll(realm);
@@ -111,7 +112,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
             case R.id.chat_fab_sub1:
                 toggleFab();
-                startActivity(new Intent(getActivity(), ChatAddActivity.class));
+                ((MainActivity) getActivity()).startChatAddActivity();
                 break;
 
             case R.id.chat_fab_sub2:
@@ -119,6 +120,11 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                 break;
         }
     }
+
+    public void refreshChatList() {
+        mAdapter.notifyDataSetChanged();
+    }
+
 
     private void toggleFab() {
         if (isFabOpen) {

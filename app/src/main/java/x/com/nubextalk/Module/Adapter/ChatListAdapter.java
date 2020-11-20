@@ -17,13 +17,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aquery.AQuery;
 import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.R;
@@ -57,7 +57,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mInflater = LayoutInflater.from(context);
         this.context = context;
         this.mDataset = mChatList;
-        realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
     }
 
     @NonNull
@@ -81,9 +81,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     load(mDataset.get(position).getRoomImg()).
                     into(((ViewItemHolder) mHolder).profileImg);
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
-            mHolder.lastMsg.setText(content.getContent());
-            mHolder.time.setText(df.format(content.getSendDate()));
-
+            if (content != null) {
+                mHolder.lastMsg.setText(content.getContent());
+                mHolder.time.setText(df.format(content.getSendDate()));
+                setStatusImg(mHolder, position);
+                setChatNotify(mHolder, position);
+                setChatFixTop(mHolder, position);
+            }
             mHolder.itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null) {
                     longClickListener.onItemLongSelected(mDataset.get(position));
@@ -96,9 +100,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     clickListener.onItemSelected(mDataset.get(position));
                 }
             });
-            setStatusImg(mHolder, position);
-            setChatNotify(mHolder, position);
-            setChatFixTop(mHolder, position);
         }
     }
 

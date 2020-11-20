@@ -63,7 +63,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         TextView title = (TextView)findViewById(R.id.toolbar_chat_room_title);
         title.setText("최재영"); // 채팅방 정보에서 불러올 예
 
-        realm = Realm.getDefaultInstance();
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mChat = realm.where(ChatContent.class).equalTo("rid", roomId).findAll();
 
         //Aquery 인스턴스 생성

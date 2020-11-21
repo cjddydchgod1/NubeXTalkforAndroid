@@ -8,7 +8,7 @@
     android:layout_marginStart="5dp"
     android:layout_marginTop="15dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/chat_list_chat_picture"
         android:layout_width="72dp"
         android:layout_height="72dp"

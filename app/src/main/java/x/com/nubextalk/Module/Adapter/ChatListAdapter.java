@@ -6,29 +6,24 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import com.aquery.AQuery;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+import java.text.SimpleDateFormat;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
-import x.com.nubextalk.ChatList;
-import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.MainActivity;
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.R;
@@ -41,6 +36,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Context context;
     private OnItemLongSelectedListener longClickListener;
     private OnItemSelectedListener clickListener;
+    private AQuery aq;
 
     public interface OnItemSelectedListener {
         void onItemSelected(ChatRoom chatRoom);
@@ -50,7 +46,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onItemLongSelected(ChatRoom chatRoom);
     }
 
-    public void setItemSelectedListener(OnItemSelectedListener listener){
+    public void setItemSelectedListener(OnItemSelectedListener listener) {
         this.clickListener = listener;
     }
 
@@ -62,8 +58,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mInflater = LayoutInflater.from(context);
         this.context = context;
         this.mDataset = mChatList;
-        realm = Realm.getDefaultInstance();
-//        sortChatList(mDataset);
+        this.aq = new AQuery(context);
+        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
     }
 
     @NonNull
@@ -79,14 +75,21 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
-
             ChatContent content;
+
             String roomId = mDataset.get(position).getRid();
             content = realm.where(ChatContent.class).equalTo("rid", roomId).findFirst();
-            mHolder.friendName.setText(mDataset.get(position).getRoomName());
-            mHolder.lastMsg.setText(content.getContent());
-            mHolder.time.setText(df.format(content.getSendDate()));
 
+            assert mDataset.get(position) != null;
+            aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
+            mHolder.friendName.setText(mDataset.get(position).getRoomName());
+            if (content != null) {
+                mHolder.lastMsg.setText(content.getContent());
+                mHolder.time.setText(df.format(content.getSendDate()));
+                setStatusImg(mHolder, position);
+                setChatNotify(mHolder, position);
+                setChatFixTop(mHolder, position);
+            }
             mHolder.itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null) {
                     longClickListener.onItemLongSelected(mDataset.get(position));
@@ -99,9 +102,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     clickListener.onItemSelected(mDataset.get(position));
                 }
             });
-            setStatusImg(mHolder, position);
-            setChatNotify(mHolder, position);
-            setChatFixTop(mHolder, position);
         }
     }
 
@@ -111,7 +111,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView friendName;
         public TextView time;
         public TextView remain;
-        public CircleImageView profileImg;
+        public ImageView profileImg;
         public ImageView statusImg;
         public ImageView notifyImg;
 
@@ -125,6 +125,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             time = itemView.findViewById(R.id.chat_list_chat_time);
             remain = itemView.findViewById(R.id.chat_list_chat_remain);
             profileImg = itemView.findViewById(R.id.chat_list_chat_picture);
+            profileImg.setBackground(new ShapeDrawable(new OvalShape()));
+            profileImg.setClipToOutline(true);
             statusImg = itemView.findViewById(R.id.chat_list_friend_status);
             notifyImg = itemView.findViewById(R.id.chat_list_notify_status);
             fixTopImg = itemView.findViewById(R.id.chat_list_fixtop_status);
@@ -150,34 +152,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    /**
+     * 채팅방 타입이 1대1 채팅방인 경우에는 대화 상대방의 상태가 보여야하고
+     * 채팅방 타입이 단체방인 경우에는 어떻게 하지?
+     **/
     public void setStatusImg(@NonNull ViewItemHolder holder, int position) {
 //        if (mDataset.get(position).getStatus() == 0) {
 //            holder.statusImg.setImageResource(R.drawable.oval_status_off);
 //        } else if (mDataset.get(position).getStatus() == 1) {
 //            holder.statusImg.setImageResource(R.drawable.oval_status_on);
 //        }
-        holder.statusImg.setImageResource(R.drawable.oval_status_off);
     }
 
-    public void sortChatList(LinkedList<ChatList> chatList) {
-        Collections.sort(chatList, new Comparator<ChatList>() {
-            @Override
-            public int compare(ChatList o1, ChatList o2) {
-                if (!o1.getFixTop() && !o2.getFixTop()) { //o1, o2 둘 다 상단 고정 아닐 때
-                    if (o1.getTime().after(o2.getTime())) return -1; //o1가 o2보다 시간이 최신일 때
-                    else return +1;
-                } else if (!o1.getFixTop() && o2.getFixTop()) { //o1은 상단 고정 아니고 o2는 상단 고정일 때
-                    return +1;
-                } else if (o1.getFixTop() && !o2.getFixTop()) { //o1은 상단 고정 o2는 상단 고정 아닐 때
-                    return -1;
-                } else if (o1.getFixTop() && o2.getFixTop()) { //o1, o2 둘 다 상단 고정일 때
-                    if (o1.getTime().after(o2.getTime())) return -1; //o1가 o2보다 시간이 최신일 때
-                    else return +1;
-                }
-                return 0;
-            }
-        });
-    }
 
     @Override
     public int getItemCount() {

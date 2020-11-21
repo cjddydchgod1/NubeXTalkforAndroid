@@ -34,33 +34,42 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
             <meta-data
-                android:resource="@xml/searchable" 
-                android:name="android.app.searchable"/>
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
-
-        <activity android:name=".LoadingActivity"
+        <activity
+            android:name=".LoadingActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>    
-        <activity android:name=".Example.Example_FireBaseFunctions"></activity>
+        </activity>
+
+        <activity
+            android:name=".ChatAddActivity"
+            android:theme="@style/AppTheme" />
+
+        <meta-data
+            android:name="android.app.searchable"
+            android:resource="@xml/searchable" />
+
+        <activity android:name=".Example.Example_FireBaseFunctions"/>
         <activity android:name=".Example.Example_Jsoup" />
         <activity android:name=".Example.Example_AnimManager" />
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
-        <activity android:name=".Example.ExampleList"/>
+        <activity android:name=".Example.ExampleList" />
         <activity
             android:name=".ChatRoomActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

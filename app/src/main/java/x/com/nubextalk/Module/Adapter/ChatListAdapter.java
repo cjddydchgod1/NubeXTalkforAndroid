@@ -18,8 +18,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -85,9 +83,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ChatContent content;
             String roomId = mDataset.get(position).getRid();
             content = realm.where(ChatContent.class).equalTo("rid", roomId).findFirst();
-            Glide.with(mHolder.profileImg).
-                    load(mDataset.get(position).getRoomImg()).
-                    into(((ViewItemHolder) mHolder).profileImg);
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
             mHolder.lastMsg.setText(content.getContent());
             mHolder.time.setText(df.format(content.getSendDate()));

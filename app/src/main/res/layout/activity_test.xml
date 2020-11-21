@@ -32,6 +32,7 @@
                 android:id="@+id/imageWrapeer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:elevation="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -49,10 +50,11 @@
 
                     <ImageView
                         android:id="@+id/profileStatus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="@dimen/status_l"
+                        android:layout_height="@dimen/status_l"
                         android:layout_gravity="right|bottom"
                         android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+
                 </FrameLayout>
 
                 <TextView
@@ -61,6 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/bottomProfileImage"
                     android:layout_centerHorizontal="true"
+                    android:clickable="false"
                     android:text="수정" />
             </RelativeLayout>
 
@@ -92,19 +95,77 @@
                     android:paddingStart="@dimen/padding_l"
                     android:text="수정" />
             </LinearLayout>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageWrapeer"
+                app:layout_constraintTop_toBottomOf="@+id/rowWrapperName" >
 
+                        <LinearLayout
+                            android:id="@+id/statusLayout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="@dimen/padding_l"
+                            android:visibility="visible"
+                            android:background="@color/cWhite"
+                            android:elevation="@dimen/elevation_l"
+                            android:layout_margin="@dimen/margin_s">
+                            <LinearLayout
+                                android:id="@+id/working_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <ImageView
+                                    android:layout_width="@dimen/status_l"
+                                    android:layout_height="@dimen/status_l"
+                                    android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/working"/>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:id="@+id/leaving_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <ImageView
+                                    android:layout_width="@dimen/status_l"
+                                    android:layout_height="@dimen/status_l"
+                                    android:src="@drawable/baseline_fiber_manual_record_yellow_50_24dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/working"/>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:id="@+id/vacation_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <ImageView
+                                    android:layout_width="@dimen/status_l"
+                                    android:layout_height="@dimen/status_l"
+                                    android:src="@drawable/baseline_fiber_manual_record_red_800_24dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/working"/>
+                            </LinearLayout>
+                        </LinearLayout>
                 <Button
                     android:id="@+id/chatButton"
                     android:drawableLeft="@drawable/outline_chat_black_24dp"
                     android:drawablePadding="@dimen/padding_l"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_Ml"
+                    android:paddingStart="@dimen/padding_l"
+                    android:layout_marginStart="@dimen/margin_l"
                     android:text="1:1채팅"
                     android:background="#00ff0000"
                     android:textSize="@dimen/txt_xl"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageWrapeer" app:layout_constraintTop_toBottomOf="@+id/rowWrapperName" />
+                    android:visibility="visible"
+                    />
+            </FrameLayout>
+
 
             <TextView
                 android:id="@+id/mClose"

@@ -38,6 +38,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
@@ -64,7 +65,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
-        realm = Realm.getDefaultInstance();
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
         aq = new AQuery(this);
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴

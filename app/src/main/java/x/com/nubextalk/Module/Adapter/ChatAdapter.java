@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
@@ -39,7 +40,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private String id ="1234"; //저장된 아이디를 가져와 넣을 예정
     private String mDate ="0000.00.00";
 
-    private Realm realm = Realm.getDefaultInstance();
+    private Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
 
 
 

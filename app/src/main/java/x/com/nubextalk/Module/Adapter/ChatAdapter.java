@@ -20,8 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
-import com.bumptech.glide.Glide;
-//import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 
@@ -95,6 +93,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     holder.my_chat_image.setVisibility(View.GONE);
                     break;
                 case 1:
+                    holder.aq.id(R.id.my_chat_image).image(chat.getContent());
 //                    Glide.with(this.mContext).load(chat.getContent()).override(500,300).into(holder.my_chat_image);
                     holder.my_chat_text.setVisibility(View.GONE);
                     break;
@@ -109,8 +108,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
         // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
         else {
-//            holder.aq.id(R.id.profile_image).image(Uri.parse(mUserData.getProfileImg()));
-            Glide.with(this.mContext).load(mUserData.getProfileImg()).into(holder.profileImage);
+            holder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
             holder.profileName.setText(mUserData.getName());
             switch (chat.getType()){
                 case 0:

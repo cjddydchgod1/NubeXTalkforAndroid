@@ -34,10 +34,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.aquery.AQuery;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.io.InputStream;
 
 import io.realm.Realm;
@@ -58,6 +59,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private RealmResults<User> mResults;
 
     private User myProfile;
+
+    private AQuery aq;
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -100,6 +103,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 0번째(내 프로필)에 있는 데이터에서 profileImage가져오기.
         myProfile = mResults.get(0);
 
+        aq = new AQuery(getActivity());
+
         return rootview;
     }
 
@@ -118,12 +123,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
     protected void initBottomsheet(User address) {
         // 내 프로필과 친구 프로필에서 이미지 수정버튼 유무
-
         if(address.getUid().equals("1")){
             mBottomWrapper.findViewById(R.id.modifyImage).setVisibility(View.VISIBLE);
         } else {
             mBottomWrapper.findViewById(R.id.modifyImage).setVisibility(View.GONE);
         }
+
         // 프로필 이름, 이미지, 상태
         TextView profileName = mBottomWrapper.findViewById(R.id.profileName);
         ImageView profileImage = mBottomWrapper.findViewById(R.id.profileImage);
@@ -138,9 +143,22 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
 
+//        File file = new file(R.drawable.baseline_fiber_manual_record_red_800_24dp);
         profileName.setText(address.getName());
         // profilestatus를 가져오려면 int형식이 아니여야 한다. 너무 더러워.
-        Glide.with(getContext()).load(address.getProfileImg()).into(profileImage);
+        switch(address.getStatus()) {
+            case 0 :
+                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                break;
+            case 1 :
+                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                break;
+            case 2 :
+                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                break;
+        }
+        aq.view(profileImage).image(address.getProfileImg());
+//        Glide.with(getContext()).load(address.getProfileImg()).into(profileImage);
 
 
         // 이름 수정 버튼
@@ -202,10 +220,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                 changeRealmData(0, statusLayout, chatButton);
                                 break;
                             case R.id.leaving_status :
-                                changeRealmData(2, statusLayout, chatButton);
+                                changeRealmData(1, statusLayout, chatButton);
                                 break;
                             case R.id.vacation_status :
-                                changeRealmData(1, statusLayout, chatButton);
+                                changeRealmData(2, statusLayout, chatButton);
                                 break;
                             default :
                                 changeRealmData(-1, statusLayout, chatButton);

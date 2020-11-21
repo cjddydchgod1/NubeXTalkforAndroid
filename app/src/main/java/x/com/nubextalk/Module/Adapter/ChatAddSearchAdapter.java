@@ -11,11 +11,10 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.aquery.AQuery;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
 import co.moonmonkeylabs.realmsearchview.RealmSearchViewHolder;
@@ -29,19 +28,23 @@ import x.com.nubextalk.R;
 public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearchAdapter.ViewItemHolder> {
     private final LayoutInflater mInflater;
     private Realm realm;
+    private Context context;
     private OnItemSelectedListner clickListener;
+    private AQuery aq;
 
     public interface OnItemSelectedListner {
         void onItemSelected(User user);
     }
 
-    public void setItemSelectedListener(OnItemSelectedListner listener){
+    public void setItemSelectedListener(OnItemSelectedListner listener) {
         this.clickListener = listener;
     }
 
     public ChatAddSearchAdapter(Context context, Realm realm, String fillterColumnName) {
         super(context, realm, fillterColumnName);
         this.realm = realm;
+        this.context = context;
+        this.aq = new AQuery(context);
         mInflater = LayoutInflater.from(context);
     }
 
@@ -56,9 +59,7 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
         if (viewHolder instanceof ViewItemHolder) {
             User user = realmResults.get(position);
             viewHolder.profileName.setText(user.getName());
-            Glide.with(viewHolder.profileImage).
-                    load(user.getProfileImg()).
-                    into(((ViewItemHolder) viewHolder).profileImage);
+            aq.view(viewHolder.profileImage).image(user.getProfileImg());
             if (user.getStatus() == 0) { // 초록
                 viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
             } else if (user.getStatus() == 1) { // 빨강
@@ -72,13 +73,10 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
                     clickListener.onItemSelected(user);
                 }
             });
-
         }
-
     }
 
     public class ViewItemHolder extends RealmSearchViewHolder {
-
         public TextView profileName;
         public ImageView profileImage;
         public ImageView profileStatus;
@@ -90,7 +88,6 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
             profileImage.setBackground(new ShapeDrawable(new OvalShape()));
             profileImage.setClipToOutline(true);
             profileStatus = itemView.findViewById(R.id.profileStatus);
-
         }
     }
 
@@ -104,13 +101,8 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
         if (!input.isEmpty()) {
             where = where.contains("name", input);
         }
-
         RealmResults businesses;
         businesses = where.sort("name", Sort.ASCENDING).findAll();
-
         this.updateRealmResults(businesses);
-
     }
-
-
 }

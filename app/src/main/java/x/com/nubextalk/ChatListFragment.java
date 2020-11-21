@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -27,6 +26,7 @@ import io.realm.RealmResults;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
@@ -88,14 +88,26 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                     @Override
                     public void onClick(DialogInterface dialog, int pos) {
                         String[] items = getResources().getStringArray(R.array.menu_chat_long_click);
-                        Toast.makeText(getActivity(), items[pos], Toast.LENGTH_SHORT).show();
+                        switch (pos) {
+                            case 0: /**채팅방 알림 설정 이벤트 구현**/
+                                break;
+                            case 1: /**대화상대 추가 이벤트 구현**/
+                                break;
+                            case 2: /**채팅방 상단 고정 이벤트 구현**/
+                                break;
+                            case 3: /**채팅방 나가기 이벤트 구현**/
+
+                                exitChatRoom(chatRoom);
+                                refreshChatList();
+                                break;
+                        }
                     }
                 }).create().show();
     }
 
     /**
-    * 채팅 목록에서 중 하나 누르면 채팅 activity 로 전환
-    **/
+     * 채팅 목록에서 중 하나 누르면 채팅 activity 로 전환
+     **/
     @Override
     public void onItemSelected(@NonNull ChatRoom chatRoom) {
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
@@ -121,10 +133,43 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         }
     }
 
+    public void exitChatRoom(ChatRoom chatRoom) {
+        //1. 눌린 채팅방 rid 통해 uid 받아오기
+        String rid = chatRoom.getRid();
+
+        //2. 채팅방 rid 통해 ChatRoomMember 에 rid 해당하는 row 삭제
+        RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
+        for (ChatRoomMember member : chatRoomMembers) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    member.deleteFromRealm();
+                }
+            });
+        }
+        //3. 채팅방 rid 통해 ChatContent 에 rid 해당하는 row 삭제
+        RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
+        for (ChatContent content : chatContents) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    content.deleteFromRealm();
+                }
+            });
+        }
+        //4. 채팅방 rid 통해 ChatRoom 삭제
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                chatRoom.deleteFromRealm();
+            }
+        });
+    }
+
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
     }
-
 
     private void toggleFab() {
         if (isFabOpen) {

@@ -21,7 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+//import com.bumptech.glide.Glide;
 
 import java.util.LinkedList;
 
@@ -134,7 +134,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
-            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
+//            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
             if(user.getStatus() == 0) { // 초록
                 profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
             } else if(user.getStatus() == 1) { // 빨강
@@ -161,7 +161,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
-            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
+//            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
             if(user.getStatus() == 0) { // 초록
                 profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
             } else if(user.getStatus() == 1) { // 빨강

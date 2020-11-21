@@ -17,7 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.aquery.AQuery;
 
 import java.text.SimpleDateFormat;
 
@@ -36,6 +36,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Context context;
     private OnItemLongSelectedListener longClickListener;
     private OnItemSelectedListener clickListener;
+    private AQuery aq;
 
     public interface OnItemSelectedListener {
         void onItemSelected(ChatRoom chatRoom);
@@ -57,6 +58,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mInflater = LayoutInflater.from(context);
         this.context = context;
         this.mDataset = mChatList;
+        this.aq = new AQuery(context);
         this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
     }
 
@@ -73,13 +75,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
-
             ChatContent content;
+
             String roomId = mDataset.get(position).getRid();
             content = realm.where(ChatContent.class).equalTo("rid", roomId).findFirst();
-            Glide.with(mHolder.profileImg).
-                    load(mDataset.get(position).getRoomImg()).
-                    into(((ViewItemHolder) mHolder).profileImg);
+
+            assert mDataset.get(position) != null;
+            aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
             if (content != null) {
                 mHolder.lastMsg.setText(content.getContent());

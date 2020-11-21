@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+//import com.bumptech.glide.Glide;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -105,7 +105,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         ((TextView) mBottomWrapper.findViewById(R.id.profileName)).setText(address.getName());
         ImageView image = mBottomWrapper.findViewById(R.id.profileImage);
-        Glide.with(getContext()).load(address.getProfileImg()).into(image);
+//        Glide.with(getContext()).load(address.getProfileImg()).into(image);
         ImageView status = mBottomWrapper.findViewById(R.id.profileStatus);
 
         mBottomWrapper.findViewById(R.id.mClose).setOnClickListener(v -> onBackPressed());

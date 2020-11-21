@@ -17,7 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.aquery.AQuery;
 
 import java.util.ArrayList;
 
@@ -28,11 +28,13 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
     private final LayoutInflater mInflater;
     public ArrayList<User> userList;
     private Context context;
+    private AQuery aq;
 
     public ChatAddMemberAdapter(Context context, ArrayList<User> userList) {
         this.mInflater = LayoutInflater.from(context);
         this.userList = userList;
         this.context = context;
+        this.aq = new AQuery(context);
     }
 
     @Override
@@ -47,14 +49,10 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
             mHolder.profileName.setText(userList.get(position).getName());
-            Glide.with(mHolder.profileImage).
-                    load(userList.get(position).getProfileImg()).
-                    into(((ViewItemHolder) mHolder).profileImage);
-
+            aq.view(mHolder.profileImage).image(userList.get(position).getProfileImg());
             mHolder.itemView.setOnClickListener(v -> {
                 deleteItem(userList.get(position));
             });
-
         }
     }
 

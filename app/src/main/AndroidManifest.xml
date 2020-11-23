@@ -51,7 +51,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ChatAddActivity"
             android:theme="@style/AppTheme" />
@@ -60,6 +59,7 @@
             android:name="android.app.searchable"
             android:resource="@xml/searchable" />
 
+        <activity android:name=".Example.Example_FireBaseCloudStore"/>
         <activity android:name=".Example.Example_FireBaseFunctions"/>
         <activity android:name=".Example.Example_Jsoup" />
         <activity android:name=".Example.Example_AnimManager" />

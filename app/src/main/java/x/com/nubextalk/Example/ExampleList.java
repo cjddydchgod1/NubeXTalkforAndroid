@@ -51,6 +51,7 @@ public class ExampleList extends AppCompatActivity implements View.OnClickListen
         mBtnJsoup.setOnClickListener(this);
         mBtnFunctions.setOnClickListener(this);
 
+
         /**
          * FCM Token 확인 함수
          */

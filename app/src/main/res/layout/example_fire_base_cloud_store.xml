@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2020.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Example.Example_Realm">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_m">
+
+            <Button
+                android:id="@+id/btn01"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 초기화" />
+
+            <Button
+                android:id="@+id/btn02"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 입력 (Write)" />
+
+            <Button
+                android:id="@+id/btn03"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 업데이트 (Update)" />
+
+            <Button
+                android:id="@+id/btn04"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 쿼리 (All)" />
+
+            <Button
+                android:id="@+id/btn05"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 쿼리 (Filter)" />
+
+            <Button
+                android:id="@+id/btn06"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 Migration (FireStore > Realm)"  />
+
+            <Button
+                android:id="@+id/btn07"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="데이터 Migration (Realm > FireStore)"  />
+
+            <Button
+                android:id="@+id/btn08"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delete Realm" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

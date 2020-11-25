@@ -112,7 +112,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void onItemSelected(@NonNull ChatRoom chatRoom) {
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
-        startActivity(intent);
+        ((MainActivity) getActivity()).startChatRoomActivity(intent);
     }
 
     @Override

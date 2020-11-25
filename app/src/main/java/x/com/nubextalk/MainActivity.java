@@ -25,6 +25,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
 
@@ -38,6 +39,7 @@ import x.com.nubextalk.Manager.UtilityManager;
  */
 public class MainActivity extends AppCompatActivity {
     private static final int CHAT_ADD = 0;
+    private static final int MOVE_TO_CHAT_ROOM = 1;
     private FriendListFragment friendListFrag = new FriendListFragment();
     private ChatListFragment chatListFrag = new ChatListFragment();
     private CalendarFragment calendarFrag = new CalendarFragment();
@@ -102,6 +104,10 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(new Intent(MainActivity.this, ChatAddActivity.class), CHAT_ADD);
     }
 
+    public void startChatRoomActivity(Intent intent) {
+        startActivityForResult(intent, MOVE_TO_CHAT_ROOM);
+    }
+
     /**
      * startActivityForResult 함수를 통해 다른 Activity 에서 받아온 결과를 받아왔을때 수행하는 함수
      **/
@@ -111,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == CHAT_ADD) {
             if (resultCode == RESULT_OK) {
+                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                cf.refreshChatList();
+            }
+        }
+
+        if (requestCode == MOVE_TO_CHAT_ROOM) {
+            if (resultCode == 10) {
                 ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
                 cf.refreshChatList();
             }

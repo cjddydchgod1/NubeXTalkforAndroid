@@ -6,7 +6,7 @@
     "department": "DCS"
   },
   "2" : {
-    "name": "야부키나코",
+    "name": "장주섭",
     "profileImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/181002_%EC%95%BC%EB%B6%80%ED%82%A4_%EB%82%98%EC%BD%94.jpg/413px-181002_%EC%95%BC%EB%B6%80%ED%82%A4_%EB%82%98%EC%BD%94.jpg",
     "status": 1,
     "department": "DCS"
@@ -15,6 +15,19 @@
     "name": "최재영",
     "profileImg": "https://www.nemopan.com/files/attach/images/6294/245/206/014/32d3eb8c0d1b1ff88ccc6f15e0935ce3.jpeg",
     "status": 2,
+    "department": "KI"
+  },
+
+  "4" : {
+    "name": "김철수",
+    "profileImg": "",
+    "status": 1,
+    "department": "DCS"
+  },
+  "5" : {
+    "name": "김수지",
+    "profileImg": "https://img1.daumcdn.net/thumb/R720x0/?fname=https://t1.daumcdn.net/news/201904/19/moneytoday/20190419141606693hahz.jpg",
+    "status": 0,
     "department": "KI"
   }
 }

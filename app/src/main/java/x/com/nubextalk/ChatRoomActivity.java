@@ -265,6 +265,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                         mEditChat.setText("");
                     }
         });
+        setResult(10);
     }
 
     private void goToAlbum() {

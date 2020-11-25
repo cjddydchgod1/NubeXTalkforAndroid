@@ -23,9 +23,11 @@ import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.R;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -78,17 +80,28 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ChatContent content;
 
             String roomId = mDataset.get(position).getRid();
-            content = realm.where(ChatContent.class).equalTo("rid", roomId).findFirst();
+            content = realm.where(ChatContent.class)
+                    .equalTo("rid", roomId)
+                    .sort("sendDate", Sort.DESCENDING).findFirst();
 
             assert mDataset.get(position) != null;
             aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
-            if (content != null) {
-                mHolder.lastMsg.setText(content.getContent());
+            if (content != null) { //채팅방 내용 있는 경우
+                if (content.getType() == 1) { //사진, 동영상 파일
+                    mHolder.lastMsg.setText("새 사진");
+                } else {
+                    mHolder.lastMsg.setText(content.getContent());
+                }
                 mHolder.time.setText(df.format(content.getSendDate()));
                 setStatusImg(mHolder, position);
                 setChatNotify(mHolder, position);
                 setChatFixTop(mHolder, position);
+            } else { // 채팅방 내용 없는 경우 (주로 처음 새로 만들었을 때)
+                mHolder.time.setText(df.format(mDataset.get(position).getUpdatedDate()));
+                mHolder.lastMsg.setText("");
+                setChatFixTop(mHolder, position);
+                setChatNotify(mHolder, position);
             }
             mHolder.itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null) {
@@ -153,17 +166,23 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * 채팅방 타입이 1대1 채팅방인 경우에는 대화 상대방의 상태가 보여야하고
+     * 채팅방 타입이 1대1 채팅방인 경우에는 대화 상대방의 상태가 보여야하는데 내가 누구인지 알아야 상대방 상태 표시 가
      * 채팅방 타입이 단체방인 경우에는 어떻게 하지?
      **/
     public void setStatusImg(@NonNull ViewItemHolder holder, int position) {
+        String rid = mDataset.get(position).getRid();
+        int memberNum = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll().size();
+        if(memberNum <= 2) { // 1 대 1 채팅방인 경우
+
+        } else {
+
+        }
 //        if (mDataset.get(position).getStatus() == 0) {
 //            holder.statusImg.setImageResource(R.drawable.oval_status_off);
 //        } else if (mDataset.get(position).getStatus() == 1) {
 //            holder.statusImg.setImageResource(R.drawable.oval_status_on);
 //        }
     }
-
 
     @Override
     public int getItemCount() {

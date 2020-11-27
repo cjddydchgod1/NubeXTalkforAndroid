@@ -23,12 +23,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_hint">"대화 상대 검색"</string>
-    <string-array name="menu_chat_long_click">
-        <item>"알림"</item>
-        <item>"대화상대 추가"</item>
-        <item>"상단 고정"</item>
-        <item>"나가기"</item>
-    </string-array>
     <string name="title_activity_chat_room">ChatRoomActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

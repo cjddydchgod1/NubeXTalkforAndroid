@@ -73,25 +73,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_list_chat_time" />
 
-    <ImageView
-        android:id="@+id/chat_list_notify_status"
+    <com.joanzapata.iconify.widget.IconButton
+        android:id="@+id/chat_list_notify1"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="10dp"
-        android:layout_weight="1"
+        android:background="@color/cTransparent"
         app:layout_constraintStart_toEndOf="@+id/chat_list_friend_name"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_sound_off" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/chat_list_fixtop_status"
+    <com.joanzapata.iconify.widget.IconButton
+        android:id="@+id/chat_list_notify2"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toEndOf="@+id/chat_list_notify_status"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_pushpin" />
+        android:background="@color/cTransparent"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_notify1"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -121,6 +121,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             mChat = ChatContent.getAll(realm);
         }
     }
+
+    @Override
+    public void onBackPressed(){
+        setResult(10);
+        finish();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -265,7 +272,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                         mEditChat.setText("");
                     }
         });
-        setResult(10);
     }
 
     private void goToAlbum() {

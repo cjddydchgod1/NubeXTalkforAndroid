@@ -8,6 +8,7 @@ package x.com.nubextalk.Module.Adapter;
 import android.content.Context;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.joanzapata.iconify.widget.IconButton;
 
 import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -76,6 +79,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewItemHolder) {
+            String dataPattern = "yyyy년 MM월 dd일 HH:mm";
             ViewItemHolder mHolder = (ViewItemHolder) holder;
             ChatContent content;
 
@@ -87,22 +91,34 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             assert mDataset.get(position) != null;
             aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
+
             if (content != null) { //채팅방 내용 있는 경우
                 if (content.getType() == 1) { //사진, 동영상 파일
                     mHolder.lastMsg.setText("새 사진");
                 } else {
                     mHolder.lastMsg.setText(content.getContent());
                 }
-                mHolder.time.setText(df.format(content.getSendDate()));
+
+                String convertedDate = DateManager.convertDate(content.getSendDate(), dataPattern);
+                mHolder.time.setText(DateManager.getTimeInterval(
+                        convertedDate, dataPattern));
+
                 setStatusImg(mHolder, position);
-                setChatNotify(mHolder, position);
-                setChatFixTop(mHolder, position);
+                setNotify(mHolder, position);
+
             } else { // 채팅방 내용 없는 경우 (주로 처음 새로 만들었을 때)
-                mHolder.time.setText(df.format(mDataset.get(position).getUpdatedDate()));
+                String convertedDate = DateManager.convertDate(
+                        mDataset.get(position).getUpdatedDate(), dataPattern
+                );
+
+                mHolder.time.setText(DateManager.getTimeInterval(
+                        convertedDate, dataPattern
+                ));
+
                 mHolder.lastMsg.setText("");
-                setChatFixTop(mHolder, position);
-                setChatNotify(mHolder, position);
+                setNotify(mHolder, position);
             }
+
             mHolder.itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null) {
                     longClickListener.onItemLongSelected(mDataset.get(position));
@@ -126,9 +142,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView remain;
         public ImageView profileImg;
         public ImageView statusImg;
-        public ImageView notifyImg;
-
-        public ImageView fixTopImg;
+        public IconButton notifyImg1;
+        public IconButton notifyImg2;
         public View chatLayout;
 
         public ViewItemHolder(View itemView) {
@@ -141,29 +156,37 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             profileImg.setBackground(new ShapeDrawable(new OvalShape()));
             profileImg.setClipToOutline(true);
             statusImg = itemView.findViewById(R.id.chat_list_friend_status);
-            notifyImg = itemView.findViewById(R.id.chat_list_notify_status);
-            fixTopImg = itemView.findViewById(R.id.chat_list_fixtop_status);
+            notifyImg1 = itemView.findViewById(R.id.chat_list_notify1);
+            notifyImg2 = itemView.findViewById(R.id.chat_list_notify2);
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
         }
 
     }
 
+    public void setNotify(@NonNull ViewItemHolder holder, int position) {
+        boolean fixTop;
+        boolean alarm;
+        String fixTopIcon = "{fas-map-pin 16dp}";
+        String alarmOff = "{far-bell-slash 16dp}";
 
-    public void setChatFixTop(@NonNull ViewItemHolder holder, int position) {
-        if (!mDataset.get(position).getSettingFixTop()) {
-            holder.fixTopImg.setVisibility(View.INVISIBLE);
-        } else {
-            holder.fixTopImg.setVisibility(View.VISIBLE);
+        fixTop = mDataset.get(position).getSettingFixTop(); //default false
+        alarm = mDataset.get(position).getSettingAlarm(); //default true
+
+        if (fixTop && alarm) { // 상단 고정만인 경우
+            holder.notifyImg1.setText(fixTopIcon);
+            holder.notifyImg2.setText("");
+        } else if (!fixTop && !alarm) { // 알림 해제만 한 경우
+            holder.notifyImg1.setText(alarmOff);
+            holder.notifyImg2.setText("");
+        } else if (fixTop && !alarm) { // 상단 고정 + 알림 해제 한 경우
+            holder.notifyImg1.setText(fixTopIcon);
+            holder.notifyImg2.setText(alarmOff);
+        } else { //기본 상태일 때
+            holder.notifyImg1.setText("");
+            holder.notifyImg2.setText("");
         }
     }
 
-    public void setChatNotify(@NonNull ViewItemHolder holder, int position) {
-        if (!mDataset.get(position).getSettingAlarm()) {
-            holder.notifyImg.setVisibility(View.VISIBLE);
-        } else {
-            holder.notifyImg.setVisibility(View.INVISIBLE);
-        }
-    }
 
     /**
      * 채팅방 타입이 1대1 채팅방인 경우에는 대화 상대방의 상태가 보여야하는데 내가 누구인지 알아야 상대방 상태 표시 가
@@ -172,7 +195,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void setStatusImg(@NonNull ViewItemHolder holder, int position) {
         String rid = mDataset.get(position).getRid();
         int memberNum = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll().size();
-        if(memberNum <= 2) { // 1 대 1 채팅방인 경우
+        if (memberNum <= 2) { // 1 대 1 채팅방인 경우
 
         } else {
 

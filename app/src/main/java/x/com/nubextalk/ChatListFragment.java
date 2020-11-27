@@ -82,21 +82,37 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
      */
     @Override
     public void onItemLongSelected(ChatRoom chatRoom) {
+        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "나가기"};
+        boolean fixTop = chatRoom.getSettingFixTop();
+        boolean alarm = chatRoom.getSettingAlarm();
+
+        if (alarm) {
+            menuArray[0] = menuArray[0].concat(" 해제");
+        } else {
+            menuArray[0] = menuArray[0].concat(" 켜기");
+        }
+
+        if (fixTop) {
+            menuArray[2] = menuArray[2].concat(" 해제");
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("채팅방 설정")
-                .setItems(R.array.menu_chat_long_click, new DialogInterface.OnClickListener() {
+                .setItems(menuArray, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int pos) {
-                        String[] items = getResources().getStringArray(R.array.menu_chat_long_click);
                         switch (pos) {
                             case 0: /**채팅방 알림 설정 이벤트 구현**/
+                                updateChatRoomAlarm(chatRoom);
+                                refreshChatList();
                                 break;
                             case 1: /**대화상대 추가 이벤트 구현**/
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트 구현**/
+                                updateChatRoomFixTop(chatRoom);
+                                refreshChatList();
                                 break;
                             case 3: /**채팅방 나가기 이벤트 구현**/
-
                                 exitChatRoom(chatRoom);
                                 refreshChatList();
                                 break;
@@ -133,35 +149,39 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         }
     }
 
-    public void exitChatRoom(ChatRoom chatRoom) {
-        //1. 눌린 채팅방 rid 통해 uid 받아오기
-        String rid = chatRoom.getRid();
-
-        //2. 채팅방 rid 통해 ChatRoomMember 에 rid 해당하는 row 삭제
-        RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
-        for (ChatRoomMember member : chatRoomMembers) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    member.deleteFromRealm();
-                }
-            });
-        }
-        //3. 채팅방 rid 통해 ChatContent 에 rid 해당하는 row 삭제
-        RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
-        for (ChatContent content : chatContents) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    content.deleteFromRealm();
-                }
-            });
-        }
-        //4. 채팅방 rid 통해 ChatRoom 삭제
+    public void updateChatRoomFixTop(ChatRoom chatRoom) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                boolean fixTop = chatRoom.getSettingFixTop();
+                chatRoom.setSettingFixTop(!fixTop);
+                realm.copyToRealmOrUpdate(chatRoom);
+            }
+        });
+    }
+
+    public void updateChatRoomAlarm(ChatRoom chatRoom) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                boolean alarm = chatRoom.getSettingAlarm();
+                chatRoom.setSettingAlarm(!alarm);
+                realm.copyToRealmOrUpdate(chatRoom);
+            }
+        });
+    }
+
+    public void exitChatRoom(ChatRoom chatRoom) {
+        String rid = chatRoom.getRid();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
+                RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
+
+                for (ChatRoomMember member : chatRoomMembers) { member.deleteFromRealm(); }
+                for (ChatContent content : chatContents) { content.deleteFromRealm(); }
                 chatRoom.deleteFromRealm();
             }
         });

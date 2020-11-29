@@ -18,9 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.joanzapata.iconify.widget.IconButton;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
@@ -49,10 +51,19 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
             mHolder.profileName.setText(userList.get(position).getName());
-            aq.view(mHolder.profileImage).image(userList.get(position).getProfileImg());
-            mHolder.itemView.setOnClickListener(v -> {
+
+            if (!userList.get(position).getProfileImg().isEmpty()) {
+                aq.view(mHolder.profileImage).image(userList.get(position).getProfileImg());
+            } else {
+                aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            }
+
+            mHolder.deleteItemButton.setText("{fas-minus-square 20dp #D50000}");
+
+            mHolder.deleteItemButton.setOnClickListener(v -> {
                 deleteItem(userList.get(position));
             });
+
         }
     }
 
@@ -73,14 +84,16 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
     public class ViewItemHolder extends RecyclerView.ViewHolder {
 
         public TextView profileName;
-        public ImageView profileImage;
+        public CircleImageView profileImage;
+        public IconButton deleteItemButton;
 
         public ViewItemHolder(View itemView) {
             super(itemView);
             profileName = itemView.findViewById(R.id.new_chat_added_profile_name);
             profileImage = itemView.findViewById(R.id.new_chat_added_profile_img);
-            profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-            profileImage.setClipToOutline(true);
+//            profileImage.setBackground(new ShapeDrawable(new OvalShape()));
+//            profileImage.setClipToOutline(true);
+            deleteItemButton = itemView.findViewById(R.id.new_chat_added_delete_btn);
         }
     }
 

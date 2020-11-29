@@ -157,7 +157,9 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
                 break;
         }
-        aq.view(profileImage).image(address.getProfileImg());
+        if(!address.getProfileImg().isEmpty()) {
+            aq.view(profileImage).image(address.getProfileImg());
+        }
 //        Glide.with(getContext()).load(address.getProfileImg()).into(profileImage);
 
 

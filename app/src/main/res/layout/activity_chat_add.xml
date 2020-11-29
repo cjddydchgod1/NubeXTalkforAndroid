@@ -42,12 +42,22 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_added_member_view"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
-        app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
+        app:layout_constraintBottom_toTopOf="@id/chat_add_chat_room_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_add_description" />
+
+    <EditText
+        android:id="@+id/chat_add_chat_room_input"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:hint="채팅방 이름을 입력하세요."
+        app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_added_member_view" />
 
     <co.moonmonkeylabs.realmsearchview.RealmSearchView
         android:id="@+id/chat_add_member_search_view"
@@ -56,27 +66,28 @@
         app:layout_constraintBottom_toTopOf="@id/chat_add_linear_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_added_member_view"
+        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_room_input"
         app:rsvHint="@string/search_hint">
 
     </co.moonmonkeylabs.realmsearchview.RealmSearchView>
 
+
     <LinearLayout
         android:id="@+id/chat_add_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="44dp"
         android:orientation="horizontal"
         android:weightSum="2"
-        app:layout_constraintBottom_toBottomOf="@id/chat_add_search_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_member_search_view">
+        app:layout_constraintTop_toBottomOf="@+id/chat_add_member_search_view">
 
         <Button
             android:id="@+id/chat_add_confirm_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/margin_s"
+            android:layout_marginRight="2dp"
             android:layout_marginBottom="@dimen/margin_s"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"

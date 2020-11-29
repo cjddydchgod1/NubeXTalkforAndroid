@@ -5,9 +5,12 @@
 
 package x.com.nubextalk;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,9 +34,11 @@ public class ChatAddActivity extends AppCompatActivity implements
     private Realm realm;
     private RealmSearchView realmSearchView;
     private RecyclerView selectedMemberView;
+    private EditText chatRoomNameInput;
     private ChatAddSearchAdapter mAdapter;
     private ChatAddMemberAdapter memberAdapter;
     private ArrayList<User> userList = new ArrayList<User>();
+
 
     private Button chatAddConfirmButton;
     private Button chatAddCancelButton;
@@ -43,6 +48,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_add);
 
+        chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
         chatAddConfirmButton = findViewById(R.id.chat_add_confirm_btn);
         chatAddCancelButton = findViewById(R.id.chat_add_cancel_btn);
         chatAddConfirmButton.setOnClickListener(this::onClick);
@@ -95,45 +101,56 @@ public class ChatAddActivity extends AppCompatActivity implements
         }
     }
 
-    public void createNewChat() {
+    public boolean createNewChat() {
+        String roomName = chatRoomNameInput.getText().toString();
+
         /**확인 버튼을 누르면 새로운 ChatRoom 생성하고 해당 rid 를 ChatRoomMember 에 rid, uid 넣어서 생성**/
         ArrayList<User> selectedUser = memberAdapter.getUserList();
         String rid = getRandomString().toString();
         ChatRoom newChatRoom = new ChatRoom();
         newChatRoom.setRid(rid);
         if (selectedUser.size() == 1) { /** 선택된 유저가 한명일 때 **/
-            newChatRoom.setRoomName(selectedUser.get(0).getName());
+            if (!roomName.isEmpty()) { // 채팅방 이름을 입력했을 때
+                newChatRoom.setRoomName(roomName);
+            } else { // 채팅방 이름 입력 안했을 때 = 상대방 이름으로 채팅방 이름 설정
+                newChatRoom.setRoomName(selectedUser.get(0).getName());
+            }
             newChatRoom.setRoomImg(selectedUser.get(0).getProfileImg());
         } else {
-            newChatRoom.setRoomName("새 단체 대화");
+            if (!roomName.isEmpty()) {
+                newChatRoom.setRoomName(roomName);
+            } else {
+                Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT ).show();
+                return false;
+            }
+            newChatRoom.setRoomImg("");
         }
+
         newChatRoom.setUpdatedDate(new Date());
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.copyToRealmOrUpdate(newChatRoom);
-            }
-        });
 
-        for (User user : selectedUser) {
-            ChatRoomMember chatMember = new ChatRoomMember();
-            chatMember.setRid(rid);
-            chatMember.setUid(user.getUid());
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
+                for (User user : selectedUser) {
+                    ChatRoomMember chatMember = new ChatRoomMember();
+                    chatMember.setRid(rid);
+                    chatMember.setUid(user.getUid());
                     /**
                      * ChatRoomMember 모델이 Primary Key 가 없어서 copyToRealmOrUpdate 함수는
                      * 사용하지 못하기 때문에 copyToRealm 함수를 사용함.
                      * 참고: https://stackoverflow.com/questions/40999299/android-create-realm-table-without-primary-key
                      **/
                     realm.copyToRealm(chatMember);
+
                 }
-            });
-        }
+            }
+        });
+
         setResult(RESULT_OK); //MainActivity 로 결과 전달
         finish();
+        return true;
     }
 
     public StringBuffer getRandomString() {

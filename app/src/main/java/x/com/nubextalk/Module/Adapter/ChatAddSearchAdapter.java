@@ -18,6 +18,7 @@ import com.aquery.AQuery;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
 import co.moonmonkeylabs.realmsearchview.RealmSearchViewHolder;
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -59,7 +60,13 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
         if (viewHolder instanceof ViewItemHolder) {
             User user = realmResults.get(position);
             viewHolder.profileName.setText(user.getName());
-            aq.view(viewHolder.profileImage).image(user.getProfileImg());
+
+            if (!user.getProfileImg().isEmpty()) {
+                aq.view(viewHolder.profileImage).image(user.getProfileImg());
+            } else {
+                aq.view(viewHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+
+            }
             if (user.getStatus() == 0) { // 초록
                 viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
             } else if (user.getStatus() == 1) { // 빨강
@@ -78,15 +85,13 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
 
     public class ViewItemHolder extends RealmSearchViewHolder {
         public TextView profileName;
-        public ImageView profileImage;
+        public CircleImageView profileImage;
         public ImageView profileStatus;
 
         public ViewItemHolder(View itemView) {
             super(itemView);
             profileName = itemView.findViewById(R.id.profileName);
             profileImage = itemView.findViewById(R.id.profileImage);
-            profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-            profileImage.setClipToOutline(true);
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
     }

@@ -10,21 +10,21 @@ import io.realm.RealmObject;
 
 public class ChatRoomMember extends RealmObject {
     @NonNull
-    private int rid;
+    private String rid;
     @NonNull
-    private int uid;
+    private String uid;
 
     @NonNull
-    public int getRid() {
+    public String getRid() {
         return rid;
     }
 
-    public void setRid(int rid) { this.rid = rid; }
+    public void setRid(String rid) { this.rid = rid; }
 
     @NonNull
-    public int getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(int uid) { this.uid = uid; }
+    public void setUid(String uid) { this.uid = uid; }
 }

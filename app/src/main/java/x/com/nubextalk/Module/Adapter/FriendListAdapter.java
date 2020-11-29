@@ -21,7 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.aquery.AQuery;
 
 import java.util.LinkedList;
 
@@ -36,6 +36,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private Context mContext;
 
     private onItemSelectedListener listener;
+
 
     public interface onItemSelectedListener{
         void onSelected(User address);
@@ -53,16 +54,15 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         View mItemView;
         if(viewType == 0) {
             // 헤더라면
             mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_myprofile, parent, false);
-            Log.e("Adpater", "myprofile onCreate");
             return new MyProfileViewHolder(mItemView);
         } else {
             // 그 외 친구목록이라면
             mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
-            Log.e("Adapter", "friendlist onCreate");
             return new FriendViewHolder(mItemView);
         }
     }
@@ -73,7 +73,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         User mCurrent = mDataSet.get(position);
         // Myprofile
         if(mCurrent.getUid().equals("1")) {
-            Log.e("Adpater", "myprofile");
             MyProfileViewHolder myProfileViewHolder = (MyProfileViewHolder) holder;
 
             myProfileViewHolder.bintTo(mCurrent);
@@ -84,8 +83,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         } else {
             // FriendList
-            Log.e("Adapter", "friendlist");
-            Log.e("Adapter", mCurrent.getName());
             FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
 
             friendViewHolder.bintTo(mCurrent);
@@ -116,58 +113,73 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class FriendViewHolder extends RecyclerView.ViewHolder {
-        public final TextView profileName;
-        public final ImageView profileImage;
-        public final ImageView profileStatus;
+        private final TextView profileName;
+        private final ImageView profileImage;
+        private final ImageView profileStatus;
+        private AQuery aq;
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
+            aq = new AQuery(itemView.getContext(), itemView);
             // item_friend.xml에서 불러온다.
             profileName = itemView.findViewById(R.id.profileName);
             profileImage = itemView.findViewById(R.id.profileImage);
             profileStatus = itemView.findViewById(R.id.profileStatus);
-
-            // 이미지 동그랗게 만드는 방법.
-            profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-            profileImage.setClipToOutline(true);
-
         }
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
-            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
-            if(user.getStatus() == 0) { // 초록
-                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-            } else if(user.getStatus() == 1) { // 빨강
-                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_red_800_24dp);
-            } else { // 노랑
-                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+            if(!user.getProfileImg().isEmpty()){
+                aq.view(profileImage).image(user.getProfileImg());
+            } else {
+                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            }
+//            aq.view(profileImage).image(user.getProfileImg());
+            // 초록
+            switch(user.getStatus()) {
+                case 0 :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                    break;
+                case 1 :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                    break;
+                case 2 :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                    break;
             }
         }
     }
     public class MyProfileViewHolder extends RecyclerView.ViewHolder {
-        public final TextView profileName;
-        public final ImageView profileImage;
-        public final ImageView profileStatus;
+        private final TextView profileName;
+        private final ImageView profileImage;
+        private final ImageView profileStatus;
+        private AQuery aq;
         public MyProfileViewHolder(@NonNull View itemView) {
            super(itemView);
+           aq = new AQuery(itemView.getContext(), itemView);
            profileName = itemView.findViewById(R.id.profileName);
            profileImage = itemView.findViewById(R.id.profileImage);
            profileStatus = itemView.findViewById(R.id.profileStatus);
-
-           // 이미지 동그랗게 만드는 방법.
-           profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-           profileImage.setClipToOutline(true);
         }
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
-            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
-            if(user.getStatus() == 0) { // 초록
-                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-            } else if(user.getStatus() == 1) { // 빨강
-                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_red_800_24dp);
-            } else { // 노랑
-                profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+            if(!user.getProfileImg().isEmpty()){
+                aq.view(profileImage).image(user.getProfileImg());
+            } else {
+                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            }
+            aq.view(profileImage).image(user.getProfileImg());
+//            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
+            switch(user.getStatus()) {
+                case 0 :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                    break;
+                case 1 :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                    break;
+                case 2 :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                    break;
             }
         }
     }

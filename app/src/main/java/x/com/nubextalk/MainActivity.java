@@ -6,9 +6,9 @@
 package x.com.nubextalk;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -27,12 +27,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatContent;
-import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
-import x.com.nubextalk.Model.User;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
@@ -43,31 +38,34 @@ import x.com.nubextalk.Model.User;
  * ....
  */
 public class MainActivity extends AppCompatActivity {
+    private static final int CHAT_ADD = 0;
+    private static final int MOVE_TO_CHAT_ROOM = 1;
     private FriendListFragment friendListFrag = new FriendListFragment();
     private ChatListFragment chatListFrag = new ChatListFragment();
     private CalendarFragment calendarFrag = new CalendarFragment();
     private SettingFragment settingFrag = new SettingFragment();
-
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private FragmentTransaction fragmentTransaction;
-
     private Toolbar toolbar;
-
     private BottomNavigationView bottomNavigationView;
 
-    FriendListFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mainFragment = (FriendListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-        Log.e("main", "MainActivity");
 
         //툴바 설정
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        initBottomNavigation();
+    }
+
+    /**
+     * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
+     **/
+    private void initBottomNavigation() {
         //네비게이션 설정
         bottomNavigationView = findViewById(R.id.bottom_nav);
 
@@ -98,12 +96,48 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-     @Override
+
+    /**
+     * ChatListFragment 에서 MainActivity -> ChatAddActivity 를 실행하는 하도록 호출해주는 함수
+     **/
+    public void startChatAddActivity() {
+        startActivityForResult(new Intent(MainActivity.this, ChatAddActivity.class), CHAT_ADD);
+    }
+
+    public void startChatRoomActivity(Intent intent) {
+        startActivityForResult(intent, MOVE_TO_CHAT_ROOM);
+    }
+
+    /**
+     * startActivityForResult 함수를 통해 다른 Activity 에서 받아온 결과를 받아왔을때 수행하는 함수
+     **/
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CHAT_ADD) {
+            if (resultCode == RESULT_OK) {
+                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                cf.refreshChatList();
+            }
+        }
+
+        if (requestCode == MOVE_TO_CHAT_ROOM) {
+            if (resultCode == 10) {
+                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                cf.refreshChatList();
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
-    //툴바 메뉴 설정
+    /**
+     * 툴바 메뉴 설정
+     **/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
@@ -122,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
         return true;
     }
 

@@ -6,33 +6,34 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.aquery.AQuery;
+import com.joanzapata.iconify.widget.IconButton;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import x.com.nubextalk.ChatList;
-import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.MainActivity;
+import io.realm.Sort;
+import x.com.nubextalk.Manager.DateManager;
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.R;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -43,6 +44,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Context context;
     private OnItemLongSelectedListener longClickListener;
     private OnItemSelectedListener clickListener;
+    private AQuery aq;
 
     public interface OnItemSelectedListener {
         void onItemSelected(ChatRoom chatRoom);
@@ -52,7 +54,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onItemLongSelected(ChatRoom chatRoom);
     }
 
-    public void setItemSelectedListener(OnItemSelectedListener listener){
+    public void setItemSelectedListener(OnItemSelectedListener listener) {
         this.clickListener = listener;
     }
 
@@ -64,8 +66,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mInflater = LayoutInflater.from(context);
         this.context = context;
         this.mDataset = mChatList;
-        realm = Realm.getDefaultInstance();
-//        sortChatList(mDataset);
+        this.aq = new AQuery(context);
+        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        sortChatRoomByDate();
+
     }
 
     @NonNull
@@ -80,17 +84,45 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewItemHolder) {
+            String dataPattern = "yyyy년 MM월 dd일 HH:mm";
             ViewItemHolder mHolder = (ViewItemHolder) holder;
+            ChatContent lastContent;
 
-            ChatContent content;
             String roomId = mDataset.get(position).getRid();
-            content = realm.where(ChatContent.class).equalTo("rid", roomId).findFirst();
-            Glide.with(mHolder.profileImg).
-                    load(mDataset.get(position).getRoomImg()).
-                    into(((ViewItemHolder) mHolder).profileImg);
+            String roomImgUrl = mDataset.get(position).getRoomImg();
+            lastContent = realm.where(ChatContent.class)
+                    .equalTo("rid", roomId)
+                    .sort("sendDate", Sort.DESCENDING).findFirst();
+
+            if (!roomImgUrl.isEmpty()) {
+                aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
+            } else {
+                aq.view(mHolder.profileImg).image(R.drawable.baseline_account_circle_black_24dp);
+
+            }
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
-            mHolder.lastMsg.setText(content.getContent());
-            mHolder.time.setText(df.format(content.getSendDate()));
+
+            if (lastContent != null) { //채팅방 내용 있는 경우
+                if (lastContent.getType() == 1) { //사진, 동영상 파일
+                    mHolder.lastMsg.setText("새 사진");
+                } else {
+                    mHolder.lastMsg.setText(lastContent.getContent());
+                }
+
+                String convertedDate = DateManager.convertDate(lastContent.getSendDate(), dataPattern);
+                mHolder.time.setText(DateManager.getTimeInterval(convertedDate, dataPattern));
+
+                setStatusImg(mHolder, position);
+                setNotify(mHolder, position);
+
+            } else { // 채팅방 내용 없는 경우 (주로 처음 새로 만들었을 때)
+                mHolder.lastMsg.setText("");
+                String convertedDate = DateManager.convertDate(
+                        mDataset.get(position).getUpdatedDate(), dataPattern);
+                mHolder.time.setText(DateManager.getTimeInterval(convertedDate, dataPattern));
+
+                setNotify(mHolder, position);
+            }
 
             mHolder.itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null) {
@@ -104,9 +136,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     clickListener.onItemSelected(mDataset.get(position));
                 }
             });
-            setStatusImg(mHolder, position);
-            setChatNotify(mHolder, position);
-            setChatFixTop(mHolder, position);
         }
     }
 
@@ -118,9 +147,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView remain;
         public CircleImageView profileImg;
         public ImageView statusImg;
-        public ImageView notifyImg;
-
-        public ImageView fixTopImg;
+        public IconButton notifyImg1;
+        public IconButton notifyImg2;
         public View chatLayout;
 
         public ViewItemHolder(View itemView) {
@@ -130,58 +158,67 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             time = itemView.findViewById(R.id.chat_list_chat_time);
             remain = itemView.findViewById(R.id.chat_list_chat_remain);
             profileImg = itemView.findViewById(R.id.chat_list_chat_picture);
+//            profileImg.setBackground(new ShapeDrawable(new OvalShape()));
+//            profileImg.setClipToOutline(true);
             statusImg = itemView.findViewById(R.id.chat_list_friend_status);
-            notifyImg = itemView.findViewById(R.id.chat_list_notify_status);
-            fixTopImg = itemView.findViewById(R.id.chat_list_fixtop_status);
+            notifyImg1 = itemView.findViewById(R.id.chat_list_notify1);
+            notifyImg2 = itemView.findViewById(R.id.chat_list_notify2);
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
         }
 
     }
 
+    /**
+     * ChatRoom Acitivity 에서 chatContent 를 만들 때의 sendDate 와  해당 chatRoom 의 updatedDate 도 맞춰
+     * 줘야함.
+     **/
+    public void sortChatRoomByDate() {
+        this.mDataset = this.mDataset.sort("settingFixTop", Sort.DESCENDING,
+                "updatedDate", Sort.DESCENDING);
+    }
 
-    public void setChatFixTop(@NonNull ViewItemHolder holder, int position) {
-        if (!mDataset.get(position).getSettingFixTop()) {
-            holder.fixTopImg.setVisibility(View.INVISIBLE);
-        } else {
-            holder.fixTopImg.setVisibility(View.VISIBLE);
+    public void setNotify(@NonNull ViewItemHolder holder, int position) {
+        boolean fixTop;
+        boolean alarm;
+        String fixTopIcon = "{fas-map-pin 16dp}";
+        String alarmOff = "{far-bell-slash 16dp}";
+
+        fixTop = mDataset.get(position).getSettingFixTop(); //default false
+        alarm = mDataset.get(position).getSettingAlarm(); //default true
+
+        if (fixTop && alarm) { // 상단 고정만인 경우
+            holder.notifyImg1.setText(fixTopIcon);
+            holder.notifyImg2.setText("");
+        } else if (!fixTop && !alarm) { // 알림 해제만 한 경우
+            holder.notifyImg1.setText(alarmOff);
+            holder.notifyImg2.setText("");
+        } else if (fixTop && !alarm) { // 상단 고정 + 알림 해제 한 경우
+            holder.notifyImg1.setText(fixTopIcon);
+            holder.notifyImg2.setText(alarmOff);
+        } else { //기본 상태일 때
+            holder.notifyImg1.setText("");
+            holder.notifyImg2.setText("");
         }
     }
 
-    public void setChatNotify(@NonNull ViewItemHolder holder, int position) {
-        if (!mDataset.get(position).getSettingAlarm()) {
-            holder.notifyImg.setVisibility(View.VISIBLE);
-        } else {
-            holder.notifyImg.setVisibility(View.INVISIBLE);
-        }
-    }
 
+    /**
+     * 채팅방 타입이 1대1 채팅방인 경우에는 대화 상대방의 상태가 보여야하는데 내가 누구인지 알아야 상대방 상태 표시 가
+     * 채팅방 타입이 단체방인 경우에는 어떻게 하지?
+     **/
     public void setStatusImg(@NonNull ViewItemHolder holder, int position) {
+        String rid = mDataset.get(position).getRid();
+        int memberNum = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll().size();
+        if (memberNum <= 2) { // 1 대 1 채팅방인 경우
+
+        } else {
+
+        }
 //        if (mDataset.get(position).getStatus() == 0) {
 //            holder.statusImg.setImageResource(R.drawable.oval_status_off);
 //        } else if (mDataset.get(position).getStatus() == 1) {
 //            holder.statusImg.setImageResource(R.drawable.oval_status_on);
 //        }
-        holder.statusImg.setImageResource(R.drawable.oval_status_off);
-    }
-
-    public void sortChatList(LinkedList<ChatList> chatList) {
-        Collections.sort(chatList, new Comparator<ChatList>() {
-            @Override
-            public int compare(ChatList o1, ChatList o2) {
-                if (!o1.getFixTop() && !o2.getFixTop()) { //o1, o2 둘 다 상단 고정 아닐 때
-                    if (o1.getTime().after(o2.getTime())) return -1; //o1가 o2보다 시간이 최신일 때
-                    else return +1;
-                } else if (!o1.getFixTop() && o2.getFixTop()) { //o1은 상단 고정 아니고 o2는 상단 고정일 때
-                    return +1;
-                } else if (o1.getFixTop() && !o2.getFixTop()) { //o1은 상단 고정 o2는 상단 고정 아닐 때
-                    return -1;
-                } else if (o1.getFixTop() && o2.getFixTop()) { //o1, o2 둘 다 상단 고정일 때
-                    if (o1.getTime().after(o2.getTime())) return -1; //o1가 o2보다 시간이 최신일 때
-                    else return +1;
-                }
-                return 0;
-            }
-        });
     }
 
     @Override

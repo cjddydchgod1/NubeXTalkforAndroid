@@ -189,6 +189,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
+        mAdapter.sortChatRoomByDate();
     }
 
     private void toggleFab() {

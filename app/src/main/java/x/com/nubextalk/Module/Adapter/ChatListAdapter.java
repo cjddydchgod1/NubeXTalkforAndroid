@@ -22,7 +22,10 @@ import com.aquery.AQuery;
 import com.joanzapata.iconify.widget.IconButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
@@ -65,6 +68,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mDataset = mChatList;
         this.aq = new AQuery(context);
         this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        sortChatRoomByDate();
+
     }
 
     @NonNull
@@ -81,41 +86,41 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (holder instanceof ViewItemHolder) {
             String dataPattern = "yyyy년 MM월 dd일 HH:mm";
             ViewItemHolder mHolder = (ViewItemHolder) holder;
-            ChatContent content;
+            ChatContent lastContent;
 
             String roomId = mDataset.get(position).getRid();
-            content = realm.where(ChatContent.class)
+            String roomImgUrl = mDataset.get(position).getRoomImg();
+            lastContent = realm.where(ChatContent.class)
                     .equalTo("rid", roomId)
                     .sort("sendDate", Sort.DESCENDING).findFirst();
 
-            assert mDataset.get(position) != null;
-            aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
+            if (!roomImgUrl.isEmpty()) {
+                aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
+            } else {
+                aq.view(mHolder.profileImg).image(R.drawable.baseline_account_circle_black_24dp);
+
+            }
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
 
-            if (content != null) { //채팅방 내용 있는 경우
-                if (content.getType() == 1) { //사진, 동영상 파일
+            if (lastContent != null) { //채팅방 내용 있는 경우
+                if (lastContent.getType() == 1) { //사진, 동영상 파일
                     mHolder.lastMsg.setText("새 사진");
                 } else {
-                    mHolder.lastMsg.setText(content.getContent());
+                    mHolder.lastMsg.setText(lastContent.getContent());
                 }
 
-                String convertedDate = DateManager.convertDate(content.getSendDate(), dataPattern);
-                mHolder.time.setText(DateManager.getTimeInterval(
-                        convertedDate, dataPattern));
+                String convertedDate = DateManager.convertDate(lastContent.getSendDate(), dataPattern);
+                mHolder.time.setText(DateManager.getTimeInterval(convertedDate, dataPattern));
 
                 setStatusImg(mHolder, position);
                 setNotify(mHolder, position);
 
             } else { // 채팅방 내용 없는 경우 (주로 처음 새로 만들었을 때)
-                String convertedDate = DateManager.convertDate(
-                        mDataset.get(position).getUpdatedDate(), dataPattern
-                );
-
-                mHolder.time.setText(DateManager.getTimeInterval(
-                        convertedDate, dataPattern
-                ));
-
                 mHolder.lastMsg.setText("");
+                String convertedDate = DateManager.convertDate(
+                        mDataset.get(position).getUpdatedDate(), dataPattern);
+                mHolder.time.setText(DateManager.getTimeInterval(convertedDate, dataPattern));
+
                 setNotify(mHolder, position);
             }
 
@@ -140,7 +145,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView friendName;
         public TextView time;
         public TextView remain;
-        public ImageView profileImg;
+        public CircleImageView profileImg;
         public ImageView statusImg;
         public IconButton notifyImg1;
         public IconButton notifyImg2;
@@ -153,14 +158,23 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             time = itemView.findViewById(R.id.chat_list_chat_time);
             remain = itemView.findViewById(R.id.chat_list_chat_remain);
             profileImg = itemView.findViewById(R.id.chat_list_chat_picture);
-            profileImg.setBackground(new ShapeDrawable(new OvalShape()));
-            profileImg.setClipToOutline(true);
+//            profileImg.setBackground(new ShapeDrawable(new OvalShape()));
+//            profileImg.setClipToOutline(true);
             statusImg = itemView.findViewById(R.id.chat_list_friend_status);
             notifyImg1 = itemView.findViewById(R.id.chat_list_notify1);
             notifyImg2 = itemView.findViewById(R.id.chat_list_notify2);
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
         }
 
+    }
+
+    /**
+     * ChatRoom Acitivity 에서 chatContent 를 만들 때의 sendDate 와  해당 chatRoom 의 updatedDate 도 맞춰
+     * 줘야함.
+     **/
+    public void sortChatRoomByDate() {
+        this.mDataset = this.mDataset.sort("settingFixTop", Sort.DESCENDING,
+                "updatedDate", Sort.DESCENDING);
     }
 
     public void setNotify(@NonNull ViewItemHolder holder, int position) {

@@ -31,4 +31,13 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/new_chat_added_profile_img" />
+
+    <com.joanzapata.iconify.widget.IconButton
+        android:id="@+id/new_chat_added_delete_btn"
+        android:layout_height="24dp"
+        android:layout_width="24dp"
+        android:background="@color/cTransparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

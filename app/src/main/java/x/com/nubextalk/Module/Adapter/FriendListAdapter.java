@@ -128,7 +128,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
-            aq.view(profileImage).image(user.getProfileImg());
+            if(!user.getProfileImg().isEmpty()){
+                aq.view(profileImage).image(user.getProfileImg());
+            } else {
+                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            }
+//            aq.view(profileImage).image(user.getProfileImg());
             // 초록
             switch(user.getStatus()) {
                 case 0 :
@@ -158,6 +163,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public void bintTo(User user) {
             String name = user.getDepartment() + " " + user.getName();
             profileName.setText(name);
+            if(!user.getProfileImg().isEmpty()){
+                aq.view(profileImage).image(user.getProfileImg());
+            } else {
+                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            }
             aq.view(profileImage).image(user.getProfileImg());
 //            Glide.with(mContext).load(user.getProfileImg()).into(profileImage);
             switch(user.getStatus()) {

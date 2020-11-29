@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.joanzapata.iconify.widget.IconButton;
 
 import java.util.ArrayList;
 
@@ -50,9 +51,14 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
             ViewItemHolder mHolder = (ViewItemHolder) holder;
             mHolder.profileName.setText(userList.get(position).getName());
             aq.view(mHolder.profileImage).image(userList.get(position).getProfileImg());
-            mHolder.itemView.setOnClickListener(v -> {
+
+            if(userList.get())
+            mHolder.deleteItemButton.setText("{fas-minus-square 20dp #D50000}");
+
+            mHolder.deleteItemButton.setOnClickListener(v -> {
                 deleteItem(userList.get(position));
             });
+
         }
     }
 
@@ -74,6 +80,7 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         public TextView profileName;
         public ImageView profileImage;
+        public IconButton deleteItemButton;
 
         public ViewItemHolder(View itemView) {
             super(itemView);
@@ -81,6 +88,7 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
             profileImage = itemView.findViewById(R.id.new_chat_added_profile_img);
             profileImage.setBackground(new ShapeDrawable(new OvalShape()));
             profileImage.setClipToOutline(true);
+            deleteItemButton = itemView.findViewById(R.id.new_chat_added_delete_btn);
         }
     }
 

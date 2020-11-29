@@ -8,13 +8,13 @@
     android:layout_marginStart="5dp"
     android:layout_marginTop="15dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chat_list_chat_picture"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/exmaple_profile" />
+        tools:src="@drawable/baseline_account_circle_black_24dp" />
 
     <ImageView
         android:id="@+id/chat_list_friend_status"
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:text="Person Name"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:text="Chat content..."
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
@@ -78,7 +78,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:background="@color/cTransparent"
         app:layout_constraintStart_toEndOf="@+id/chat_list_friend_name"
         app:layout_constraintTop_toTopOf="parent" />
@@ -88,7 +88,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:background="@color/cTransparent"
         app:layout_constraintStart_toEndOf="@+id/chat_list_notify1"
         app:layout_constraintTop_toTopOf="parent" />

@@ -115,13 +115,16 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
         drawerTitle.setText(mRoomTitle);
 
-        //데이터가 없을 경우 테스트 데이터 넣기
-        if(mChat.size() == 0){
-            ChatContent.init(this, realm);
-            mChat = ChatContent.getAll(realm);
-        }
+        //데이터가 없을 경우 테스트 데이터 넣기 -> 요고는 이제 필요 없어서 지웠음. 이거 지금도 있으면 새로운 채팅방 생성해서 해당 채팅방 들어가면
+        // ChatContent.init(this, realm) 이 코드 때문에 다른 채팅방 메세지도 초기화 됨.
+//        if(mChat.size() == 0){
+//            ChatContent.init(this, realm);
+//            mChat = ChatContent.getAll(realm);
+//        }
     }
 
+    // 이상하게 onDestroy() 에서는 setResult(10) 작동이 안되서 onBackPressed() 함수에서 씀.
+    // 채팅방에서 뒤로갈때(= ChatRoomAcitivity 종료) setResult(10) 를 보내줘서 MainAcitivity 에서 채팅목록 동기화.
     @Override
     public void onBackPressed(){
         setResult(10);
@@ -267,6 +270,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setContent(content);
                             chat.setSendDate(date);
                             realm.copyToRealmOrUpdate(chat);
+
+                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+                            ChatRoom chatRoom = realm.where(ChatRoom.class)
+                                    .equalTo("rid",mRoomId).findFirst();
+                            chatRoom.setUpdatedDate(date);
+                            realm.copyToRealmOrUpdate(chatRoom);
+
                             mAdapter.notifyDataSetChanged();
                         }
                         mEditChat.setText("");

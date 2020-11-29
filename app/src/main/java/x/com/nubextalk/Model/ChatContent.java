@@ -41,6 +41,9 @@ public class ChatContent extends RealmObject {
     private Date sendDate;
 
     @NonNull
+    private Boolean isRead = false;
+
+    @NonNull
     public String getCid() {
         return cid;
     }
@@ -80,6 +83,11 @@ public class ChatContent extends RealmObject {
     }
 
     public void setSendDate(Date sendDate){ this.sendDate = sendDate; }
+
+    @NonNull
+    public Boolean getIsRead() { return isRead; }
+
+    public void setIsRead(Boolean isRead) { this.isRead = isRead; }
 
     /**
      * Data 초기화 함수

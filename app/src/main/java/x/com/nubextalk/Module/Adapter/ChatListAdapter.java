@@ -6,6 +6,7 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.util.Log;
@@ -136,6 +137,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     clickListener.onItemSelected(mDataset.get(position));
                 }
             });
+
+            setUnreadMessage(mHolder, position);
         }
     }
 
@@ -158,8 +161,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             time = itemView.findViewById(R.id.chat_list_chat_time);
             remain = itemView.findViewById(R.id.chat_list_chat_remain);
             profileImg = itemView.findViewById(R.id.chat_list_chat_picture);
-//            profileImg.setBackground(new ShapeDrawable(new OvalShape()));
-//            profileImg.setClipToOutline(true);
             statusImg = itemView.findViewById(R.id.chat_list_friend_status);
             notifyImg1 = itemView.findViewById(R.id.chat_list_notify1);
             notifyImg2 = itemView.findViewById(R.id.chat_list_notify2);
@@ -199,6 +200,29 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.notifyImg1.setText("");
             holder.notifyImg2.setText("");
         }
+    }
+
+    public void setUnreadMessage(@NonNull ViewItemHolder holder, int position) {
+        int unreadMessages = 0;
+        ChatRoom chatRoom = mDataset.get(position);
+        RealmResults<ChatContent> chatContents;
+        chatContents = realm.where(ChatContent.class).equalTo("rid", chatRoom.getRid()).findAll();
+
+        for (ChatContent chatContent : chatContents) {
+            if (chatContent.getIsRead() == false) {
+                unreadMessages += 1;
+            }
+        }
+
+        if (unreadMessages == 0) {
+            holder.remain.setText("");
+            holder.remain.setVisibility(View.INVISIBLE);
+        } else {
+            holder.remain.setText(Integer.toString(unreadMessages));
+            holder.remain.setVisibility(View.VISIBLE);
+
+        }
+
     }
 
 

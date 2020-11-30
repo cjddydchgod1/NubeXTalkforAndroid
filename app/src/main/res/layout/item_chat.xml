@@ -53,9 +53,12 @@
         android:layout_marginEnd="@dimen/margin_m"
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
+        android:maxWidth="200dp"
         android:padding="@dimen/padding_s"
+        android:layout_marginTop="@dimen/padding_s"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_date" />
 
     <TextView
         android:id="@+id/my_time"

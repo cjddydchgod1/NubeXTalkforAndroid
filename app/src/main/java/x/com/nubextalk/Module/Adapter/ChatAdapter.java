@@ -40,7 +40,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context mContext;
     private String id ="1234"; //저장된 아이디를 가져와 넣을 예정
     private String mDate ="0000.00.00";
-
     private Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
 
     public ChatAdapter(Context context, RealmResults<ChatContent>  mChatLog) {
@@ -49,7 +48,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.mChatData = mChatLog;
 
     }
-
 
     @NonNull
     @Override
@@ -160,6 +158,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         else{
             return 1;
         }
+    }
+
+    public void update(RealmResults<ChatContent> data) {
+        this.mChatData = data;
+        notifyDataSetChanged();
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {

@@ -4,16 +4,17 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewManager;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,9 +24,11 @@ import com.aquery.AQuery;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,7 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.navigation.NavigationView;
 import com.joanzapata.iconify.widget.IconButton;
 
-import java.net.URI;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -50,16 +52,16 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private static RealmResults<ChatContent> mChat;
     private static RecyclerView mRecyclerView;
-    private static RecyclerView.Adapter mAdapter;
+    private static ChatAdapter mAdapter;
     private static DrawerLayout mDrawerLayout;
+    private static NavigationView mNavigationView;
 
     private static EditText mEditChat;
     private static IconButton mSendButton;
     private static IconButton mMediaButton;
     private static LinearLayout mMediaMenu;
-    private static String mRoomId;
-    private static String mRoomTitle;
 
+    private static String mRoomId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +73,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
         mRoomId = intent.getExtras().getString("rid");
-        ChatRoom RoomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-        mRoomTitle = RoomInfo.getRoomName();
+        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+        String roomTitle = roomInfo.getRoomName();
 
         // 채팅방 툴바 설정
         Toolbar toolbar_chat_room = findViewById(R.id.toolbar_chat_room);
@@ -83,7 +85,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         TextView title = (TextView)findViewById(R.id.toolbar_chat_room_title);
-        title.setText(mRoomTitle);
+        title.setText(roomTitle);
 
         // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
@@ -106,53 +108,45 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         mAdapter = new ChatAdapter(this, mChat);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         // Drawer navigation 설정
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View header = navigationView.getHeaderView(0);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
+
+        setNavigationView(roomInfo);
+        View header = mNavigationView.getHeaderView(0);
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
-        drawerTitle.setText(mRoomTitle);
-
-        //데이터가 없을 경우 테스트 데이터 넣기 -> 요고는 이제 필요 없어서 지웠음. 이거 지금도 있으면 새로운 채팅방 생성해서 해당 채팅방 들어가면
-        // ChatContent.init(this, realm) 이 코드 때문에 다른 채팅방 메세지도 초기화 됨.
-//        if(mChat.size() == 0){
-//            ChatContent.init(this, realm);
-//            mChat = ChatContent.getAll(realm);
-//        }
+        drawerTitle.setText(roomTitle);
     }
-
-    // 이상하게 onDestroy() 에서는 setResult(10) 작동이 안되서 onBackPressed() 함수에서 씀.
-    // 채팅방에서 뒤로갈때(= ChatRoomAcitivity 종료) setResult(10) 를 보내줘서 MainAcitivity 에서 채팅목록 동기화.
     @Override
     public void onBackPressed(){
         setResult(10);
         finish();
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
     }
-    @Override
+    @Override // Button onClick Listener
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.send_button:
                 sendChat(v);
                 break;
             case R.id.media_button:
-                showMediaMenu(v);
+                openMediaMenu(v);
                 break;
             case R.id.gallery_button:
-                goToAlbum();
+                openAlbum();
                 ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
                 break;
             case R.id.camera_button:
+                openCamera();
                 ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
                 break;
             case R.id.pacs_button:
+                openPacs();
                 ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
                 break;
             case R.id.media_menu_cancel:
@@ -160,8 +154,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
     }
-
-    @Override
+    @Override // Option Item Selected Listener
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
         switch (id) {
@@ -171,69 +164,152 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         }
         return super.onOptionsItemSelected(item);
     }
-    @Override
+    @Override // Navigation Item Selected Listener
     public boolean onNavigationItemSelected(MenuItem menuItem) {
-        menuItem.setChecked(true);
-        mDrawerLayout.closeDrawers();
+        Menu menu = mNavigationView.getMenu();
         int id = menuItem.getItemId();
-        ChatRoom RoomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+        SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_fix_top)).findViewById(R.id.drawer_switch);
+        SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_alarm)).findViewById(R.id.drawer_switch);
+
         switch (id) {
             case  R.id.setting_fix_top :
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        if(RoomInfo.getSettingFixTop()){
-                            RoomInfo.setSettingFixTop(false);
-                            Toast.makeText(getApplicationContext(),"상단고정이 해제 되었습니다.",Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            RoomInfo.setSettingFixTop(true);
-                            Toast.makeText(getApplicationContext(),"상단고정이 설정 되었습니다.",Toast.LENGTH_SHORT).show();
-                        }
-                        realm.copyToRealmOrUpdate(RoomInfo);
-                    }
-                });
+                fixTopSwitch.toggle();
                 break;
+
             case R.id.setting_alarm :
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        if(RoomInfo.getSettingAlarm()){
-                            RoomInfo.setSettingAlarm(false);
-
-                            Toast.makeText(getApplicationContext(),"알람이 해제 되었습니다.",Toast.LENGTH_SHORT).show();
-
-                        }
-                        else{
-                            RoomInfo.setSettingAlarm(true);
-                            Toast.makeText(getApplicationContext(),"알람이 설정 되었습니다.",Toast.LENGTH_SHORT).show();
-                        }
-                        realm.copyToRealmOrUpdate(RoomInfo);
-                    }
-                });
+                alarmSwitch.toggle();
                 break;
-            case R.id.exit :
-                RealmResults<ChatContent> chatInfo = realm.where(ChatContent.class)
-                        .equalTo("rid",mRoomId)
-                        .findAll();
-                realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            RoomInfo.deleteFromRealm();
-                            realm.copyToRealmOrUpdate(RoomInfo);
-                            chatInfo.deleteAllFromRealm();
-                            realm.copyToRealmOrUpdate(chatInfo);
 
-                        }
-                    });
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
+            case R.id.exit :
+                mDrawerLayout.closeDrawers();
+                exitRoom();
                 break;
         }
         return true;
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            try {
+                Uri uri = data.getData();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                            Date date = new Date();
+                            ChatContent chat = new ChatContent();
+                            chat.setCid();
+                            chat.setUid("1234");
+                            chat.setRid(mRoomId);
+                            chat.setType(1);
+                            chat.setContent(uri.toString());
+                            chat.setSendDate(date);
+                            realm.copyToRealmOrUpdate(chat);
+                    }
+            });
+            } catch (Exception e) {
+                    e.printStackTrace();
+            }
+        }
+        else if(requestCode == 2 && resultCode == RESULT_OK){
+            try {
+                Uri uri = data.getData();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                            Date date = new Date();
+                            ChatContent chat = new ChatContent();
+                            chat.setCid();
+                            chat.setUid("1234");
+                            chat.setRid(mRoomId);
+                            chat.setType(1);
+                            chat.setContent(uri.toString());
+                            chat.setSendDate(date);
+                            realm.copyToRealmOrUpdate(chat);
+                            mAdapter.notifyDataSetChanged();
 
-    public void showMediaMenu(View view) {
+                    }
+                });
+            } catch (Exception e) {
+                    e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void setNavigationView(ChatRoom roomInfo){
+         Menu menu = mNavigationView.getMenu();
+         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_fix_top)).findViewById(R.id.drawer_switch);
+         SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_alarm)).findViewById(R.id.drawer_switch);
+
+         if(roomInfo.getSettingFixTop()){
+             fixTopSwitch.setChecked(true);
+         }
+         else{
+             fixTopSwitch.setChecked(false);
+         }
+         if(roomInfo.getSettingAlarm()){
+             alarmSwitch.setChecked(true);
+         }
+         else {
+             alarmSwitch.setChecked(false);
+         }
+
+         fixTopSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(isChecked){
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    roomInfo.setSettingFixTop(true);
+                                    Toast.makeText(getApplicationContext(),"상단고정이 설정 되었습니다.",Toast.LENGTH_SHORT).show();
+                                    realm.copyToRealmOrUpdate(roomInfo);
+                                }
+                            });
+                        }
+                        else{
+                            Log.e("fixTOp","please");
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    roomInfo.setSettingFixTop(false);
+                                    Toast.makeText(getApplicationContext(),"상단고정이 해제 되었습니다.",Toast.LENGTH_SHORT).show();
+                                    realm.copyToRealmOrUpdate(roomInfo);
+                                }
+                            });
+                        }
+                    }
+         });
+         alarmSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+             @Override
+             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                 if(isChecked){
+                     realm.executeTransaction(new Realm.Transaction() {
+                         @Override
+                         public void execute(Realm realm) {
+                             roomInfo.setSettingAlarm(true);
+                             Toast.makeText(getApplicationContext(),"알람기능이 설정 되었습니다.",Toast.LENGTH_SHORT).show();
+                             realm.copyToRealmOrUpdate(roomInfo);
+                         }
+                     });
+                 }
+                 else{
+                     realm.executeTransaction(new Realm.Transaction() {
+                         @Override
+                         public void execute(Realm realm) {
+                             roomInfo.setSettingAlarm(false);
+                             Toast.makeText(getApplicationContext(),"알람기능이 해제 되었습니다.",Toast.LENGTH_SHORT).show();
+                             realm.copyToRealmOrUpdate(roomInfo);
+                         }
+                     });
+                 }
+             }
+         });
+
+    }
+
+    private void openMediaMenu(View view) {
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mMediaMenu = (LinearLayout)inflater.inflate(R.layout.view_media_menu, null);
         addContentView(mMediaMenu, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT ));
@@ -250,8 +326,35 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         CameraButton.setText("{fas-camera-retro 90dp #FFFFFF}");
         PacsButton.setText("{fas-puzzle-piece 90dp #FFFFFF}");
     }
-    // 채팅 메세지를 Chat 클래스를 활용하여 인스턴스를 만들어 리스트에 추가 해줌
-    public void sendChat(View view) {
+
+    private void openAlbum() {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            if (intent.resolveActivity(this.getPackageManager()) != null) {
+                startActivityForResult(intent, 1);
+            }
+        }
+    }
+
+    private void openCamera(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        } else {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, 2);
+            }
+        }
+    }
+
+    private void openPacs(){
+    }
+
+    private void sendChat(View view) {
         realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -272,11 +375,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             realm.copyToRealmOrUpdate(chat);
 
                             // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
-                            ChatRoom chatRoom = realm.where(ChatRoom.class)
+                            ChatRoom roomInfo = realm.where(ChatRoom.class)
                                     .equalTo("rid",mRoomId).findFirst();
-                            chatRoom.setUpdatedDate(date);
-                            realm.copyToRealmOrUpdate(chatRoom);
-
+                            roomInfo.setUpdatedDate(date);
+                            realm.copyToRealmOrUpdate(roomInfo);
                             mAdapter.notifyDataSetChanged();
                         }
                         mEditChat.setText("");
@@ -284,80 +386,21 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
-    private void goToAlbum() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            if (intent.resolveActivity(this.getPackageManager()) != null) {
-                startActivityForResult(intent, 1);
-            }
-        }
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                try {
-                    Uri uri = data.getData();
-                    realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-
-                            Date date = new Date();
-
-                            ChatContent chat = new ChatContent();
-                            chat.setCid();
-                            chat.setUid("1234");
-                            chat.setRid(mRoomId);
-                            chat.setType(1);
-                            chat.setContent(uri.toString());
-                            chat.setSendDate(date);
-                            realm.copyToRealmOrUpdate(chat);
-                            mAdapter.notifyDataSetChanged();
-                    }
-            });
-//                    getPicture(uri);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-    public void getPicture(Uri uri) {
-        int index = 0;
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = this.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor == null) {
-            Log.d("cursor", "null ");
-        }
-        else if (cursor.moveToFirst()) {
-            index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-            String imgPath = cursor.getString(index);
-            realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-
-                            Date date = new Date();
-
-                            ChatContent chat = new ChatContent();
-                            chat.setCid();
-                            chat.setUid("1234");
-                            chat.setRid(mRoomId);
-                            chat.setType(1);
-                            chat.setContent(imgPath);
-                            chat.setSendDate(date);
-                            realm.copyToRealmOrUpdate(chat);
-                            mAdapter.notifyDataSetChanged();
-                    }
-            });
-            Log.d("realPathFromURI", "realPathFromURI: " + imgPath);
-            cursor.close();
-        } else {
-            Log.e("null", "커서가 비어있습니다.");
-        }
+    private void exitRoom(){
+        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+        RealmResults<ChatContent> chatInfo = realm.where(ChatContent.class)
+                        .equalTo("rid",mRoomId)
+                        .findAll();
+                realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            roomInfo.deleteFromRealm();
+                            realm.copyToRealmOrUpdate(roomInfo);
+                            chatInfo.deleteAllFromRealm();
+                            realm.copyToRealmOrUpdate(chatInfo);
+                        }
+                });
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
     }
 }

@@ -4,15 +4,19 @@
   ~ Copyright 테크하임(주). All rights reserved.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+>
     <group>
         <item
             android:id="@+id/setting_fix_top"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            app:actionLayout="@layout/action_switch"
             android:title="상단 고정"/>
         <item
             android:id="@+id/setting_alarm"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            app:actionLayout="@layout/action_switch"
             android:title="알람 설정"
             />
         <item

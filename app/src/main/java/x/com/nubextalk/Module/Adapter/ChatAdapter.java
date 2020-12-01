@@ -81,23 +81,28 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         if(chat.getType() == 0){
             ChatViewHolder cvHolder = (ChatViewHolder) holder;
-            if(mDate.equals(sendDate)){
-                cvHolder.date.setVisibility(View.GONE);
-            }
-            else{
-                mDate = sendDate;
-                cvHolder.date.setText(mDate);
-            }
+            cvHolder.date.setVisibility(View.GONE);
+//            if(mDate.equals(sendDate)){
+//                cvHolder.date.setVisibility(View.INVISIBLE);
+//            }
+//            else{
+//                mDate = sendDate;
+//                cvHolder.date.setText(mDate);
+//                cvHolder.date.setVisibility(View.VISIBLE);
+//            }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
             if(chat.getUid().equals(this.id)){
                 cvHolder.my_chat_text.setText(chat.getContent());
                 cvHolder.my_time.setText(sendTime);
 
-                cvHolder.profileImage.setVisibility(View.GONE);
-                cvHolder.profileName.setVisibility(View.GONE);
-                cvHolder.other_chat_text.setVisibility(View.GONE);
-                cvHolder.other_time.setVisibility(View.GONE);
+                cvHolder.my_chat_text.setVisibility(View.VISIBLE);
+                cvHolder.my_time.setVisibility(View.VISIBLE);
+
+                cvHolder.profileImage.setVisibility(View.INVISIBLE);
+                cvHolder.profileName.setVisibility(View.INVISIBLE);
+                cvHolder.other_chat_text.setVisibility(View.INVISIBLE);
+                cvHolder.other_time.setVisibility(View.INVISIBLE);
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
@@ -106,19 +111,26 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cvHolder.other_chat_text.setText(chat.getContent());
                 cvHolder.other_time.setText(sendTime);
 
-                cvHolder.my_chat_text.setVisibility(View.GONE);
-                cvHolder.my_time.setVisibility(View.GONE);
+                cvHolder.profileImage.setVisibility(View.VISIBLE);
+                cvHolder.profileName.setVisibility(View.VISIBLE);
+                cvHolder.other_chat_text.setVisibility(View.VISIBLE);
+                cvHolder.other_time.setVisibility(View.VISIBLE);
+
+                cvHolder.my_chat_text.setVisibility(View.INVISIBLE);
+                cvHolder.my_time.setVisibility(View.INVISIBLE);
             }
         }
         else{
             ChatMediaViewHolder cvmHolder = (ChatMediaViewHolder) holder;
-             if(mDate.equals(sendDate)){
-                cvmHolder.date.setVisibility(View.GONE);
-            }
-            else{
-                mDate = sendDate;
-                cvmHolder.date.setText(mDate);
-            }
+            cvmHolder.date.setVisibility(View.GONE);
+
+//             if(mDate.equals(sendDate)){
+//                cvmHolder.date.setVisibility(View.GONE);
+//            }
+//            else{
+//                mDate = sendDate;
+//                cvmHolder.date.setText(mDate);
+//            }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
             if(chat.getUid().equals(this.id)){
@@ -141,7 +153,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cvmHolder.my_chat_image.setVisibility(View.GONE);
             }
         }
-        // 날짜변경시 날짜 보여주기
     }
 
     @Override

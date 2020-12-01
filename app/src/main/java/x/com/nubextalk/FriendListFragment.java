@@ -40,11 +40,15 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Date;
+import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import x.com.nubextalk.Manager.AnimManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 
@@ -57,10 +61,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RealmResults<User> mResults;
+    private ChatRoomMember mChat;
 
     private User myProfile;
 
     private AQuery aq;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -142,26 +148,25 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         LinearLayout statusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
-
-//        File file = new file(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+        // 프로필 이름 설정
         profileName.setText(address.getName());
-        // profilestatus를 가져오려면 int형식이 아니여야 한다. 너무 더러워.
+        // profilestatus 수정 버튼
         switch(address.getStatus()) {
-            case 0 :
-                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-                break;
             case 1 :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
             case 2 :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
                 break;
+            default : // 0과 기본으로 되어있는 설정
+                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                break;
         }
+
+        // 프로필 사진
         if(!address.getProfileImg().isEmpty()) {
             aq.view(profileImage).image(address.getProfileImg());
         }
-//        Glide.with(getContext()).load(address.getProfileImg()).into(profileImage);
-
 
         // 이름 수정 버튼
         modifyNameButton.setOnClickListener(v -> {
@@ -180,16 +185,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 profileName.setVisibility(View.VISIBLE);
                 profileName.setText(address.getName());
 
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        User user = realm.where(User.class).equalTo("uid", address.getUid()).findFirst();
-                        user.setName(temp);
-                    }
-                });
-                // 새로고침
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.detach(this).attach(this).commit();
+                changeRealmData(temp, 0);
             }
         });
 
@@ -219,16 +215,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     public void onClick(View v) {
                         switch (v.getId()) {
                             case R.id.working_status :
-                                changeRealmData(0, statusLayout, chatButton);
+                                changeStatus(0, statusLayout, chatButton);
                                 break;
                             case R.id.leaving_status :
-                                changeRealmData(1, statusLayout, chatButton);
+                                changeStatus(1, statusLayout, chatButton);
                                 break;
                             case R.id.vacation_status :
-                                changeRealmData(2, statusLayout, chatButton);
-                                break;
-                            default :
-                                changeRealmData(-1, statusLayout, chatButton);
+                                changeStatus(2, statusLayout, chatButton);
                                 break;
                         }
                     }
@@ -246,8 +239,16 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              * 1. address에서 uid를 찾는다 (대화할 상대의 uid)
              * 2. ChatRoomMember에서 해당 uid와, 내 uid를 갖고 있는 rid를 찾는다.
              * 3. rid를 가지고 와서 intent로 넘겨준다.
-             * 지금 ChatRoomMember를 만들지 않음.
              */
+            mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getUid()).findFirst();
+            if(mChat==null){
+                // 새로만든 채팅이 없다면 새로 만든다.
+                temporary(address);
+            } else {
+                Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                intent.putExtra("rid", mChat.getRid());
+                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+            }
         });
 
 
@@ -289,10 +290,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private void startGallery() {
         // 갤러리를 들어가기 위한 intent
         Intent cameraIntent = new Intent(Intent.ACTION_PICK);
-        cameraIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        // 두 개의 차이점이 뭐
         cameraIntent.setType("image/*");
-//        cameraIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
         if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             // 갤러리 실행
             startActivityForResult(cameraIntent, 1);
@@ -306,8 +304,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 try {
                     // 선택된 이미지의 Uri값을 가져온다.
                     Uri imgUri = data.getData();
-                    // Uri값을 String으로 변환시킨다.
-                    getPicture(imgUri);
+                    /* Uri값의 이미지값을 불러온다.
+                     * 이미지값을 저장한다.
+                     * 해당 이미지값을 서버에 올린다.
+                     */
+                    changeRealmData(imgUri, 2);
                     // realm데이터에 myprofile이미지를 변경한다.
 
                 } catch (Exception e) {
@@ -316,61 +317,95 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             }
         }
     }
-    public void getPicture(Uri uri) {
-        int index = 0;
-        String[] proj = {MediaStore.Images.Media.DATA};
-
-        // 이미지 경로로 해당 이미지에 대한 정보를 가지고 있는 cursor 호출
-        Cursor cursor = getActivity().getContentResolver().query(uri, proj, null, null, null);
-
-        if(cursor == null){
-//            view.showToast("사진이 없습니다.");
-//            view.setInitProfile();
-            Log.e("null", "사진이 비어있습니다.");
-        } else if (cursor.moveToFirst()) {
-            index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-            String imgPath = cursor.getString(index);
-
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    User user = realm.where(User.class).equalTo("uid", myProfile.getUid()).findFirst();
-                    user.setProfileImg(imgPath);
-                }
-            });
-            // 새로고침
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.detach(this).attach(this).commit();
-
-            Log.d("realPathFromURI", "realPathFromURI: " + imgPath);
-            cursor.close();
-        } else {
-//            view.showToast("커서가 비었습니다.");
-//            view.setInitProfile(); cursor.close();
-            Log.e("null", "커서가 비어있습니다.");
-        }
-
-    }
 
     // 상태변경
-    public void changeRealmData(int status, LinearLayout statusLayout , Button chatButton) {
+    public void changeStatus(int status, LinearLayout statusLayout , Button chatButton) {
         // 버튼을 눌렀다면
         if(status != -1) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    User user = realm.where(User.class).equalTo("uid", myProfile.getUid()).findFirst();
-                    user.setStatus(status);
-                }
-            });
-            // 원상복귀 후 새로고침
+            // 원상복귀
             chatButton.setVisibility(View.VISIBLE);
             statusLayout.setVisibility(View.INVISIBLE);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.detach(this).attach(this).commit();
+            changeRealmData(status, 1);
         } else { // 버튼을 누르지 않았다면
             chatButton.setVisibility(View.VISIBLE);
             statusLayout.setVisibility(View.INVISIBLE);
         }
     }
+
+    public void changeRealmData(Object object, int a) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                User user = realm.where(User.class).equalTo("uid", myProfile.getUid()).findFirst();
+                if(a==0) user.setName(object.toString());
+                else if(a==1) user.setStatus((Integer) object);
+                else if(a==2) user.setProfileImg(object.toString());
+            }
+        });
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
+    }
+    /** 현재 ChatAddActivity에서 가지고 온 코드 **/
+
+    public void temporary(User address) {
+        String rid = getRandomString().toString();
+        ChatRoom newChatRoom = new ChatRoom();
+        newChatRoom.setRid(rid);
+        newChatRoom.setRoomName(address.getName());
+        newChatRoom.setRoomImg(address.getProfileImg());
+
+        newChatRoom.setUpdatedDate(new Date());
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(newChatRoom);
+
+                ChatRoomMember chatMember = new ChatRoomMember();
+                chatMember.setRid(rid);
+                chatMember.setUid(address.getUid());
+                /**
+                 * ChatRoomMember 모델이 Primary Key 가 없어서 copyToRealmOrUpdate 함수는
+                 * 사용하지 못하기 때문에 copyToRealm 함수를 사용함.
+                 * 참고: https://stackoverflow.com/questions/40999299/android-create-realm-table-without-primary-key
+                 **/
+                realm.copyToRealm(chatMember);
+            }
+        });
+
+//        setResult(RESULT_OK); //MainActivity 로 결과 전달
+//        finish();
+    }
+
+    public StringBuffer getRandomString() {
+        StringBuffer temp = new StringBuffer();
+        Random rnd = new Random();
+        rnd.setSeed(System.currentTimeMillis());
+        for (int i = 0; i < 20; i++) {
+            int rIndex = rnd.nextInt(3);
+            switch (rIndex) {
+                case 0:
+                    // a-z
+                    temp.append((char) ((int) (rnd.nextInt(26)) + 97));
+                    break;
+                case 1:
+                    // A-Z
+                    temp.append((char) ((int) (rnd.nextInt(26)) + 65));
+                    break;
+                case 2:
+                    // 0-9
+                    temp.append((rnd.nextInt(10)));
+                    break;
+            }
+        }
+        return temp;
+    }
+
+
+
+
+
+
+
+
 }

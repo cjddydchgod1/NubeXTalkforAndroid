@@ -205,7 +205,14 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setContent(uri.toString());
                             chat.setSendDate(date);
                             realm.copyToRealmOrUpdate(chat);
+
+                            mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+                            mAdapter.update(mChat);
+
+                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+
                     }
+
             });
             } catch (Exception e) {
                     e.printStackTrace();
@@ -379,11 +386,16 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                                     .equalTo("rid",mRoomId).findFirst();
                             roomInfo.setUpdatedDate(date);
                             realm.copyToRealmOrUpdate(roomInfo);
-                            mAdapter.notifyDataSetChanged();
                         }
+
+                        mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+                        mAdapter.update(mChat);
+                        mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+
                         mEditChat.setText("");
                     }
         });
+
     }
 
     private void exitRoom(){

@@ -3,7 +3,7 @@
  * Copyright 테크하임(주). All rights reserved.
  */
 
-package x.com.nubextalk;
+package x.com.nubextalk.Module.Fragment;
 
 import android.os.Bundle;
 
@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import x.com.nubextalk.R;
 
 public class SettingFragment extends Fragment {
 

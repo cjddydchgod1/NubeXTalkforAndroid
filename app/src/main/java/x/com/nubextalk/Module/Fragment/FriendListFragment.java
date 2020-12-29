@@ -1,4 +1,9 @@
-package x.com.nubextalk;
+/*
+ * Created By Jong Ho, Lee on  2020.
+ * Copyright 테크하임(주). All rights reserved.
+ */
+
+package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.app.Activity;
@@ -45,12 +50,15 @@ import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.ChatRoomActivity;
+import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
+import x.com.nubextalk.R;
 
 import static android.app.Activity.RESULT_OK;
 

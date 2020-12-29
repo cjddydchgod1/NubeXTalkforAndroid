@@ -26,8 +26,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import io.realm.Realm;
-import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Module.Fragment.CalendarFragment;
+import x.com.nubextalk.Module.Fragment.ChatListFragment;
+import x.com.nubextalk.Module.Fragment.FriendListFragment;
+import x.com.nubextalk.Module.Fragment.SettingFragment;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.

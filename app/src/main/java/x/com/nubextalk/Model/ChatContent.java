@@ -44,6 +44,9 @@ public class ChatContent extends RealmObject {
     private Boolean isRead = false;
 
     @NonNull
+    private Boolean isFirst = true;
+
+    @NonNull
     public String getCid() {
         return cid;
     }
@@ -88,6 +91,11 @@ public class ChatContent extends RealmObject {
     public Boolean getIsRead() { return isRead; }
 
     public void setIsRead(Boolean isRead) { this.isRead = isRead; }
+
+    @NonNull
+    public Boolean getFirst() { return isFirst; }
+
+    public void setFirst(@NonNull Boolean first) { isFirst = first; }
 
     /**
      * Data 초기화 함수

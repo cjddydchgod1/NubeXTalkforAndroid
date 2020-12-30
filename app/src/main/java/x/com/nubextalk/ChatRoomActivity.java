@@ -100,6 +100,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+        setChatContentRead(mChat);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
         mEditChat = (EditText)findViewById(R.id.edit_chat);
@@ -131,6 +132,21 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
         drawerTitle.setText(roomTitle);
     }
+    private void setChatContentRead(RealmResults<ChatContent> mChat) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (ChatContent chatContent : mChat) {
+                    if (!chatContent.getIsRead()) {
+                        chatContent.setIsRead(true);
+                    }
+                }
+                ;
+            }
+        });
+    }
+
+
     @Override
     public void onBackPressed(){
         setResult(10);
@@ -273,6 +289,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setRid(mRoomId); // RID 채팅방 아이디
                             chat.setType(1);
                             chat.setContent(uri.toString());
+                            chat.setIsRead(true);
                             chat.setSendDate(date);
                             if(day2.equals(day1)){
                                 chat.setFirst(false);
@@ -335,12 +352,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setRid(mRoomId); // RID 채팅방 아이디
                             chat.setType(1);
                             chat.setContent(uri.toString());
+                            chat.setIsRead(true);
                             chat.setSendDate(date);
-                            if(day2.equals(day1)){
-                                chat.setFirst(false);
-                            }
-                            Log.d("day1",sDay1);
-                            Log.d("day2",sDay2);
                             realm.copyToRealmOrUpdate(chat);
                             mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
                         }
@@ -509,6 +522,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setRid(mRoomId); // RID 채팅방 아이디
                             chat.setType(0);
                             chat.setContent(content);
+                            chat.setIsRead(true);
                             chat.setSendDate(date);
                             if(day2.equals(day1)){
                                 chat.setFirst(false);

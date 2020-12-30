@@ -1,4 +1,9 @@
-package x.com.nubextalk;
+/*
+ * Created By Jong Ho, Lee on  2020.
+ * Copyright 테크하임(주). All rights reserved.
+ */
+
+package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.app.Activity;
@@ -23,6 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -32,6 +40,7 @@ import android.widget.EditText;
 
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.aquery.AQuery;
@@ -40,17 +49,22 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.ChatRoomActivity;
+import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
+import x.com.nubextalk.R;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -95,9 +109,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mAdapter = new FriendListAdapter(getActivity() ,mResults);
         ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(mAdapter);
-
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -112,6 +123,29 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         aq = new AQuery(getActivity());
 
         return rootview;
+    }
+
+    // 검색
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem searchItem = menu.findItem(R.id.toolbar_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        // 바로 검색이 가능하게끔
+        searchView.onActionViewExpanded();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
     }
 
     @Override

@@ -3,7 +3,7 @@
  * Copyright 테크하임(주). All rights reserved.
  */
 
-package x.com.nubextalk;
+package x.com.nubextalk.Module.Fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,11 +23,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.ChatRoomActivity;
+import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
+import x.com.nubextalk.R;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
         ChatListAdapter.OnItemSelectedListener, View.OnClickListener {

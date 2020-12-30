@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -119,15 +120,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == CHAT_ADD) {
             if (resultCode == RESULT_OK) {
-                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                cf.refreshChatList();
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                if(fragment instanceof ChatListFragment) {
+                    ((ChatListFragment) fragment).refreshChatList();
+                }
             }
         }
 
         if (requestCode == MOVE_TO_CHAT_ROOM) {
             if (resultCode == 10) {
-                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                cf.refreshChatList();
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                if(fragment instanceof ChatListFragment) {
+                    ((ChatListFragment) fragment).refreshChatList();
+                }
             }
         }
     }
@@ -145,8 +150,11 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
         //검색창 입력 리스
+        //검색창 불러오기
         MenuItem searchItem = menu.findItem(R.id.toolbar_search);
+
         SearchView searchView = (SearchView) searchItem.getActionView();
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override //검색어 완료시
             public boolean onQueryTextSubmit(String query) {

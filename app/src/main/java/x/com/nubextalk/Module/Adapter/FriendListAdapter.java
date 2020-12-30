@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.aquery.AQuery;
 
 import java.util.LinkedList;
 
+import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
+import io.realm.Realm;
 import io.realm.RealmResults;
 import okhttp3.internal.http2.Header;
 import x.com.nubextalk.Model.User;
@@ -34,9 +37,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private RealmResults<User> mDataSet;
     private Context mContext;
-
     private onItemSelectedListener listener;
-
+    private AQuery aq;
 
     public interface onItemSelectedListener{
         void onSelected(User address);
@@ -116,7 +118,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private final TextView profileName;
         private final ImageView profileImage;
         private final ImageView profileStatus;
-        private AQuery aq;
+
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
             aq = new AQuery(itemView.getContext(), itemView);

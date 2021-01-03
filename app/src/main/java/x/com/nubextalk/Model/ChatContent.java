@@ -34,7 +34,7 @@ public class ChatContent extends RealmObject {
     @NonNull
     private String uid;
     @NonNull
-    private int type;
+    private int type; // 0 = 일반 텍스트, 1 = 사진 , 9 = system
     @NonNull
     private String content;
     @NonNull

@@ -45,6 +45,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -55,6 +56,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private static Realm realm;
     private static AQuery aq;
     private static InputMethodManager imm;
+    private static DateManager dm;
 
     private static RealmResults<ChatContent> mChat;
     private static RecyclerView mRecyclerView;
@@ -64,11 +66,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private static EditText mEditChat;
     private static IconButton mSendButton;
-//    private static IconButton mMediaButton;
-//    private static LinearLayout mMediaMenu;
 
     private static String mRoomId;
-    private static Date mRoomUpdateDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +84,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         mRoomId = intent.getExtras().getString("rid");
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
         String roomTitle = roomInfo.getRoomName();
-        mRoomUpdateDate = roomInfo.getUpdatedDate();
 
         // 채팅방 툴바 설정
         Toolbar toolbar_chat_room = findViewById(R.id.toolbar_chat_room);
@@ -105,7 +103,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
         mEditChat = (EditText)findViewById(R.id.edit_chat);
         mSendButton = (IconButton)findViewById(R.id.send_button);
-//        mMediaButton = (IconButton)findViewById(R.id.media_button);
 
         // 버튼 아이콘 설정
         mSendButton.setText("{far-paper-plane 30dp #747475}");
@@ -113,7 +110,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // on click listener 설정
         mSendButton.setOnClickListener(this);
-//        mMediaButton.setOnClickListener(this);
 
         // 리사이클러 뷰와 어댑터를 연결 채팅을 불러 올수 있음
         mRecyclerView = (RecyclerView)findViewById(R.id.chat_room_content);
@@ -146,7 +142,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
-
     @Override
     public void onBackPressed(){
         setResult(10);
@@ -161,31 +156,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.send_button:
-                sendChat(v);
+                sendChat();
                 break;
-
-//            case R.id.chat_room_content:
-//                imm.hideSoftInputFromWindow(mEditChat.getWindowToken(), 0);
-//                break;
-
-//            case R.id.media_button:
-//                openMediaMenu(v);
-//                break;
-//            case R.id.gallery_button:
-//                openAlbum();
-//                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-//                break;
-//            case R.id.camera_button:
-//                openCamera();
-//                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-//                break;
-//            case R.id.pacs_button:
-//                openPacs();
-//                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-//                break;
-//            case R.id.media_menu_cancel:
-//                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-//                break;
         }
     }
     @Override // Option Item Selected Listener
@@ -241,47 +213,15 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             try {
                 Uri uri = data.getData();
                 realm.executeTransaction(new Realm.Transaction() {
-//                    @Override
-//                    public void execute(Realm realm) {
-//                            Date date = new Date();
-//                            ChatContent chat = new ChatContent();
-//                            chat.setCid();
-//                            chat.setUid("1234");
-//                            chat.setRid(mRoomId);
-//                            chat.setType(1);
-//                            chat.setContent(uri.toString());
-//                            chat.setSendDate(date);
-//                            realm.copyToRealmOrUpdate(chat);
-//
-//                            mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
-//                            mAdapter.update(mChat);
-//
-//                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
-//
-//                    }
                     @Override
                     public void execute(Realm realm) {
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
                             Date date = new Date();
 
                             // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
                             ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-                            mRoomUpdateDate = roomInfo.getUpdatedDate();
+                            Date roomUpdateDate = roomInfo.getUpdatedDate();
                             roomInfo.setUpdatedDate(date);
                             realm.copyToRealmOrUpdate(roomInfo);
-
-                            String sDay1 = sdf.format(mRoomUpdateDate);
-                            String sDay2 = sdf.format(date);
-
-                            Date day1 = null;
-                            Date day2 = null;
-                            try {
-                                day1 = sdf.parse(sDay1);
-                                day2 = sdf.parse(sDay2);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
 
                             ChatContent chat = new ChatContent();
                             chat.setCid(); // Content ID 자동으로 유니크한 값 설정
@@ -291,11 +231,9 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setContent(uri.toString());
                             chat.setIsRead(true);
                             chat.setSendDate(date);
-                            if(day2.equals(day1)){
+                            if(dm.isSameDay(date,roomUpdateDate)){
                                 chat.setFirst(false);
                             }
-                            Log.d("day1",sDay1);
-                            Log.d("day2",sDay2);
                             realm.copyToRealmOrUpdate(chat);
                             mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
                         }
@@ -309,42 +247,15 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             try {
                 Uri uri = data.getData();
                 realm.executeTransaction(new Realm.Transaction() {
-//                    @Override
-//                    public void execute(Realm realm) {
-//                            Date date = new Date();
-//                            ChatContent chat = new ChatContent();
-//                            chat.setCid();
-//                            chat.setUid("1234");
-//                            chat.setRid(mRoomId);
-//                            chat.setType(1);
-//                            chat.setContent(uri.toString());
-//                            chat.setSendDate(date);
-//                            realm.copyToRealmOrUpdate(chat);
-//                            mAdapter.notifyDataSetChanged();
-//                    }
                     @Override
                     public void execute(Realm realm) {
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
                             Date date = new Date();
 
                             // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
                             ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-                            mRoomUpdateDate = roomInfo.getUpdatedDate();
+                            Date roomUpdateDate = roomInfo.getUpdatedDate();
                             roomInfo.setUpdatedDate(date);
                             realm.copyToRealmOrUpdate(roomInfo);
-
-                            String sDay1 = sdf.format(mRoomUpdateDate);
-                            String sDay2 = sdf.format(date);
-
-                            Date day1 = null;
-                            Date day2 = null;
-                            try {
-                                day1 = sdf.parse(sDay1);
-                                day2 = sdf.parse(sDay2);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
 
                             ChatContent chat = new ChatContent();
                             chat.setCid(); // Content ID 자동으로 유니크한 값 설정
@@ -354,6 +265,9 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setContent(uri.toString());
                             chat.setIsRead(true);
                             chat.setSendDate(date);
+                            if(dm.isSameDay(date,roomUpdateDate)){
+                                chat.setFirst(false);
+                            }
                             realm.copyToRealmOrUpdate(chat);
                             mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
                         }
@@ -437,27 +351,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
-//    private void openMediaMenu(View view) {
-//        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        mMediaMenu = (LinearLayout)inflater.inflate(R.layout.activity_chat_room_media, null);
-//        mMediaMenu.setBackgroundColor(Color.parseColor("#99000000"));
-//        addContentView(mMediaMenu, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT ));
-//
-//        IconButton GalleryButton = findViewById(R.id.gallery_button);
-//        IconButton CameraButton = findViewById(R.id.camera_button);
-//        IconButton PacsButton = findViewById(R.id.pacs_button);
-//        TextView Cancel = findViewById(R.id.media_menu_cancel);
-//
-//        GalleryButton.setOnClickListener(this);
-//        CameraButton.setOnClickListener(this);
-//        PacsButton.setOnClickListener(this);
-//        Cancel.setOnClickListener(this);
-//
-//        GalleryButton.setText("{fas-images 70dp #FFFFFF}");
-//        CameraButton.setText("{fas-camera-retro 70dp #FFFFFF}");
-//        PacsButton.setText("{fas-puzzle-piece 70dp #FFFFFF}");
-//    }
-
     private void openAlbum() {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -485,7 +378,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private void openPacs(){
     }
 
-    private void sendChat(View view) {
+    private void sendChat() {
         realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -494,27 +387,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             aq.toast("메세지를 입력하세요");
                         }
                         else {
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
                             Date date = new Date();
 
                             // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
                             ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-                            mRoomUpdateDate = roomInfo.getUpdatedDate();
+                            Date roomUpdateDate = roomInfo.getUpdatedDate();
                             roomInfo.setUpdatedDate(date);
                             realm.copyToRealmOrUpdate(roomInfo);
-
-                            String sDay1 = sdf.format(mRoomUpdateDate);
-                            String sDay2 = sdf.format(date);
-
-                            Date day1 = null;
-                            Date day2 = null;
-                            try {
-                                day1 = sdf.parse(sDay1);
-                                day2 = sdf.parse(sDay2);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
 
                             ChatContent chat = new ChatContent();
                             chat.setCid(); // Content ID 자동으로 유니크한 값 설정
@@ -524,7 +403,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             chat.setContent(content);
                             chat.setIsRead(true);
                             chat.setSendDate(date);
-                            if(day2.equals(day1)){
+                            if(dm.isSameDay(date,roomUpdateDate)){
                                 chat.setFirst(false);
                             }
                             realm.copyToRealmOrUpdate(chat);

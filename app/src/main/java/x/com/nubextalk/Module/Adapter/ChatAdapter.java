@@ -8,8 +8,6 @@ package x.com.nubextalk.Module.Adapter;
 // 채팅방 액티비티와 Chat class 어댑터
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +24,6 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import io.realm.RealmViewHolder;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.User;
@@ -55,9 +52,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View mItemView = mInflater.inflate(R.layout.item_chat, parent, false);
             return new ChatViewHolder(mItemView, this);
         }
-        else{
+        else if(viewType == 1){
             View mItemView = mInflater.inflate(R.layout.item_chat_media, parent, false);
             return new ChatMediaViewHolder(mItemView, this);
+        }
+        else{
+            View mItemView = mInflater.inflate(R.layout.item_chat_system,parent,false);
+            return new ChatSystemViewHolder(mItemView,this);
         }
     }
 
@@ -116,45 +117,56 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cvHolder.my_time.setVisibility(View.GONE);
             }
         }
-        else{
-            ChatMediaViewHolder cvmHolder = (ChatMediaViewHolder) holder;
+        else if(chat.getType() == 1){
+            ChatMediaViewHolder cmvHolder = (ChatMediaViewHolder) holder;
             if(chat.getFirst()){
-                cvmHolder.date.setText(sendDate);
-                cvmHolder.date.setVisibility(View.VISIBLE);
+                cmvHolder.date.setText(sendDate);
+                cmvHolder.date.setVisibility(View.VISIBLE);
             }
             else{
-                cvmHolder.date.setVisibility(View.GONE);
+                cmvHolder.date.setVisibility(View.GONE);
             }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
             if(chat.getUid().equals(this.id)){
-                cvmHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
-                cvmHolder.my_time.setText(sendTime);
+                cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
+                cmvHolder.my_time.setText(sendTime);
 
-                cvmHolder.my_chat_image.setVisibility(View.VISIBLE);
-                cvmHolder.my_time.setVisibility(View.VISIBLE);
+                cmvHolder.my_chat_image.setVisibility(View.VISIBLE);
+                cmvHolder.my_time.setVisibility(View.VISIBLE);
 
-                cvmHolder.profileImage.setVisibility(View.GONE);
-                cvmHolder.profileName.setVisibility(View.GONE);
-                cvmHolder.other_time.setVisibility(View.GONE);
-                cvmHolder.other_chat_image.setVisibility(View.GONE);
+                cmvHolder.profileImage.setVisibility(View.GONE);
+                cmvHolder.profileName.setVisibility(View.GONE);
+                cmvHolder.other_time.setVisibility(View.GONE);
+                cmvHolder.other_chat_image.setVisibility(View.GONE);
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
-                cvmHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
-                cvmHolder.profileName.setText(mUserData.getName());
-                cvmHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
-                cvmHolder.other_time.setText(sendTime);
+                cmvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
+                cmvHolder.profileName.setText(mUserData.getName());
+                cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
+                cmvHolder.other_time.setText(sendTime);
 
-                cvmHolder.profileImage.setVisibility(View.VISIBLE);
-                cvmHolder.profileName.setVisibility(View.VISIBLE);
-                cvmHolder.other_time.setVisibility(View.VISIBLE);
-                cvmHolder.other_chat_image.setVisibility(View.VISIBLE);
+                cmvHolder.profileImage.setVisibility(View.VISIBLE);
+                cmvHolder.profileName.setVisibility(View.VISIBLE);
+                cmvHolder.other_time.setVisibility(View.VISIBLE);
+                cmvHolder.other_chat_image.setVisibility(View.VISIBLE);
 
-                cvmHolder.my_chat_image.setVisibility(View.GONE);
-                cvmHolder.my_time.setVisibility(View.GONE);
+                cmvHolder.my_chat_image.setVisibility(View.GONE);
+                cmvHolder.my_time.setVisibility(View.GONE);
 
             }
+        }
+        else{
+            ChatSystemViewHolder csvHolder = (ChatSystemViewHolder) holder;//채팅방 내용이 없으면 그냥 만들면 first == true 일듯
+            if(chat.getFirst()){
+                csvHolder.date.setText(sendDate);
+                csvHolder.date.setVisibility(View.VISIBLE);
+            }
+            else{
+                csvHolder.date.setVisibility(View.GONE);
+            }
+            csvHolder.chat_system.setText(chat.getContent());
         }
     }
 
@@ -169,8 +181,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if(type == 0){
             return 0;
         }
-        else{
+        else if(type == 1){
             return 1;
+        }
+        else{
+            return 9;
         }
     }
 
@@ -197,7 +212,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             aq = new AQuery(itemView.getContext(), itemView);
 
-            date = itemView.findViewById(R.id.text_date);
+            date = itemView.findViewById(R.id.chat_date);
             profileImage = itemView.findViewById(R.id.profile_image);
             profileName = itemView.findViewById(R.id.profile_name);
             other_chat_text = itemView.findViewById(R.id.other_chat_text);
@@ -222,12 +237,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private AQuery aq ;
 
-
         public ChatMediaViewHolder(@NonNull View itemView, ChatAdapter mAdapter) {
             super(itemView);
             aq = new AQuery(itemView.getContext(), itemView);
 
-            date = itemView.findViewById(R.id.text_date);
+            date = itemView.findViewById(R.id.chat_date);
             profileImage = itemView.findViewById(R.id.profile_image);
             profileName = itemView.findViewById(R.id.profile_name);
             other_chat_image = itemView.findViewById(R.id.other_chat_image);
@@ -238,4 +252,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.mAdapter = mAdapter;
         }
     }
+    public static class ChatSystemViewHolder extends RecyclerView.ViewHolder {
+        public TextView chat_system;
+        public TextView date;
+
+        final ChatAdapter mAdapter;
+
+
+        public ChatSystemViewHolder(@NonNull View itemView, ChatAdapter mAdapter) {
+            super(itemView);
+            chat_system = itemView.findViewById(R.id.chat_system);
+            date = itemView.findViewById(R.id.chat_date);
+            this.mAdapter = mAdapter;
+        }
+    }
+
 }

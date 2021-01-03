@@ -313,7 +313,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 modifyName.setVisibility(View.GONE);
                 profileName.setVisibility(View.VISIBLE);
                 profileName.setText(address.getName());
-
                 changeRealmData(temp, 0, address);
             }
         });
@@ -455,6 +454,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 else if(selection==1) user.setStatus((Integer) object);
                 // 2 == 프로필 이미지변경
                 else if(selection==2) user.setProfileImg(object.toString());
+                realm.copyToRealmOrUpdate(user);
             }
         });
         FragmentTransaction ft = getFragmentManager().beginTransaction();

@@ -6,18 +6,11 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,12 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aquery.AQuery;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
-import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
-import io.realm.Realm;
-import io.realm.RealmResults;
-import okhttp3.internal.http2.Header;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 

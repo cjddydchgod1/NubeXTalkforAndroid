@@ -142,32 +142,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /**
-     * 툴바 메뉴 설정
-     **/
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-
-        //검색창 입력 리스
-        //검색창 불러오기
-        MenuItem searchItem = menu.findItem(R.id.toolbar_search);
-
-        SearchView searchView = (SearchView) searchItem.getActionView();
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override //검색어 완료시
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override //검색어 입력시
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-        return true;
-    }
 
     private void initPermission() {
         PermissionListener pm = new PermissionListener() {

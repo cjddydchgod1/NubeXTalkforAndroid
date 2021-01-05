@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.aquery.AQuery;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
@@ -36,9 +37,15 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.joanzapata.iconify.widget.IconButton;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -57,6 +64,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private static AQuery aq;
     private static InputMethodManager imm;
     private static DateManager dm;
+    private static FirebaseStorage storage;
 
     private static RealmResults<ChatContent> mChat;
     private static RecyclerView mRecyclerView;
@@ -71,12 +79,18 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         aq = new AQuery(this);
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        storage = FirebaseStorage.getInstance();
+
+        Log.i("RealmManager",realm.getPath());
+
+
 
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
@@ -209,73 +223,120 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        StorageReference storageRef = storage.getReference();
+
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            try {
-                Uri uri = data.getData();
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                            Date date = new Date();
+            Uri file = data.getData();
+            StorageReference imageRef = storageRef.child("images/"+file.getLastPathSegment());
+            UploadTask uploadTask = imageRef.putFile(file);
 
-                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
-                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-                            Date roomUpdateDate = roomInfo.getUpdatedDate();
-                            roomInfo.setUpdatedDate(date);
-                            realm.copyToRealmOrUpdate(roomInfo);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    try {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                Date date = new Date();
 
-                            ChatContent chat = new ChatContent();
-                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
-                            chat.setUid("1234"); // UID 보내는 사람
-                            chat.setRid(mRoomId); // RID 채팅방 아이디
-                            chat.setType(1);
-                            chat.setContent(uri.toString());
-                            chat.setIsRead(true);
-                            chat.setSendDate(date);
-                            if(dm.isSameDay(date,roomUpdateDate)){
-                                chat.setFirst(false);
+                                // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+                                ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+                                Date roomUpdateDate = roomInfo.getUpdatedDate();
+                                roomInfo.setUpdatedDate(date);
+                                realm.copyToRealmOrUpdate(roomInfo);
+
+                                ChatContent chat = new ChatContent();
+                                chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                                chat.setUid("1234"); // UID 보내는 사람
+                                chat.setRid(mRoomId); // RID 채팅방 아이디
+                                chat.setType(1);
+                                chat.setContent("images/"+file.getLastPathSegment());
+                                chat.setIsRead(true);
+                                chat.setSendDate(date);
+                                if(dm.isSameDay(date,roomUpdateDate)){
+                                    chat.setFirst(false);
+                                }
+                                realm.copyToRealmOrUpdate(chat);
+                                mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
                             }
-                            realm.copyToRealmOrUpdate(chat);
-                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
-                        }
 
-                });
-            } catch (Exception e) {
-                    e.printStackTrace();
-            }
-        }
-        else if(requestCode == 2 && resultCode == RESULT_OK){
-            try {
-                Uri uri = data.getData();
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                            Date date = new Date();
-
-                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
-                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-                            Date roomUpdateDate = roomInfo.getUpdatedDate();
-                            roomInfo.setUpdatedDate(date);
-                            realm.copyToRealmOrUpdate(roomInfo);
-
-                            ChatContent chat = new ChatContent();
-                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
-                            chat.setUid("1234"); // UID 보내는 사람
-                            chat.setRid(mRoomId); // RID 채팅방 아이디
-                            chat.setType(1);
-                            chat.setContent(uri.toString());
-                            chat.setIsRead(true);
-                            chat.setSendDate(date);
-                            if(dm.isSameDay(date,roomUpdateDate)){
-                                chat.setFirst(false);
-                            }
-                            realm.copyToRealmOrUpdate(chat);
-                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
-                        }
-                });
-            } catch (Exception e) {
-                    e.printStackTrace();
-            }
-
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+//            try {
+//                Uri uri = data.getData();
+//                realm.executeTransaction(new Realm.Transaction() {
+//                    @Override
+//                    public void execute(Realm realm) {
+//                            Date date = new Date();
+//
+//                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+//                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+//                            Date roomUpdateDate = roomInfo.getUpdatedDate();
+//                            roomInfo.setUpdatedDate(date);
+//                            realm.copyToRealmOrUpdate(roomInfo);
+//
+//                            ChatContent chat = new ChatContent();
+//                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+//                            chat.setUid("1234"); // UID 보내는 사람
+//                            chat.setRid(mRoomId); // RID 채팅방 아이디
+//                            chat.setType(1);
+//                            chat.setContent(uri.toString());
+//                            chat.setIsRead(true);
+//                            chat.setSendDate(date);
+//                            if(dm.isSameDay(date,roomUpdateDate)){
+//                                chat.setFirst(false);
+//                            }
+//                            realm.copyToRealmOrUpdate(chat);
+//                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+//                        }
+//
+//                });
+//            } catch (Exception e) {
+//                    e.printStackTrace();
+//            }
+//        }
+//        else if(requestCode == 2 && resultCode == RESULT_OK){
+//            try {
+//                Uri uri = data.getData();
+//                realm.executeTransaction(new Realm.Transaction() {
+//                    @Override
+//                    public void execute(Realm realm) {
+//                            Date date = new Date();
+//
+//                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+//                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+//                            Date roomUpdateDate = roomInfo.getUpdatedDate();
+//                            roomInfo.setUpdatedDate(date);
+//                            realm.copyToRealmOrUpdate(roomInfo);
+//
+//                            ChatContent chat = new ChatContent();
+//                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+//                            chat.setUid("1234"); // UID 보내는 사람
+//                            chat.setRid(mRoomId); // RID 채팅방 아이디
+//                            chat.setType(1);
+//                            chat.setContent(uri.toString());
+//                            chat.setIsRead(true);
+//                            chat.setSendDate(date);
+//                            if(dm.isSameDay(date,roomUpdateDate)){
+//                                chat.setFirst(false);
+//                            }
+//                            realm.copyToRealmOrUpdate(chat);
+//                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+//                        }
+//                });
+//            } catch (Exception e) {
+//                    e.printStackTrace();
+//            }
+//
         }
     }
 
@@ -311,7 +372,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                             });
                         }
                         else{
-                            Log.e("fixTOp","please");
                             realm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {

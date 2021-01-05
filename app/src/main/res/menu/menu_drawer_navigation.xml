@@ -5,26 +5,44 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
->
-    <group>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group
+        android:id="@+id/menu_media">
         <item
-            android:id="@+id/setting_fix_top"
-            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-            app:actionLayout="@layout/action_switch"
-            android:title="상단 고정"/>
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="카메라" />
         <item
-            android:id="@+id/setting_alarm"
-            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-            app:actionLayout="@layout/action_switch"
-            android:title="알람 설정"
-            />
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="갤러리" />
         <item
-            android:id="@+id/exit"
-            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-            android:title="나가기"
-            />
+            android:id="@+id/nav_pacs"
+            android:title="PACS" />
     </group>
+
+    <item android:title="설정">
+        <menu>
+            <group
+                android:id="@+id/menu_settings">
+                <item
+                    android:id="@+id/nav_setting_fix_top"
+                    app:actionLayout="@layout/activity_chat_room_draw_switch"
+                    android:title="상단 고정"/>
+                <item
+                    android:id="@+id/nav_setting_alarm"
+                    app:actionLayout="@layout/activity_chat_room_draw_switch"
+                    android:title="알람 설정" />
+            </group>
+        </menu>
+    </item>
+
+     <item
+         android:id="@+id/nav_exit"
+         android:title="나가기" />
 
 
 </menu>

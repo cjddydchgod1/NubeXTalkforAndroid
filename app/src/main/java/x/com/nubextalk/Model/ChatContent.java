@@ -34,7 +34,7 @@ public class ChatContent extends RealmObject {
     @NonNull
     private String uid;
     @NonNull
-    private int type;
+    private int type; // 0 = 일반 텍스트, 1 = 사진 , 9 = system
     @NonNull
     private String content;
     @NonNull
@@ -42,6 +42,9 @@ public class ChatContent extends RealmObject {
 
     @NonNull
     private Boolean isRead = false;
+
+    @NonNull
+    private Boolean isFirst = true;
 
     @NonNull
     public String getCid() {
@@ -88,6 +91,11 @@ public class ChatContent extends RealmObject {
     public Boolean getIsRead() { return isRead; }
 
     public void setIsRead(Boolean isRead) { this.isRead = isRead; }
+
+    @NonNull
+    public Boolean getFirst() { return isFirst; }
+
+    public void setFirst(@NonNull Boolean first) { isFirst = first; }
 
     /**
      * Data 초기화 함수

@@ -23,6 +23,7 @@ import java.util.Random;
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
 import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
@@ -126,7 +127,8 @@ public class ChatAddActivity extends AppCompatActivity implements
             newChatRoom.setRoomImg("");
         }
 
-        newChatRoom.setUpdatedDate(new Date());
+        Date date = new Date();
+        newChatRoom.setUpdatedDate(date);
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -145,6 +147,16 @@ public class ChatAddActivity extends AppCompatActivity implements
                     realm.copyToRealm(chatMember);
 
                 }
+                ChatContent chat = new ChatContent();
+                chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                chat.setRid(rid); // RID 채팅방 아이디
+                chat.setType(9); // 시스템 메세지
+                chat.setContent("채팅방이 개설 되었습니다.");
+                chat.setIsRead(true);
+                chat.setSendDate(date);
+                realm.copyToRealmOrUpdate(chat);
+
+
             }
         });
 

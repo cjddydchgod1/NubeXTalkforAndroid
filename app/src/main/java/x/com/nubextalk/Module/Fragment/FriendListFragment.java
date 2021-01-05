@@ -7,12 +7,11 @@ package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +34,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,7 +51,8 @@ import io.realm.Sort;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
-import x.com.nubextalk.Manager.StorageManager;
+import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
+import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -74,10 +73,15 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private ArrayList<User> mList; // realm데이터를 복사
     private ChatRoomMember mChat;
     private User myProfile;
-
+    private String myUid = "6G67LygR16Xcp0vX65iS";
     private LinearLayout wrapper;
 
     private AQuery aq;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
 
     @Override
     public void onDestroy() {
@@ -96,23 +100,33 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         rootview = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
+
+
         mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
         mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
         aq = new AQuery(getActivity());
         // 현재 로그인되어있는 uid("1")랑은 다른 목록을 불러오기.
-        mResults = realm.where(User.class).notEqualTo("uid", "1").findAll()
-                .sort("name", Sort.ASCENDING);
-        if(mResults.size() == 0){
+
+        mResults = realm.where(User.class).notEqualTo("uid",myUid).findAll();
+        if(mResults.size() == 0) {
             User.init(getActivity(), realm);
-            mResults = realm.where(User.class).notEqualTo("uid", "1").findAll();
         }
+        Log.e("size", Integer.toString(mResults.size()));
+        // firestore에서 user불러오기
+        FirebaseStoreManager.getUser(realm);
         // realmResult -> ArrayList , search할 때 데이터를 썼다 지웠다가 필요함.
         mList = new ArrayList<>();
         mList.addAll(realm.copyFromRealm(mResults));
 
+        /**
+         * Adapter 설정
+         */
         mAdapter = new FriendListAdapter(getActivity() ,mList);
         ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
 
+        /**
+         * recyclerview 디자인 및 애니매이션
+         */
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -121,6 +135,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.scheduleLayoutAnimation();
 
         // myProfile
+        myProfile = realm.where(User.class).equalTo("uid", myUid).findFirst();
         makeProfile();
 
         // search action bar fragment마다 다르게 하기 위해서
@@ -132,7 +147,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     // myProfile
     public void makeProfile() {
         // uid("1") 나의 프로필 불러오기
-        myProfile = realm.where(User.class).equalTo("uid", "1").findFirst();
+
 
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
@@ -187,11 +202,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
             Log.e("모든 데이터", "all data");
-            mResults = realm.where(User.class).notEqualTo("uid", "1").findAll()
+            mResults = realm.where(User.class).notEqualTo("uid", myUid).findAll()
                 .sort("name", Sort.ASCENDING);
             if(mResults.size() == 0){
-                User.init(getActivity(), realm);
-                mResults = realm.where(User.class).notEqualTo("uid", "1").findAll();
+                mResults = realm.where(User.class).notEqualTo("uid", myUid).findAll();
             }
             mList.addAll(realm.copyFromRealm(mResults));
         }
@@ -256,7 +270,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // 초기화
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if(address.getUid().equals("1")){
+        if(address.getUid().equals(myUid)){
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
         } else {
@@ -315,7 +329,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         });
 
         // status(상태) 수정 버튼 (myProfile만 가능)
-        if(address.getUid().equals("1")) {
+        if(address.getUid().equals(myUid)) {
             profileStatus.setOnClickListener(v -> {
 
                 // chatButton은 숨기고, status를 선택하는 Layout등장
@@ -421,9 +435,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * 이미지값을 저장한다.
                      * 해당 이미지값을 서버에 올린다.
                      */
-                    StorageManager.uploadFile(imgUri);
-                    User user = realm.where(User.class).equalTo("uid", myProfile.getUid()).findFirst();
-                    changeRealmData(imgUri, 2, user);
+
+                    FirebaseStorageManager.uploadProfileImg(imgUri,myProfile);
+
+                    changeRealmData(imgUri, 2, myProfile);
                     // realm데이터에 myprofile이미지를 변경한다.
 
                 } catch (Exception e) {
@@ -431,14 +446,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 }
             }
         }
-    }
-    public String getPath(Uri uri) {
-        String [] proj = {MediaStore.Images.Media.DATA};
-        CursorLoader cursorLoader = new CursorLoader(getActivity(), uri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-        int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(index);
     }
 
     public void changeRealmData(Object object, int selection, User user) {

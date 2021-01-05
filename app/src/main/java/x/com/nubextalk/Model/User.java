@@ -32,6 +32,7 @@ public class User extends RealmObject {
     private String profileImg;
     @NonNull
     private int status;
+    @NonNull
     private String department;
 
     @NonNull
@@ -78,8 +79,7 @@ public class User extends RealmObject {
      *
      * @param realm
      */
-
-    public static void init(Context context, Realm realm) {
+        public static void init(Context context, Realm realm) {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = null;
         try {
@@ -101,7 +101,9 @@ public class User extends RealmObject {
         }
     }
 
+
     public static RealmResults<User> getAll(Realm realm){
         return realm.where(User.class).findAll();
     }
+
 }

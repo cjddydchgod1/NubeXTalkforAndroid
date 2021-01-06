@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -26,6 +28,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
@@ -36,10 +39,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.navigation.NavigationView;
 import com.joanzapata.iconify.widget.IconButton;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -47,8 +53,10 @@ import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
 public class ChatRoomActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
-    private static AQuery aq;
     private static Realm realm;
+    private static AQuery aq;
+    private static InputMethodManager imm;
+    private static DateManager dm;
 
     private static RealmResults<ChatContent> mChat;
     private static RecyclerView mRecyclerView;
@@ -58,8 +66,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private static EditText mEditChat;
     private static IconButton mSendButton;
-    private static IconButton mMediaButton;
-    private static LinearLayout mMediaMenu;
 
     private static String mRoomId;
 
@@ -67,8 +73,11 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
+
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         aq = new AQuery(this);
+        imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
@@ -89,25 +98,26 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+        setChatContentRead(mChat);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
         mEditChat = (EditText)findViewById(R.id.edit_chat);
         mSendButton = (IconButton)findViewById(R.id.send_button);
-        mMediaButton = (IconButton)findViewById(R.id.media_button);
 
         // 버튼 아이콘 설정
-        mSendButton.setText("{far-paper-plane 35dp #FFFFFF}");
-        mMediaButton.setText("{far-image 35dp #FFFFFF}");
+        mSendButton.setText("{far-paper-plane 30dp #747475}");
+//        mMediaButton.setText("{far-image 35dp #747475}");
 
         // on click listener 설정
         mSendButton.setOnClickListener(this);
-        mMediaButton.setOnClickListener(this);
 
         // 리사이클러 뷰와 어댑터를 연결 채팅을 불러 올수 있음
         mRecyclerView = (RecyclerView)findViewById(R.id.chat_room_content);
         mAdapter = new ChatAdapter(this, mChat);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+
         // Drawer navigation 설정
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -118,6 +128,20 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
         drawerTitle.setText(roomTitle);
     }
+    private void setChatContentRead(RealmResults<ChatContent> mChat) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (ChatContent chatContent : mChat) {
+                    if (!chatContent.getIsRead()) {
+                        chatContent.setIsRead(true);
+                    }
+                }
+                ;
+            }
+        });
+    }
+
     @Override
     public void onBackPressed(){
         setResult(10);
@@ -132,25 +156,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.send_button:
-                sendChat(v);
-                break;
-            case R.id.media_button:
-                openMediaMenu(v);
-                break;
-            case R.id.gallery_button:
-                openAlbum();
-                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-                break;
-            case R.id.camera_button:
-                openCamera();
-                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-                break;
-            case R.id.pacs_button:
-                openPacs();
-                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
-                break;
-            case R.id.media_menu_cancel:
-                ((ViewManager)mMediaMenu.getParent()).removeView(mMediaMenu);
+                sendChat();
                 break;
         }
     }
@@ -159,6 +165,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
+                imm.hideSoftInputFromWindow(mEditChat.getWindowToken(), 0);
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
@@ -168,19 +175,31 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         Menu menu = mNavigationView.getMenu();
         int id = menuItem.getItemId();
-        SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_fix_top)).findViewById(R.id.drawer_switch);
-        SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_alarm)).findViewById(R.id.drawer_switch);
+        SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_fix_top)).findViewById(R.id.drawer_switch);
+        SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_alarm)).findViewById(R.id.drawer_switch);
 
         switch (id) {
-            case  R.id.setting_fix_top :
+            case R.id.nav_camera :
+                openCamera();
+                break;
+
+            case R.id.nav_gallery :
+                openAlbum();
+                break;
+
+            case R.id.nav_pacs :
+                openPacs();
+                break;
+
+            case  R.id.nav_setting_fix_top :
                 fixTopSwitch.toggle();
                 break;
 
-            case R.id.setting_alarm :
+            case R.id.nav_setting_alarm :
                 alarmSwitch.toggle();
                 break;
 
-            case R.id.exit :
+            case R.id.nav_exit :
                 mDrawerLayout.closeDrawers();
                 exitRoom();
                 break;
@@ -197,23 +216,29 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void execute(Realm realm) {
                             Date date = new Date();
+
+                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+                            Date roomUpdateDate = roomInfo.getUpdatedDate();
+                            roomInfo.setUpdatedDate(date);
+                            realm.copyToRealmOrUpdate(roomInfo);
+
                             ChatContent chat = new ChatContent();
-                            chat.setCid();
-                            chat.setUid("1234");
-                            chat.setRid(mRoomId);
+                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                            chat.setUid("1234"); // UID 보내는 사람
+                            chat.setRid(mRoomId); // RID 채팅방 아이디
                             chat.setType(1);
                             chat.setContent(uri.toString());
+                            chat.setIsRead(true);
                             chat.setSendDate(date);
+                            if(dm.isSameDay(date,roomUpdateDate)){
+                                chat.setFirst(false);
+                            }
                             realm.copyToRealmOrUpdate(chat);
-
-                            mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
-                            mAdapter.update(mChat);
-
                             mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+                        }
 
-                    }
-
-            });
+                });
             } catch (Exception e) {
                     e.printStackTrace();
             }
@@ -225,17 +250,27 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void execute(Realm realm) {
                             Date date = new Date();
+
+                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+                            Date roomUpdateDate = roomInfo.getUpdatedDate();
+                            roomInfo.setUpdatedDate(date);
+                            realm.copyToRealmOrUpdate(roomInfo);
+
                             ChatContent chat = new ChatContent();
-                            chat.setCid();
-                            chat.setUid("1234");
-                            chat.setRid(mRoomId);
+                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                            chat.setUid("1234"); // UID 보내는 사람
+                            chat.setRid(mRoomId); // RID 채팅방 아이디
                             chat.setType(1);
                             chat.setContent(uri.toString());
+                            chat.setIsRead(true);
                             chat.setSendDate(date);
+                            if(dm.isSameDay(date,roomUpdateDate)){
+                                chat.setFirst(false);
+                            }
                             realm.copyToRealmOrUpdate(chat);
-                            mAdapter.notifyDataSetChanged();
-
-                    }
+                            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+                        }
                 });
             } catch (Exception e) {
                     e.printStackTrace();
@@ -246,8 +281,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private void setNavigationView(ChatRoom roomInfo){
          Menu menu = mNavigationView.getMenu();
-         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_fix_top)).findViewById(R.id.drawer_switch);
-         SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.setting_alarm)).findViewById(R.id.drawer_switch);
+         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_fix_top)).findViewById(R.id.drawer_switch);
+         SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_alarm)).findViewById(R.id.drawer_switch);
 
          if(roomInfo.getSettingFixTop()){
              fixTopSwitch.setChecked(true);
@@ -316,24 +351,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
-    private void openMediaMenu(View view) {
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mMediaMenu = (LinearLayout)inflater.inflate(R.layout.view_media_menu, null);
-        addContentView(mMediaMenu, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT ));
-        IconButton GalleryButton = findViewById(R.id.gallery_button);
-        IconButton CameraButton = findViewById(R.id.camera_button);
-        IconButton PacsButton = findViewById(R.id.pacs_button);
-        TextView Cancel = findViewById(R.id.media_menu_cancel);
-        GalleryButton.setOnClickListener(this);
-        CameraButton.setOnClickListener(this);
-        PacsButton.setOnClickListener(this);
-        Cancel.setOnClickListener(this);
-
-        GalleryButton.setText("{fas-images 90dp #FFFFFF}");
-        CameraButton.setText("{fas-camera-retro 90dp #FFFFFF}");
-        PacsButton.setText("{fas-puzzle-piece 90dp #FFFFFF}");
-    }
-
     private void openAlbum() {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -361,7 +378,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private void openPacs(){
     }
 
-    private void sendChat(View view) {
+    private void sendChat() {
         realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -372,26 +389,27 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                         else {
                             Date date = new Date();
 
+                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
+                            Date roomUpdateDate = roomInfo.getUpdatedDate();
+                            roomInfo.setUpdatedDate(date);
+                            realm.copyToRealmOrUpdate(roomInfo);
+
                             ChatContent chat = new ChatContent();
                             chat.setCid(); // Content ID 자동으로 유니크한 값 설정
                             chat.setUid("1234"); // UID 보내는 사람
                             chat.setRid(mRoomId); // RID 채팅방 아이디
                             chat.setType(0);
                             chat.setContent(content);
+                            chat.setIsRead(true);
                             chat.setSendDate(date);
+                            if(dm.isSameDay(date,roomUpdateDate)){
+                                chat.setFirst(false);
+                            }
                             realm.copyToRealmOrUpdate(chat);
 
-                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
-                            ChatRoom roomInfo = realm.where(ChatRoom.class)
-                                    .equalTo("rid",mRoomId).findFirst();
-                            roomInfo.setUpdatedDate(date);
-                            realm.copyToRealmOrUpdate(roomInfo);
                         }
-
-                        mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
-                        mAdapter.update(mChat);
                         mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
-
                         mEditChat.setText("");
                     }
         });

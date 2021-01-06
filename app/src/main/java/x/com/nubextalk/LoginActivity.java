@@ -35,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
@@ -60,9 +61,6 @@ public class LoginActivity extends AppCompatActivity {
         TextView loginButton = findViewById(R.id.login);
 
         id1 = id.getText().toString();
-
-        Task<QuerySnapshot> query = hospital.collection("users").whereEqualTo("uid",id1).get();
-
         /**
          * 현재 기기의 fcm값을 가지고 온다.
          */
@@ -119,17 +117,19 @@ public class LoginActivity extends AppCompatActivity {
                                         /**
                                         * Config가 있다면 update를 한다.
                                         */
-                                        if(config.getExt1() == null) config.setExt1(fcm);
-                                        else if(config.getExt2() == null) config.setExt2(fcm);
-                                        else if(config.getExt3() == null) config.setExt3(fcm);
-                                        else if(config.getExt4() == null) config.setExt4(fcm);
-                                        else if(config.getExt5() == null) config.setExt5(fcm);
+                                        if(config.getExt1() == null || config.getExt1().equals(fcm)) config.setExt1(fcm);
+                                        else if(config.getExt2() == null || config.getExt2().equals(fcm)) config.setExt2(fcm);
+                                        else if(config.getExt3() == null || config.getExt3().equals(fcm)) config.setExt3(fcm);
+                                        else if(config.getExt4() == null || config.getExt4().equals(fcm)) config.setExt4(fcm);
+                                        else if(config.getExt5() == null || config.getExt5().equals(fcm)) config.setExt5(fcm);
                                         else config.setExt1(fcm);
                                         realm.copyToRealmOrUpdate(config);
                                     }
                                 }
                             });
-                            startActivity(new Intent(activity, MainActivity.class));
+                            Intent intent = new Intent(activity, MainActivity.class);
+                            intent.putExtra("token", token);
+                            startActivity(intent);
                             finish();
                         } else {
                             Toast.makeText(activity, "id가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();

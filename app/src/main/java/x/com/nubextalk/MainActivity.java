@@ -25,6 +25,9 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Module.Fragment.CalendarFragment;
 import x.com.nubextalk.Module.Fragment.ChatListFragment;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
-
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +62,21 @@ public class MainActivity extends AppCompatActivity {
         //툴바 설정
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        Intent intent = getIntent();
+        token = intent.getStringExtra("token");
         initBottomNavigation();
     }
-
+    public String getUid(){
+        Realm realm           = Realm.getInstance(UtilityManager.getRealmConfig());
+        Config config = realm.where(Config.class).equalTo("ext1",token)
+                .or().equalTo("ext2", token)
+                .or().equalTo("ext3", token)
+                .or().equalTo("ext4", token)
+                .or().equalTo("ext5", token).findFirst();
+        String myUid = config.getOid();
+        realm.close();
+        return myUid;
+    }
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/

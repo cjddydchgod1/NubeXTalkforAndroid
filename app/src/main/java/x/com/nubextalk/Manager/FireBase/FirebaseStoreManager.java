@@ -10,6 +10,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,56 +25,29 @@ import org.json.JSONObject;
 
 import io.realm.Realm;
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Module.Fragment.FriendListFragment;
 
 public class FirebaseStoreManager {
     private static FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
     private static final String hid = "w34qjptO0cYSJdAwScFQ";
     private static final String uid = "6G67LygR16Xcp0vX65iS";
     private static final DocumentReference hospital = fireStore.collection("hospital").document(hid);
-    public static void updateProfileImg(String img){
+    public void updateProfileImg(String img){
         /**
          * Storage -> Firestore
          */
         hospital.collection("users").document(uid)
-                .update("profileImg", img).addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-
-                    }
-                });
-    }
-    public static void getUser(Realm realm) {
-        /**
-         * Firestore -> Realm
-         */
-        Gson gson = new Gson();
-        hospital.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .update("profileImg", img).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        Log.e("여기오냐?", "aaa");
-                        if (task.isSuccessful()) {
-                            realm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    try {
-                                        JSONArray jsonArray = new JSONArray();
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            JSONObject json = new JSONObject(gson.toJson(document.getData()));
-                                            jsonArray.put(json);
-                                        }
-                                        realm.createOrUpdateAllFromJson(User.class, jsonArray);
-                                        Log.e("Success", "aaa");
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                        } else {
-                            Log.e("Fail", "aaa");
-                        }
+                    public void onSuccess(Void aVoid) {
+                        Log.i("FirebaseStoreManager", "UpdateSuccess");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.i("FirebaseStoreManager", "UpdateFail");
                     }
                 });
-        Log.e("End", "aaa");
     }
 }

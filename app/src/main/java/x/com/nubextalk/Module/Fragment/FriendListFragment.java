@@ -40,11 +40,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
+import io.realm.OrderedCollectionChangeSet;
+import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
@@ -73,14 +86,133 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private ArrayList<User> mList; // realm데이터를 복사
     private ChatRoomMember mChat;
     private User myProfile;
-    private String myUid = "6G67LygR16Xcp0vX65iS";
     private LinearLayout wrapper;
-
     private AQuery aq;
+
+    private String myUid = "6G67LygR16Xcp0vX65iS";
+    private String TAG = "FriendListFragment";
+
+    private static FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
+    private static final DocumentReference hospital = fireStore.collection("hospital").document("w34qjptO0cYSJdAwScFQ");
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        realm           = Realm.getInstance(UtilityManager.getRealmConfig());
+        mResults = realm.where(User.class).findAll();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                mResults.deleteAllFromRealm();
+            }
+        });
+        Log.i(TAG, "OnAttach");
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "OnCreate");
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.i(TAG, "OnViewCreated");
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
+        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
+        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
+        aq              = new AQuery(getActivity());
+
+
+        /**
+         * Firestore에서 realm으로 migration
+         */
+
+        Gson gson = new Gson();
+        hospital.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Log.e("여기오냐?", "aaa");
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    try {
+                                        JSONArray jsonArray = new JSONArray();
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            JSONObject json = new JSONObject(gson.toJson(document.getData()));
+                                            jsonArray.put(json);
+                                        }
+                                        realm.createOrUpdateAllFromJson(User.class, jsonArray);
+                                        Log.e("end", "aaa");
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            Log.e("task", "success");
+                            makeData();
+                        } else {
+                            Log.e("Fail", "aaa");
+                        }
+                    }
+                });
+
+//        FirebaseStoreManager.getUser(realm, view);
+
+
+        // search action bar fragment마다 다르게 하기 위해서
+        setHasOptionsMenu(true);
+        getActivity().invalidateOptionsMenu();
+        Log.i(TAG, "OncreateView");
+        return rootview;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG, "OnActivityCreated");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(TAG, "OnStart");
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "OnResume");
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i(TAG, "OnPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i(TAG, "OnStop");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.i(TAG, "OnDestoryView");
     }
 
     @Override
@@ -88,33 +220,23 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         super.onDestroy();
         realm.close();
     }
+
     @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().invalidateOptionsMenu();
+    public void onDetach() {
+        super.onDetach();
+        Log.i(TAG, "OnDetach");
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
+    public void makeData() {
 
-        realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-
-
-        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
-        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
-        aq = new AQuery(getActivity());
-        // 현재 로그인되어있는 uid("1")랑은 다른 목록을 불러오기.
-
+        /**
+         * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
+         */
         mResults = realm.where(User.class).notEqualTo("uid",myUid).findAll();
-        if(mResults.size() == 0) {
-            User.init(getActivity(), realm);
-        }
-        Log.e("size", Integer.toString(mResults.size()));
-        // firestore에서 user불러오기
-        FirebaseStoreManager.getUser(realm);
-        // realmResult -> ArrayList , search할 때 데이터를 썼다 지웠다가 필요함.
+
+        /**
+         * Search하기 위해 mResult -> mList
+         */
         mList = new ArrayList<>();
         mList.addAll(realm.copyFromRealm(mResults));
 
@@ -134,14 +256,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scheduleLayoutAnimation();
 
-        // myProfile
+        /**
+         * 현재 uid의 user data불러오
+         */
         myProfile = realm.where(User.class).equalTo("uid", myUid).findFirst();
         makeProfile();
-
-        // search action bar fragment마다 다르게 하기 위해서
-        setHasOptionsMenu(true);
-
-        return rootview;
     }
 
     // myProfile
@@ -225,10 +344,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+
 
     @Override
     public void onSelected(User address) {
@@ -435,12 +551,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * 이미지값을 저장한다.
                      * 해당 이미지값을 서버에 올린다.
                      */
-
                     FirebaseStorageManager.uploadProfileImg(imgUri,myProfile);
-
-                    changeRealmData(imgUri, 2, myProfile);
-                    // realm데이터에 myprofile이미지를 변경한다.
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -456,8 +567,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 if(selection==0) user.setName(object.toString());
                 // 1 == 상태변경
                 else if(selection==1) user.setStatus((Integer) object);
-                // 2 == 프로필 이미지변경
-                else if(selection==2) user.setProfileImg(object.toString());
                 realm.copyToRealmOrUpdate(user);
             }
         });

@@ -430,6 +430,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             if(dm.isSameDay(date,roomUpdateDate)){
                 chat.put("isFirst","false");
             }
+            else{
+                chat.put("isFirst","true");
+
+            }
             //서버에 채팅 추가
             fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
                     .collection("chatRoom").document(mRoomId)

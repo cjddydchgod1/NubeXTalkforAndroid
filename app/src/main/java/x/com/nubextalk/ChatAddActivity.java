@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.gson.Gson;

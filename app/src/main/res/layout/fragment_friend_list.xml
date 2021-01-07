@@ -5,39 +5,92 @@
     android:layout_height="match_parent"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
     <LinearLayout
         android:id="@+id/mainFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
 
+            android:id="@+id/profileConstraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:padding="6dp">
+
+            <FrameLayout
+                android:id="@+id/profileFrameLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/my_profileImage"
+                    android:layout_width="@dimen/profile_image_m"
+                    android:layout_height="@dimen/profile_image_m"
+                    android:src="@drawable/baseline_account_circle_black_24dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/my_profileStatus"
+                    android:layout_width="@dimen/status_m"
+                    android:layout_height="@dimen/status_m"
+                    android:layout_gravity="right|bottom"
+                    android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/my_profileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/padding_l"
+                android:textSize="@dimen/txt_xl"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/profileFrameLayout"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EFFBFC">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/padding_m"
+                android:text="전체" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRecycleview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-        />
+            android:layout_height="match_parent" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone"
-        >
-    </LinearLayout>
-        <LinearLayout
-            android:id="@+id/bottomWrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@color/cWhite"
-            android:elevation="@dimen/elevation_l"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/padding_xl"
-            android:translationY="8000dp">
+        android:visibility="gone"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/cWhite"
+        android:elevation="@dimen/elevation_l"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_xl"
+        android:translationY="8000dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/rowWRapperName"
@@ -50,6 +103,7 @@
             android:paddingTop="@dimen/padding_m"
             android:paddingRight="@dimen/padding_l"
             android:paddingBottom="@dimen/padding_m">
+
             <RelativeLayout
                 android:id="@+id/imageWrapeer"
                 android:layout_width="wrap_content"
@@ -57,30 +111,33 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
+
                 <FrameLayout
                     android:id="@+id/bottomProfileImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/profileImage"
                         android:layout_width="@dimen/profile_image_l"
                         android:layout_height="@dimen/profile_image_l"
-                        android:src="@drawable/baseline_account_circle_black_24dp"/>
+                        android:src="@drawable/baseline_account_circle_black_24dp" />
+
                     <ImageView
                         android:id="@+id/profileStatus"
                         android:layout_width="@dimen/status_l"
                         android:layout_height="@dimen/status_l"
-                        android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp"
-                        android:layout_gravity="right|bottom"/>
+                        android:layout_gravity="right|bottom"
+                        android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
                 </FrameLayout>
+
                 <TextView
                     android:id="@+id/modifyImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/bottomProfileImage"
-                    android:text="@string/modify"
                     android:layout_centerHorizontal="true"
-                    />
+                    android:text="@string/modify" />
             </RelativeLayout>
 
             <LinearLayout
@@ -99,18 +156,19 @@
                     android:id="@+id/profileName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/txt_Ml"
                     android:textColor="@color/cBlack"
+                    android:textSize="@dimen/txt_Ml"
                     android:textStyle="bold"
-                    android:visibility="visible"/>
+                    android:visibility="visible" />
+
                 <EditText
                     android:id="@+id/modifyName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/txt_Ml"
                     android:textColor="@color/cBlack"
+                    android:textSize="@dimen/txt_Ml"
                     android:textStyle="bold"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/modifyButton"
@@ -119,73 +177,85 @@
                     android:paddingStart="@dimen/padding_l"
                     android:text="@string/modify" />
             </LinearLayout>
+
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageWrapeer"
-                app:layout_constraintTop_toBottomOf="@+id/rowWrapperName" >
+                app:layout_constraintTop_toBottomOf="@+id/rowWrapperName">
+
                 <LinearLayout
                     android:id="@+id/statusLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_s"
                     android:background="@color/cWhite"
                     android:elevation="@dimen/elevation_l"
-                    android:layout_margin="@dimen/margin_s"
                     android:paddingTop="@dimen/padding_l"
                     android:visibility="invisible">
+
                     <LinearLayout
                         android:id="@+id/working_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
+
                         <ImageView
                             android:layout_width="@dimen/status_l"
                             android:layout_height="@dimen/status_l"
-                            android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp"/>
+                            android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/working"/>
+                            android:text="@string/working" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:id="@+id/leaving_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
+
                         <ImageView
                             android:layout_width="@dimen/status_l"
                             android:layout_height="@dimen/status_l"
-                            android:src="@drawable/baseline_fiber_manual_record_yellow_50_24dp"/>
+                            android:src="@drawable/baseline_fiber_manual_record_yellow_50_24dp" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/leaving"/>
+                            android:text="@string/leaving" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:id="@+id/vacation_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
+
                         <ImageView
                             android:layout_width="@dimen/status_l"
                             android:layout_height="@dimen/status_l"
-                            android:src="@drawable/baseline_fiber_manual_record_red_800_24dp"/>
+                            android:src="@drawable/baseline_fiber_manual_record_red_800_24dp" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/vacation"/>
+                            android:text="@string/vacation" />
                     </LinearLayout>
                 </LinearLayout>
+
                 <Button
                     android:id="@+id/chatButton"
-                    android:drawableLeft="@drawable/outline_chat_black_24dp"
-                    android:drawablePadding="@dimen/padding_l"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_l"
                     android:layout_marginStart="@dimen/margin_l"
-                    android:text="@string/Chatting"
                     android:background="#00ff0000"
+                    android:drawableLeft="@drawable/outline_chat_black_24dp"
+                    android:drawablePadding="@dimen/padding_l"
+                    android:paddingStart="@dimen/padding_l"
+                    android:text="@string/Chatting"
                     android:textSize="@dimen/txt_xl"
-                    android:visibility="visible"/>
+                    android:visibility="visible" />
             </FrameLayout>
 
 

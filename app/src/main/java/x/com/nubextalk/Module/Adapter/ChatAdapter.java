@@ -49,7 +49,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context mContext;
     private String id ="1234"; //저장된 아이디를 가져와 넣을 예정
     private Realm realm;
-    private RealmChangeListener realmChangeListener;
     private FirebaseStorageManager fsm;
 
     public ChatAdapter(Context context, RealmResults<ChatContent>  mChatLog) {
@@ -58,14 +57,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.mChatData = mChatLog;
         this.fsm = new FirebaseStorageManager();
         this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        this.realmChangeListener = new RealmChangeListener() {
-            @Override
-            public void onChange(Object o) {
-                notifyDataSetChanged();
-            }
-        };
-        realm.addChangeListener(realmChangeListener);
-
     }
 
     @NonNull

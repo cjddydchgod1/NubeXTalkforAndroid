@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,9 +48,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
+import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -56,24 +60,21 @@ import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
 public class ChatRoomActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
-    private static Realm realm;
-    private static AQuery aq;
-    private static InputMethodManager imm;
-    private static DateManager dm;
-    private static FirebaseStorageManager fsm;
-    private static FirebaseFirestore fs;
-
-
-    private static RealmResults<ChatContent> mChat;
-    private static RecyclerView mRecyclerView;
-    private static ChatAdapter mAdapter;
-    private static DrawerLayout mDrawerLayout;
-    private static NavigationView mNavigationView;
-
-    private static EditText mEditChat;
-    private static IconButton mSendButton;
-
-    private static String mRoomId;
+    private Realm realm;
+    private RealmChangeListener realmChangeListener;
+    private AQuery aq;
+    private InputMethodManager imm;
+    private DateManager dm;
+    private FirebaseStorageManager fsm;
+    private FirebaseFirestore fs;
+    private RealmResults<ChatContent> mChat;
+    private  RecyclerView mRecyclerView;
+    private  ChatAdapter mAdapter;
+    private  DrawerLayout mDrawerLayout;
+    private  NavigationView mNavigationView;
+    private  EditText mEditChat;
+    private  IconButton mSendButton;
+    private  String mRoomId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +87,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         fsm = new FirebaseStorageManager();
         fs = FirebaseFirestore.getInstance();
-
-        Log.i("RealmManager",realm.getPath());
-
-
-
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
@@ -140,7 +136,50 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         View header = mNavigationView.getHeaderView(0);
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
         drawerTitle.setText(roomTitle);
+
+
+        realmChangeListener = new RealmChangeListener() {
+            @Override
+            public void onChange(Object o) {
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount()-1);
+            }
+        };
+        realm.addChangeListener(realmChangeListener);
+
+
+        final KeyboardManager km = new KeyboardManager(this);
+        addContentView(km,new FrameLayout.LayoutParams(-1, -1));
+
+        km.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
+            @Override
+            public void onShowSoftKeyboard() {
+//                int keyboardHeight = km.getKeyboardHeight();
+//                Log.d("keyBoard",Integer.toString(keyboardHeight));
+//
+//                //키보드 등장할 때
+//                mRecyclerView.scrollBy(0,987);
+                mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+
+            }
+        });
+        km.setOnHiddenKeyboard(new KeyboardManager.OnHiddenKeyboardListener() {
+            @Override
+            public void onHiddenSoftKeyboard() {
+//                mRecyclerView.scrollBy(0,-987);
+                mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
+            }
+        });
+
+//        mDrawerLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
+//             public void onGlobalLayout(){
+//                   int heightDiff = mDrawerLayout.getRootView().getHeight()- mDrawerLayout.getHeight();
+//                   Log.d("dadsasdsdasd",Integer.toString(heightDiff));
+//                }
+//        });
+
     }
+
     private void setChatContentRead(RealmResults<ChatContent> mChat) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -226,46 +265,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             Uri file = data.getData();
             UploadTask uploadTask = fsm.uploadFile(file,"images/");
 
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    try {
-//                        realm.executeTransaction(new Realm.Transaction() {
-//                            @Override
-//                            public void execute(Realm realm) {
-//                                Date date = new Date();
-//                                String fDate = dm.convertDate(date, "c");
-//
-//                                // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
-//                                ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-//                                Date roomUpdateDate = roomInfo.getUpdatedDate();
-//                                roomInfo.setUpdatedDate(date);
-//                                realm.copyToRealmOrUpdate(roomInfo);
-//
-//                                ChatContent chat = new ChatContent();
-//                                chat.setCid(); // Content ID
-//                                chat.setUid("1234"); // UID 보내는 사람
-//                                chat.setRid(mRoomId); // RID 채팅방 아이디
-//                                chat.setType(1);
-//                                chat.setContent("images/"+file.getLastPathSegment());
-//                                chat.setIsRead(true);
-//                                chat.setSendDate(fDate);
-//                                if(dm.isSameDay(date,roomUpdateDate)){
-//                                    chat.setFirst(false);
-//                                }
-//                                realm.copyToRealmOrUpdate(chat);
-//                                mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
-//                            }
-//
-//                        });
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
                 }
             });
         }
@@ -370,40 +376,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void sendChat() {
-//        realm.executeTransaction(new Realm.Transaction() {
-//                    @Override
-//                    public void execute(Realm realm) {
-//                        String content;
-//                        if( (content = String.valueOf(mEditChat.getText())).equals("")){
-//                            aq.toast("메세지를 입력하세요");
-//                        }
-//                        else {
-//                            Date date = new Date();
-//
-//                            // 채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
-//                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
-//                            Date roomUpdateDate = roomInfo.getUpdatedDate();
-//                            roomInfo.setUpdatedDate(date);
-//                            realm.copyToRealmOrUpdate(roomInfo);
-//
-//                            ChatContent chat = new ChatContent();
-//                            chat.setCid(); // Content ID 자동으로 유니크한 값 설정
-//                            chat.setUid("1234"); // UID 보내는 사람
-//                            chat.setRid(mRoomId); // RID 채팅방 아이디
-//                            chat.setType(0);
-//                            chat.setContent(content);
-//                            chat.setIsRead(true);
-//                            chat.setSendDate(date);
-//                            if(dm.isSameDay(date,roomUpdateDate)){
-//                                chat.setFirst(false);
-//                            }
-//                            realm.copyToRealmOrUpdate(chat);
-//
-//                        }
-//                        mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
-//                        mEditChat.setText("");
-//                    }
-//        });
         String content;
         if( (content = String.valueOf(mEditChat.getText())).equals("")){
             aq.toast("메세지를 입력하세요");
@@ -452,7 +424,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                         public void onFailure(@NonNull Exception e) {
                         }
                     });
-            mRecyclerView.scrollToPosition(mAdapter.getItemCount()-1);
             mEditChat.setText("");
         }
     }

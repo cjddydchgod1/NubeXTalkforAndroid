@@ -22,9 +22,9 @@ import com.google.firebase.storage.UploadTask;
 import x.com.nubextalk.Model.User;
 
 public class FirebaseStorageManager {
-    public static void uploadProfileImg(Uri file, User user) {
+    public static void uploadProfileImg(Uri file, String uid) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference profilesImgRef = storage.getReference().child("profiles/"+user.getUid());
+        StorageReference profilesImgRef = storage.getReference().child("profiles/"+uid);
         UploadTask uploadTask = profilesImgRef.putFile(file);
 
         Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -42,7 +42,7 @@ public class FirebaseStorageManager {
                     Uri imgUri = task.getResult();
                     if (imgUri != null){
                         FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                        firebaseStoreManager.updateProfileImg(imgUri.toString());
+                        firebaseStoreManager.updateProfileImg(imgUri.toString(), uid);
                     }
                     else
                         Log.i("FirebaseStorageManager", "uploadProfileImgFail");

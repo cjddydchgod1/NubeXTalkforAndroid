@@ -6,6 +6,7 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,7 +112,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
         public void bintTo(User user) {
-            String name = user.getDepartment() + " " + user.getName();
+            String name = user.getDepartment() + " ";
+            if(user.getNickname()==null) {
+                name += user.getName();
+            } else {
+                name += user.getNickname();
+            }
             profileName.setText(name);
             if(!user.getProfileImg().isEmpty()){
                 aq.view(profileImage).image(user.getProfileImg());
@@ -144,7 +150,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileStatus = itemView.findViewById(R.id.my_profileStatus);
         }
         public void bintTo(User user) {
-            String name = user.getDepartment() + " " + user.getName();
+            String name = user.getDepartment() + " ";
+            if(user.getNickname()==null) {
+                name += user.getName();
+            } else {
+                name += user.getNickname();
+            }
             profileName.setText(name);
             if(!user.getProfileImg().isEmpty()){
                 aq.view(profileImage).image(user.getProfileImg());

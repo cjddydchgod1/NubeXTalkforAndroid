@@ -28,11 +28,11 @@ import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
 
 public class FirebaseStoreManager {
-    private static FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
-    private static final String hid = "w34qjptO0cYSJdAwScFQ";
-    private static final String uid = "6G67LygR16Xcp0vX65iS";
-    private static final DocumentReference hospital = fireStore.collection("hospital").document(hid);
-    public void updateProfileImg(String img){
+    private FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
+    private final String hid = "w34qjptO0cYSJdAwScFQ";
+    private DocumentReference hospital = fireStore.collection("hospital").document(hid);
+    private String TAG = "FirebaseStoreManager";
+    public void updateProfileImg(String img, String uid){
         /**
          * Storage -> Firestore
          */
@@ -40,13 +40,28 @@ public class FirebaseStoreManager {
                 .update("profileImg", img).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.i("FirebaseStoreManager", "UpdateSuccess");
+                        Log.i(TAG, "ImgSuccess");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.i("FirebaseStoreManager", "UpdateFail");
+                        Log.i(TAG, "ImgFail");
+                    }
+                });
+    }
+    public void updateProfileStatus(int status, String uid){
+        hospital.collection("users").document(uid)
+                .update("status", status).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Status Success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.i(TAG, "Status Fail");
                     }
                 });
     }

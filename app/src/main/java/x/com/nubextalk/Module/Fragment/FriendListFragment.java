@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -83,19 +84,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private LinearLayout mBottomWrapper;
     private RecyclerView mRecyclerView;
     private FriendListAdapter mAdapter;
-    private RealmResults<User> mResults; // realm데이터
-    private ArrayList<User> mList; // realm데이터를 복사
+    private RealmResults<User> mResults;
+    private ArrayList<User> mList; // mResults를 복사
     private ChatRoomMember mChat;
-    private User myProfile;
-    private LinearLayout wrapper;
     private AQuery aq;
 
-    private String myUid;
-    private String token;
+    private String myUid; // Uid
     private String TAG = "FriendListFragment";
-
-    private static FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
-    private static final DocumentReference hospital = fireStore.collection("hospital").document("w34qjptO0cYSJdAwScFQ");
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -107,26 +102,33 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         /**
-         * token을 받아온다.
+         * uid를 받아온다.
          */
         myUid = ((MainActivity)getActivity()).getUid();
 
-        /**
-         * user list를 초기화한다.
-         */
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-        mResults        = realm.where(User.class).findAll();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                mResults.deleteAllFromRealm();
-            }
-        });
         Log.i(TAG, "OnCreate");
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.i(TAG, "OnViewCreated");
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
+        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
+        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
+        aq              = new AQuery(getActivity());
+
         /**
          * Firestore에서 realm으로 migration
          */
-
+        FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
+        DocumentReference hospital = fireStore.collection("hospital").document("w34qjptO0cYSJdAwScFQ");
         Gson gson = new Gson();
         hospital.collection("users")
                 .get()
@@ -156,27 +158,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         }
                     }
                 });
-//        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-//        firebaseStoreManager.getUser(realm);
 
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.i(TAG, "OnViewCreated");
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
-        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
-        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
-        aq              = new AQuery(getActivity());
-
-
-        // search action bar fragment마다 다르게 하기 위해서
+        /**
+         * search를 FriendListFragment에서 사용가능하게
+         */
         setHasOptionsMenu(true);
         getActivity().invalidateOptionsMenu();
         Log.i(TAG, "OncreateView");
@@ -272,10 +257,14 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         SearchView searchView = (SearchView) searchItem.getActionView();
         // 바로 검색이 가능하게끔
         searchView.onActionViewExpanded();
-
+        /**
+         * keyboard
+         */
+        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                inputMethodManager.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
                 return true;
             }
 
@@ -287,7 +276,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         });
     }
     public void search(String query) {
-      // 문자 입력시마다 리스트를 지우고 새로 뿌려준다.
+        // 문자 입력시마다 리스트를 지우고 새로 뿌려준다.
         mList.clear();
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
@@ -300,11 +289,16 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         {
             Log.i(TAG, "Input data");
             mList.add(realm.where(User.class).equalTo("uid", myUid).findFirst());
-            mList.addAll(realm.copyFromRealm(realm.where(User.class)
-                          .contains("name", query)
+            mList.addAll(realm.where(User.class).isNull("nickname")
+                        .contains("name", query)
+                        .or()
+                        .contains("department", query.toUpperCase())
+                        .findAll());
+            mList.addAll(realm.where(User.class).isNotNull("nickname")
+                          .contains("nickname", query)
                           .or()
                           .contains("department", query.toUpperCase())
-                          .findAll()));
+                          .findAll());
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
         Log.i(TAG, "Notify");
@@ -352,115 +346,95 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 break;
         }
 
-        // 초기화
+        /**
+         * 데이터 초기화
+         */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
         if(address.getUid().equals(myUid)){
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
+            profileStatus.setClickable(true);
         } else {
             modifyImageButton.setVisibility(View.GONE);
             chatButton.setVisibility(View.VISIBLE);
+            profileStatus.setClickable(false);
         }
         statusLayout.setVisibility(View.INVISIBLE);
-        modifyNameButton.setText("수정");
         modifyName.setVisibility(View.GONE);
         profileName.setVisibility(View.VISIBLE);
-        // RecyclerView위를 감싸는 view
-        wrapper = rootview.findViewById(R.id.wrapper);
-        wrapper.setVisibility(View.VISIBLE);
-        // 해당 뷰를 클릭했을 시 나가기.
-        wrapper.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
-                    onBackPressed();
-                }
-                return true;
-            }
-        });
+        modifyNameButton.setText("수정");
 
         // 프로필 사진
         if(!address.getProfileImg().isEmpty()) {
             aq.view(profileImage).image(address.getProfileImg());
         }
 
-        // 이름 수정 버튼
+        // Nickname 변
         modifyNameButton.setOnClickListener(v -> {
             String buttonName = modifyNameButton.getText().toString();
-            if(buttonName.equals("수정")) { // 완료버튼을 눌렀을 경우
+            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
                 modifyNameButton.setText("완료");
-                String temp = profileName.getText().toString();
                 profileName.setVisibility(View.GONE);
                 modifyName.setVisibility(View.VISIBLE);
-                modifyName.setText(temp);
-            } else { // 수정버튼을 눌렀을 경우
-                modifyNameButton.setText("수정");
-                String temp = modifyName.getText().toString();
-                modifyName.setVisibility(View.GONE);
-                profileName.setVisibility(View.VISIBLE);
-                profileName.setText(address.getName());
-                changeRealmData(temp, 0, address);
+                modifyName.setText(profileName.getText().toString());
+            } else { // 완료버튼을 눌렀을 경우
+                updateNickname(address, modifyName.getText().toString());
+                refreshFragment();
             }
         });
 
-        // 프로필 사진 수정 버튼 (myProfile만 가능)
+        // 프로필 사진 변경 (myProfile만 가능)
         modifyImageButton.setOnClickListener(v -> {
             if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             } else {
                 startGallery();
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.detach(this).attach(this).commit();
+                // refresh
+                refreshFragment();
             }
         });
 
-        // status(상태) 수정 버튼 (myProfile만 가능)
-        if(address.getUid().equals(myUid)) {
-            profileStatus.setOnClickListener(v -> {
-
-                // chatButton은 숨기고, status를 선택하는 Layout등장
-                chatButton.setVisibility(View.INVISIBLE);
-                statusLayout.setVisibility(View.VISIBLE);
-                // status를 클릭
-                LinearLayout working = statusLayout.findViewById(R.id.working_status);
-                LinearLayout leaving = statusLayout.findViewById(R.id.leaving_status);
-                LinearLayout vacation = statusLayout.findViewById(R.id.vacation_status);
-
-                LinearLayout.OnClickListener onClickListener = new LinearLayout.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        switch (v.getId()) {
-                            case R.id.working_status :
-                                chatButton.setVisibility(View.VISIBLE);
-                                statusLayout.setVisibility(View.INVISIBLE);
-                                changeRealmData(0, 1, address);
-                                break;
-                            case R.id.leaving_status :
-                                chatButton.setVisibility(View.VISIBLE);
-                                statusLayout.setVisibility(View.INVISIBLE);
-                                changeRealmData(1, 1, address);
-                                break;
-                            case R.id.vacation_status :
-                                chatButton.setVisibility(View.VISIBLE);
-                                statusLayout.setVisibility(View.INVISIBLE);
-                                changeRealmData(2, 1, address);
-                                break;
-                        }
+        // 프로필 Status 변경
+        profileStatus.setOnClickListener(v -> {
+            // chatButton은 숨기고, status를 선택하는 Layout등장
+            chatButton.setVisibility(View.INVISIBLE);
+            statusLayout.setVisibility(View.VISIBLE);
+            // status를 클릭
+            LinearLayout working = statusLayout.findViewById(R.id.working_status);
+            LinearLayout leaving = statusLayout.findViewById(R.id.leaving_status);
+            LinearLayout vacation = statusLayout.findViewById(R.id.vacation_status);
+            LinearLayout.OnClickListener onClickListener = new LinearLayout.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    chatButton.setVisibility(View.VISIBLE);
+                    statusLayout.setVisibility(View.INVISIBLE);
+                    FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                    switch (v.getId()) {
+                        case R.id.working_status :
+                            firebaseStoreManager.updateProfileStatus(0, myUid);
+                            break;
+                        case R.id.leaving_status :
+                            firebaseStoreManager.updateProfileStatus(1, myUid);
+                            break;
+                        case R.id.vacation_status :
+                            firebaseStoreManager.updateProfileStatus(2, myUid);
+                            break;
                     }
-                };
-                working.setOnClickListener(onClickListener);
-                leaving.setOnClickListener(onClickListener);
-                vacation.setOnClickListener(onClickListener);
-            });
-        }
+                    refreshFragment();
+                }
+            };
+            working.setOnClickListener(onClickListener);
+            leaving.setOnClickListener(onClickListener);
+            vacation.setOnClickListener(onClickListener);
+        });
 
         // 1대1채팅 버튼
         chatButton.setOnClickListener(v -> {
-            /*
-             * 1. address에서 uid를 찾는다 (대화할 상대의 uid)
-             * 2. ChatRoomMember에서 해당 uid와, 내 uid를 갖고 있는 rid를 찾는다.
-             * 3. rid를 가지고 와서 intent로 넘겨준다.
-             */
+            /**
+              * 1. address에서 uid를 찾는다 (대화할 상대의 uid)
+              * 2. ChatRoomMember에서 해당 uid와, 내 uid를 갖고 있는 rid를 찾는다.
+              * 3. rid를 가지고 와서 intent로 넘겨준다.
+              */
             mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getUid()).findFirst();
             if(mChat==null){
                 // 새로만든 채팅이 없다면 새로 만든다.
@@ -477,12 +451,30 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mBottomWrapper.findViewById(R.id.mClose).setOnClickListener(v -> {
             onBackPressed();
         });
-        // 바깥 레이아웃 클릭시 닫기
+        // RecyclerView위를 감싸는 view
+        LinearLayout wrapper = rootview.findViewById(R.id.wrapper);
+        wrapper.setVisibility(View.VISIBLE);
+        // 해당 뷰를 클릭했을 시 나가기.
+        wrapper.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+                    wrapper.setVisibility(View.GONE);
+                    onBackPressed();
+                }
+                return true;
+            }
+        });
 
-    }
+        // 하위 레이아웃(wrapper)에게 touch event 전달하지 않게 막기
+        mBottomWrapper.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
 
-    public interface IOnBackPressed {
-        boolean onBackPressed();
+
     }
 
     // bottomsheet 닫기버튼
@@ -491,7 +483,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             new AnimManager(
                     AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
             ).start(AnimManager.TOGETHER);
-            wrapper.setVisibility(View.GONE);
             return true;
         } else {
             return false;
@@ -519,9 +510,9 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     Uri imgUri = data.getData();
                     /* Uri값의 이미지값을 불러온다.
                      * 이미지값을 저장한다.
-                     * 해당 이미지값을 서버에 올린다.
+                     * 해당 이미지값을 Storage에 올린다.
                      */
-                    FirebaseStorageManager.uploadProfileImg(imgUri,myProfile);
+                    FirebaseStorageManager.uploadProfileImg(imgUri,myUid);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -529,19 +520,19 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         }
     }
 
-    public void changeRealmData(Object object, int selection, User user) {
+    public void refreshFragment() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
+    }
+
+    public void updateNickname(User user, String name) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                // 0 == 이름변경
-                if(selection==0) user.setName(object.toString());
-                // 1 == 상태변경
-                else if(selection==1) user.setStatus((Integer) object);
+                user.setNickname(name);
                 realm.copyToRealmOrUpdate(user);
             }
         });
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.detach(this).attach(this).commit();
     }
 
     /** 현재 ChatAddActivity에서 가지고 온 코드 **/

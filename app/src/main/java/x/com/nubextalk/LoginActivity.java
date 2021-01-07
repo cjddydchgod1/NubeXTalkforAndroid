@@ -49,7 +49,8 @@ public class LoginActivity extends AppCompatActivity {
     private Config config;
     private String fcm;
     private String id1;
-    private String test = "6G67LygR16Xcp0vX65iS";
+    private String test = "zwnQyY3IlK6OXqkaq6Hv";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

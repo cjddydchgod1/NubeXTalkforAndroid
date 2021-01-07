@@ -22,7 +22,7 @@ import x.com.nubextalk.Manager.UtilityManager;
 public class Config extends RealmObject {
     @NonNull
     @PrimaryKey
-    String oid = UUID.randomUUID().toString();
+    String oid;
     @NonNull
     String CODENAME;
     @NonNull

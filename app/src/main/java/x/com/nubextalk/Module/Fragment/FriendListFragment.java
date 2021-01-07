@@ -104,7 +104,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * uid를 받아온다.
          */
-        myUid = ((MainActivity)getActivity()).getUid();
+        myUid = UtilityManager.getUid();
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         Log.i(TAG, "OnCreate");

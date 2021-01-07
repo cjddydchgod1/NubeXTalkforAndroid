@@ -104,7 +104,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * uid를 받아온다.
          */
-        myUid = ((MainActivity)getActivity()).getUid();
+        myUid = UtilityManager.getUid();
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         Log.i(TAG, "OnCreate");
@@ -223,7 +223,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
          */
-        mResults = realm.where(User.class).findAll();
+        mResults = realm.where(User.class).notEqualTo("uid", myUid).findAll();
 
         /**
          * Search하기 위해 mResult -> mList
@@ -246,6 +246,39 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scheduleLayoutAnimation();
+
+        makeProfile();
+    }
+
+    public void makeProfile() {
+        User myProfile = realm.where(User.class).equalTo("uid", myUid).findFirst();
+        TextView myProfileName = rootview.findViewById(R.id.my_profileName);
+        ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
+        ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
+        String name = myProfile.getDepartment() + " ";
+        if (!myProfile.getProfileImg().isEmpty()) {
+            aq.view(myProfileImage).image(myProfile.getProfileImg());
+        }
+        if (myProfile.getNickname() == null) {
+            name += myProfile.getName();
+        } else {
+            name += myProfile.getNickname();
+        }
+        myProfileName.setText(name);
+        switch (myProfile.getStatus()) {
+            case 0:
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                break;
+            case 1:
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                break;
+            case 2:
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                break;
+        }
+        rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
+            onSelected(myProfile);
+        });
     }
 
     // 검색
@@ -332,7 +365,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
         // 프로필 이름 설정
-        profileName.setText(address.getName());
+        String name;
+        if(address.getNickname()==null) {
+            name = address.getName();
+        } else {
+            name = address.getNickname();
+        }
+        profileName.setText(name);
         // profilestatus 수정 버튼
         switch(address.getStatus()) {
             case 1 :

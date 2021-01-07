@@ -29,6 +29,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
 
 
@@ -163,5 +164,24 @@ public class UtilityManager {
         } else {
             ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(i);
         }
+    }
+
+    /**
+     * my Uid를 가져오는 함수
+     */
+    private static String myUid;
+    public static void initUid(String token) {
+        Realm realm           = Realm.getInstance(UtilityManager.getRealmConfig());
+        Config config = realm.where(Config.class).equalTo("ext1",token)
+                .or().equalTo("ext2", token)
+                .or().equalTo("ext3", token)
+                .or().equalTo("ext4", token)
+                .or().equalTo("ext5", token).findFirst();
+        myUid = config.getOid();
+        realm.close();
+    }
+
+    public static String getUid() {
+        return myUid;
     }
 }

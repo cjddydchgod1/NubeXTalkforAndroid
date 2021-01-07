@@ -128,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             });
                             Intent intent = new Intent(activity, MainActivity.class);
-                            intent.putExtra("token", token);
+                            UtilityManager.initUid(token);
                             startActivity(intent);
                             finish();
                         } else {

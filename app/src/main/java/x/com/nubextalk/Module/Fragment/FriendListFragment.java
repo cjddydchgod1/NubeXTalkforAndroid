@@ -52,6 +52,7 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -223,7 +224,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
          */
-        mResults = realm.where(User.class).findAll();
+        mResults = realm.where(User.class).notEqualTo("uid", myUid).findAll();
 
         /**
          * Search하기 위해 mResult -> mList
@@ -246,6 +247,38 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scheduleLayoutAnimation();
+        makeProfile();
+    }
+
+    public void makeProfile() {
+        User myProfile = realm.where(User.class).equalTo("uid", myUid).findFirst();
+        TextView myProfileName = rootview.findViewById(R.id.my_profileName);
+        ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
+        ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
+        String name = myProfile.getDepartment() + " ";
+        if(!myProfile.getProfileImg().isEmpty()){
+            aq.view(myProfileImage).image(myProfile.getProfileImg());
+        }
+        if(myProfile.getNickname()==null) {
+            name += myProfile.getName();
+        } else {
+            name += myProfile.getNickname();
+        }
+        myProfileName.setText(name);
+        switch(myProfile.getStatus()) {
+            case 0 :
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                break;
+            case 1 :
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                break;
+            case 2 :
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                break;
+            }
+        rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
+            onSelected(myProfile);
+        });
     }
 
     // 검색

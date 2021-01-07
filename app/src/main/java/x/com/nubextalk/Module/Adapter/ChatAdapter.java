@@ -42,21 +42,23 @@ import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private Realm realm;
+    private FirebaseStorageManager fsm;
 
     private LayoutInflater mInflater;
     private User mUserData;
     private RealmResults<ChatContent> mChatData;
     private Context mContext;
-    private String id ="1234"; //저장된 아이디를 가져와 넣을 예정
-    private Realm realm;
-    private FirebaseStorageManager fsm;
+    private String mUid;
 
     public ChatAdapter(Context context, RealmResults<ChatContent>  mChatLog) {
+        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        this.fsm = new FirebaseStorageManager();
+
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-        this.fsm = new FirebaseStorageManager();
-        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        this.mUid = UtilityManager.getUid();
     }
 
     @NonNull
@@ -103,7 +105,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
-            if(chat.getUid().equals(this.id)){
+            if(chat.getUid().equals(this.mUid)){
                 cvHolder.my_chat_text.setText(chat.getContent());
                 cvHolder.my_time.setText(sendTime);
 
@@ -145,7 +147,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     else{
                         cmvHolder.date.setVisibility(View.GONE);
                     }
-                    if(chat.getUid().equals(id)){
+                    if(chat.getUid().equals(mUid)){
                         cmvHolder.aq.id(R.id.my_chat_image).image(uri.toString());
                         cmvHolder.my_time.setText(sendTime);
 

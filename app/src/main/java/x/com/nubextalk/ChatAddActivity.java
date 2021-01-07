@@ -12,12 +12,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
@@ -39,6 +48,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     private ChatAddSearchAdapter mAdapter;
     private ChatAddMemberAdapter memberAdapter;
     private ArrayList<User> userList = new ArrayList<User>();
+    private FirebaseFirestore fs;
 
 
     private Button chatAddConfirmButton;
@@ -48,6 +58,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_add);
+        fs = FirebaseFirestore.getInstance();
 
         chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
         chatAddConfirmButton = findViewById(R.id.chat_add_confirm_btn);
@@ -147,14 +158,33 @@ public class ChatAddActivity extends AppCompatActivity implements
                     realm.copyToRealm(chatMember);
 
                 }
-                ChatContent chat = new ChatContent();
-                chat.setCid(); // Content ID 자동으로 유니크한 값 설정
-                chat.setRid(rid); // RID 채팅방 아이디
-                chat.setType(9); // 시스템 메세지
-                chat.setContent("채팅방이 개설 되었습니다.");
-                chat.setIsRead(true);
-                chat.setSendDate(date);
-                realm.copyToRealmOrUpdate(chat);
+//                Map<String, Object> chat = new HashMap<>();
+//                chat.put("cid", null);
+//                chat.put("uid", null);
+//                chat.put("content", "채팅방이 개설 되었습니다.");
+//                chat.put("isRead", true);
+//                chat.put("sendDate", new SimpleDateFormat("c").format(new Date()));
+//                chat.put("type", 9);
+//                chat.put("isFirst",true);
+//
+//                //서버에 채팅 추가
+//                fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+//                        .collection("chatRoom").document()
+//                        .collection("chatContent").add(chat)
+//                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                            @Override
+//                            public void onSuccess(DocumentReference documentReference) {
+//                                fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+//                                        .collection("chatRoom").document("mRoomId")
+//                                        .collection("chatContent").document(documentReference.getId())
+//                                        .update("cid", documentReference.getId());
+//                            }
+//                        })
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                            }
+//                        });
 
 
             }

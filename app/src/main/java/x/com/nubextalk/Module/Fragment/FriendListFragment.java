@@ -564,7 +564,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                  **/
                 realm.copyToRealm(chatMember);
                 ChatContent chat = new ChatContent();
-                chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                chat.setCid(""); // Content ID 자동으로 유니크한 값 설정
                 chat.setRid(rid); // RID 채팅방 아이디
                 chat.setType(9); // 시스템 메세지
                 chat.setContent("채팅방이 개설 되었습니다.");

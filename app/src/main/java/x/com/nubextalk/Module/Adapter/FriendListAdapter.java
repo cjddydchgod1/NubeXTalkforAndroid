@@ -58,6 +58,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // LinkedList에서 하나씩.
         User mCurrent = mDataSet.get(position);
+
         FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
         friendViewHolder.bintTo(mCurrent);
         friendViewHolder.itemView.setOnClickListener(v -> {
@@ -71,6 +72,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public int getItemCount() {
         return mDataSet.size();
     }
+
 
     public class FriendViewHolder extends RecyclerView.ViewHolder {
         private final TextView profileName;

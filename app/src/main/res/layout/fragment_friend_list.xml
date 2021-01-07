@@ -67,7 +67,6 @@
                 android:text="전체" />
         </LinearLayout>
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRecycleview"
             android:layout_width="match_parent"

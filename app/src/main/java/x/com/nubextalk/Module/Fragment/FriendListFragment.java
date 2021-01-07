@@ -52,6 +52,7 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -246,7 +247,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scheduleLayoutAnimation();
-
         makeProfile();
     }
 
@@ -256,26 +256,26 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
         String name = myProfile.getDepartment() + " ";
-        if (!myProfile.getProfileImg().isEmpty()) {
+        if(!myProfile.getProfileImg().isEmpty()){
             aq.view(myProfileImage).image(myProfile.getProfileImg());
         }
-        if (myProfile.getNickname() == null) {
+        if(myProfile.getNickname()==null) {
             name += myProfile.getName();
         } else {
             name += myProfile.getNickname();
         }
         myProfileName.setText(name);
-        switch (myProfile.getStatus()) {
-            case 0:
+        switch(myProfile.getStatus()) {
+            case 0 :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                 break;
-            case 1:
+            case 1 :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
-            case 2:
+            case 2 :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
                 break;
-        }
+            }
         rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
             onSelected(myProfile);
         });
@@ -603,7 +603,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                  **/
                 realm.copyToRealm(chatMember);
                 ChatContent chat = new ChatContent();
-                chat.setCid(); // Content ID 자동으로 유니크한 값 설정
+                chat.setCid(""); // Content ID 자동으로 유니크한 값 설정
                 chat.setRid(rid); // RID 채팅방 아이디
                 chat.setType(9); // 시스템 메세지
                 chat.setContent("채팅방이 개설 되었습니다.");

@@ -51,7 +51,7 @@ public class ChatContent extends RealmObject {
         return cid;
     }
 
-    public void setCid() { this.cid = UUID.randomUUID().toString(); }
+    public void setCid(String cid) { this.cid = cid; }
 
     @NonNull
     public String getRid() {

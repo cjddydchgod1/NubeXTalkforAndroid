@@ -64,17 +64,18 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private RealmChangeListener realmChangeListener;
     private AQuery aq;
     private InputMethodManager imm;
-    private DateManager dm;
     private FirebaseStorageManager fsm;
     private FirebaseFirestore fs;
     private RealmResults<ChatContent> mChat;
-    private  RecyclerView mRecyclerView;
-    private  ChatAdapter mAdapter;
-    private  DrawerLayout mDrawerLayout;
-    private  NavigationView mNavigationView;
-    private  EditText mEditChat;
-    private  IconButton mSendButton;
-    private  String mRoomId;
+
+    private RecyclerView mRecyclerView;
+    private ChatAdapter mAdapter;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private EditText mEditChat;
+    private IconButton mSendButton;
+    private String mRoomId;
+    private String mUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,9 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         fsm = new FirebaseStorageManager();
         fs = FirebaseFirestore.getInstance();
+
+        //
+        mUid = UtilityManager.getUid();
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
@@ -395,11 +399,11 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
             Map<String, Object> chat = new HashMap<>();
             chat.put("cid", null);
-            chat.put("uid", "1234");
+            chat.put("uid", mUid);
             chat.put("content", content);
             chat.put("sendDate",  new SimpleDateFormat("yyyy.MM.dd E HH:mm:ss").format(date));
             chat.put("type", "0");
-            if(dm.isSameDay(date,roomUpdateDate)){
+            if(DateManager.isSameDay(date,roomUpdateDate)){
                 chat.put("isFirst","false");
             }
             else{

@@ -97,33 +97,6 @@ public class ChatContent extends RealmObject {
 
     public void setFirst(@NonNull Boolean first) { isFirst = first; }
 
-    /**
-     * Data 초기화 함수
-     *
-     * @param realm
-     */
-    public static void init(Context context, Realm realm) {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_chat_content.json")); //json 파일 추가
-            RealmList<ChatContent> list = new RealmList<>();
-            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
-                String cid = it.next();
-                jsonObject.getJSONObject(cid).put("cid", cid);
-                jsonArray.put(jsonObject.getJSONObject(cid));
-            }
-
-
-            realm.executeTransaction(realm1 -> {
-                realm1.where(ChatContent.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(ChatContent.class, jsonArray);
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static RealmResults<ChatContent> getAll(Realm realm) {
         return realm.where(ChatContent.class).findAll();
     }

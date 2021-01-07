@@ -28,10 +28,12 @@ public class User extends RealmObject {
     private String uid;
     @NonNull
     private String name;
+    private String nickname;
     @NonNull
     private String profileImg;
     @NonNull
     private int status;
+    @NonNull
     private String department;
 
     @NonNull
@@ -73,13 +75,19 @@ public class User extends RealmObject {
         this.department = department;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
     /**
      * Data 초기화 함수
      *
      * @param realm
      */
-
-    public static void init(Context context, Realm realm) {
+        public static void init(Context context, Realm realm) {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = null;
         try {
@@ -101,7 +109,9 @@ public class User extends RealmObject {
         }
     }
 
+
     public static RealmResults<User> getAll(Realm realm){
         return realm.where(User.class).findAll();
     }
+
 }

@@ -52,7 +52,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
         chatContentResults = ChatContent.getAll(realm);
-        if (chatContentResults.size() == 0) ChatContent.init(getContext(), realm);
         if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);

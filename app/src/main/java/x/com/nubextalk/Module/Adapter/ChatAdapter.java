@@ -8,6 +8,8 @@ package x.com.nubextalk.Module.Adapter;
 // 채팅방 액티비티와 Chat class 어댑터
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,31 +20,45 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
+import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private Realm realm;
+    private FirebaseStorageManager fsm;
 
     private LayoutInflater mInflater;
     private User mUserData;
     private RealmResults<ChatContent> mChatData;
     private Context mContext;
-    private String id ="1234"; //저장된 아이디를 가져와 넣을 예정
-    private Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
+    private String mUid;
 
     public ChatAdapter(Context context, RealmResults<ChatContent>  mChatLog) {
+        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        this.fsm = new FirebaseStorageManager();
+
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-
+        this.mUid = UtilityManager.getUid();
     }
 
     @NonNull
@@ -89,7 +105,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
-            if(chat.getUid().equals(this.id)){
+            if(chat.getUid().equals(this.mUid)){
                 cvHolder.my_chat_text.setText(chat.getContent());
                 cvHolder.my_time.setText(sendTime);
 
@@ -118,44 +134,55 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
         else if(chat.getType() == 1){
-            ChatMediaViewHolder cmvHolder = (ChatMediaViewHolder) holder;
-            if(chat.getFirst()){
-                cmvHolder.date.setText(sendDate);
-                cmvHolder.date.setVisibility(View.VISIBLE);
-            }
-            else{
-                cmvHolder.date.setVisibility(View.GONE);
-            }
 
-            // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
-            if(chat.getUid().equals(this.id)){
-                cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
-                cmvHolder.my_time.setText(sendTime);
+            Task downloadTask = fsm.downloadFile(chat.getContent());
+            downloadTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    ChatMediaViewHolder cmvHolder = (ChatMediaViewHolder) holder;
+                    if(chat.getFirst()){
+                        cmvHolder.date.setText(sendDate);
+                        cmvHolder.date.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        cmvHolder.date.setVisibility(View.GONE);
+                    }
+                    if(chat.getUid().equals(mUid)){
+                        cmvHolder.aq.id(R.id.my_chat_image).image(uri.toString());
+                        cmvHolder.my_time.setText(sendTime);
 
-                cmvHolder.my_chat_image.setVisibility(View.VISIBLE);
-                cmvHolder.my_time.setVisibility(View.VISIBLE);
+                        cmvHolder.my_chat_image.setVisibility(View.VISIBLE);
+                        cmvHolder.my_time.setVisibility(View.VISIBLE);
 
-                cmvHolder.profileImage.setVisibility(View.GONE);
-                cmvHolder.profileName.setVisibility(View.GONE);
-                cmvHolder.other_time.setVisibility(View.GONE);
-                cmvHolder.other_chat_image.setVisibility(View.GONE);
-            }
-            // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
-            else {
-                cmvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
-                cmvHolder.profileName.setText(mUserData.getName());
-                cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
-                cmvHolder.other_time.setText(sendTime);
+                        cmvHolder.profileImage.setVisibility(View.GONE);
+                        cmvHolder.profileName.setVisibility(View.GONE);
+                        cmvHolder.other_time.setVisibility(View.GONE);
+                        cmvHolder.other_chat_image.setVisibility(View.GONE);
+                    }
+                    // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
+                    else {
 
-                cmvHolder.profileImage.setVisibility(View.VISIBLE);
-                cmvHolder.profileName.setVisibility(View.VISIBLE);
-                cmvHolder.other_time.setVisibility(View.VISIBLE);
-                cmvHolder.other_chat_image.setVisibility(View.VISIBLE);
+                        cmvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
+                        cmvHolder.profileName.setText(mUserData.getName());
+                        cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
+                        cmvHolder.other_time.setText(sendTime);
 
-                cmvHolder.my_chat_image.setVisibility(View.GONE);
-                cmvHolder.my_time.setVisibility(View.GONE);
+                        cmvHolder.profileImage.setVisibility(View.VISIBLE);
+                        cmvHolder.profileName.setVisibility(View.VISIBLE);
+                        cmvHolder.other_time.setVisibility(View.VISIBLE);
+                        cmvHolder.other_chat_image.setVisibility(View.VISIBLE);
 
-            }
+                        cmvHolder.my_chat_image.setVisibility(View.GONE);
+                        cmvHolder.my_time.setVisibility(View.GONE);
+
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
         }
         else{
             ChatSystemViewHolder csvHolder = (ChatSystemViewHolder) holder;//채팅방 내용이 없으면 그냥 만들면 first == true 일듯

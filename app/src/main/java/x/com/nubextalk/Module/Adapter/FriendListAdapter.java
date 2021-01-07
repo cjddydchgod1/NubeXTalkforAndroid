@@ -6,18 +6,12 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,12 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aquery.AQuery;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
-import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
-import io.realm.Realm;
-import io.realm.RealmResults;
-import okhttp3.internal.http2.Header;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
@@ -38,6 +27,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private ArrayList<User> mDataSet;
     private Context mContext;
+    private String uid;
     private onItemSelectedListener listener;
     private AQuery aq;
 
@@ -48,9 +38,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data) {
+    public FriendListAdapter(Context context, ArrayList<User> data, String uid) {
         this.mDataSet = data;
         this.mContext = context;
+        this.uid = uid;
         this.aq = new AQuery(context);
     }
 
@@ -67,22 +58,21 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // LinkedList에서 하나씩.
         User mCurrent = mDataSet.get(position);
-        // FriendList uid를 이용하여 비교한다.
-        if(!mCurrent.getUid().equals("1")) {
-            FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
-            friendViewHolder.bintTo(mCurrent);
-            friendViewHolder.itemView.setOnClickListener(v -> {
-                if(listener != null) {
-                    listener.onSelected(mDataSet.get(position));
-                }
-            });
-        }
+
+        FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
+        friendViewHolder.bintTo(mCurrent);
+        friendViewHolder.itemView.setOnClickListener(v -> {
+            if(listener != null) {
+                listener.onSelected(mDataSet.get(position));
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mDataSet.size();
     }
+
 
     public class FriendViewHolder extends RecyclerView.ViewHolder {
         private final TextView profileName;
@@ -97,7 +87,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
         public void bintTo(User user) {
-            String name = user.getDepartment() + " " + user.getName();
+            String name = user.getDepartment() + " ";
+            if(user.getNickname()==null) {
+                name += user.getName();
+            } else {
+                name += user.getNickname();
+            }
             profileName.setText(name);
             if(!user.getProfileImg().isEmpty()){
                 aq.view(profileImage).image(user.getProfileImg());

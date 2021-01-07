@@ -53,6 +53,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     private ChatAddSearchAdapter mAdapter;
     private ChatAddMemberAdapter memberAdapter;
     private ArrayList<User> userList = new ArrayList<User>();
+    private FirebaseFirestore fs;
 
 
     private Button chatAddConfirmButton;
@@ -62,6 +63,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_add);
+        fs = FirebaseFirestore.getInstance();
 
         chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
         chatAddConfirmButton = findViewById(R.id.chat_add_confirm_btn);

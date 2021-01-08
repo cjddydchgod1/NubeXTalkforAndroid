@@ -64,7 +64,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private RealmChangeListener realmChangeListener;
     private AQuery aq;
     private InputMethodManager imm;
-    private FirebaseStorageManager fsm;
     private FirebaseFirestore fs;
     private RealmResults<ChatContent> mChat;
 
@@ -86,7 +85,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         aq = new AQuery(this);
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        fsm = new FirebaseStorageManager();
         fs = FirebaseFirestore.getInstance();
 
         //
@@ -267,7 +265,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Uri file = data.getData();
-            UploadTask uploadTask = fsm.uploadFile(file,"images/");
+            UploadTask uploadTask = FirebaseStorageManager.uploadFile(file,"images/");
 
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override

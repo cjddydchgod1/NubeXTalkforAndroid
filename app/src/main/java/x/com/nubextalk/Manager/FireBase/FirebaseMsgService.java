@@ -46,6 +46,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 Config userMe = realm.where(Config.class).equalTo("CODE", "USER_ME").findFirst();
                 if (userMe == null) {
                     userMe = new Config();
+                    userMe.setOid("zwnQyY3IlK6OXqkaq6Hv");
                     userMe.setCODENAME("USER");
                     userMe.setCODE("USER_ME");
                 }

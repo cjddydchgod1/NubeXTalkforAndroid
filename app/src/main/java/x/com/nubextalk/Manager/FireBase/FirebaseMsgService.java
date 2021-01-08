@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+
 import io.realm.Realm;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -39,22 +40,21 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         super.onNewToken(s);
         Log.d("FCM_TOKEN_OnNew : ", s);
 
-        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Config userMe = realm.where(Config.class).equalTo("CODE", "USER_ME").findFirst();
-                if (userMe == null) {
-                    userMe = new Config();
-                    userMe.setOid("zwnQyY3IlK6OXqkaq6Hv");
-                    userMe.setCODENAME("USER");
-                    userMe.setCODE("USER_ME");
-                }
-                userMe.setExt1(s);
-
-                realm.copyToRealmOrUpdate(userMe);
-            }
-        });
+//        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                Config userMe = realm.where(Config.class).equalTo("CODE", "USER_ME").findFirst();
+//                if (userMe == null) {
+//                    userMe = new Config();
+//                    userMe.setCODENAME("USER");
+//                    userMe.setCODE("USER_ME");
+//                }
+//                userMe.setExt1(s);
+//
+//                realm.copyToRealmOrUpdate(userMe);
+//            }
+//        });
 
 
         /**
@@ -80,33 +80,60 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
         DateManager dm = new DateManager();
         Map<String, String> data = remoteMessage.getData();
-        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\n"+data.get("chatRoomId"));
+        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\n" + data.get("chatRoomId"));
         switch (data.get("CODE")) {
 
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
                 realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst();
-                            roomInfo.setUpdatedDate(new Date());
-                            realm.copyToRealmOrUpdate(roomInfo);
+                    @Override
+                    public void execute(Realm realm) {
+                        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst();
+                        roomInfo.setUpdatedDate(new Date());
+                        realm.copyToRealmOrUpdate(roomInfo);
 
-                            ChatContent chat = new ChatContent();
+                        ChatContent chat = new ChatContent();
 
-                            chat.setCid(data.get("chatContentId")); // Content ID 자동으로 유니크한 값 설정
-                            chat.setUid(data.get("senderId")); // UID 보내는 사람
-                            chat.setRid(data.get("chatRoomId")); // RID 채팅방 아이디
-                            chat.setType(Integer.parseInt(data.get("contentType")));
-                            chat.setContent(data.get("content"));
-                            chat.setSendDate(new Date());
-                            chat.setFirst(Boolean.parseBoolean(data.get("isFirst")));
-                            realm.copyToRealmOrUpdate(chat);
-
-                            Log.d("realm",data.get("chatContentId"));
-                        }
-                    });
+                        chat.setCid(data.get("chatContentId")); // Content ID 자동으로 유니크한 값 설정
+                        chat.setUid(data.get("senderId")); // UID 보내는 사람
+                        chat.setRid(data.get("chatRoomId")); // RID 채팅방 아이디
+                        chat.setType(Integer.parseInt(data.get("contentType")));
+                        chat.setContent(data.get("content"));
+                        chat.setSendDate(DateManager.
+                                convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
+                        chat.setFirst(Boolean.parseBoolean(data.get("isFirst")));
+                        realm.copyToRealmOrUpdate(chat);
+                    }
+                });
 
                 break;
+            case "FIRST_CHAT_CREATED": //채팅방이 생성되고 처음 메세지가 생성된 경우 채팅방과 채팅메세지 생성
+                FirebaseFunctionsManager.getChatRoom(data.get("hospitalId"), data.get("chatRoomId"));
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        ChatContent notifyChat = new ChatContent();
+                        notifyChat.setCid("sys".concat(data.get("chatContentId")));
+                        notifyChat.setRid(data.get("chatRoomId"));
+                        notifyChat.setType(9);
+                        notifyChat.setContent("채팅방이 개설되었습니다.");
+                        notifyChat.setSendDate(DateManager.
+                                convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
+                        notifyChat.setIsRead(true);
+                        notifyChat.setFirst(false);
+                        realm.copyToRealmOrUpdate(notifyChat);
+
+                        ChatContent chat = new ChatContent();
+                        chat.setCid(data.get("chatContentId"));
+                        chat.setRid(data.get("chatRoomId"));
+                        chat.setUid(data.get("senderId"));
+                        chat.setType(Integer.parseInt(data.get("contentType")));
+                        chat.setContent(data.get("content"));
+                        chat.setSendDate(DateManager.
+                                convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
+                        chat.setFirst(Boolean.parseBoolean(data.get("isFirst")));
+                        realm.copyToRealmOrUpdate(chat);
+                    }
+                });
 
                 // Chatting Message(Notification Message)
                 // System Message

@@ -21,7 +21,12 @@ import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import javax.annotation.Nullable;
+
+import io.realm.ObjectChangeSet;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
@@ -52,13 +57,21 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
         chatContentResults = ChatContent.getAll(realm);
-        if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
+//        if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
         mAdapter.setItemLongSelectedListener(this::onItemLongSelected);
         mAdapter.setItemSelectedListener(this::onItemSelected);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
+            @Override
+            public void onChange(Realm realm) {
+                mAdapter.notifyDataSetChanged();
+                mAdapter.sortChatRoomByDate();
+            }
+        });
 
         fab_main = rootView.findViewById(R.id.chat_fab_main);
         fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);

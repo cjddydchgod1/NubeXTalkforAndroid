@@ -43,7 +43,6 @@ import x.com.nubextalk.R;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Realm realm;
-    private FirebaseStorageManager fsm;
 
     private LayoutInflater mInflater;
     private User mUserData;
@@ -53,7 +52,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public ChatAdapter(Context context, RealmResults<ChatContent>  mChatLog) {
         this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        this.fsm = new FirebaseStorageManager();
 
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
@@ -134,55 +132,37 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
         else if(chat.getType() == 1){
-
-            Task downloadTask = fsm.downloadFile(chat.getContent());
-            downloadTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    ChatMediaViewHolder cmvHolder = (ChatMediaViewHolder) holder;
-                    if(chat.getFirst()){
-                        cmvHolder.date.setText(sendDate);
-                        cmvHolder.date.setVisibility(View.VISIBLE);
-                    }
-                    else{
-                        cmvHolder.date.setVisibility(View.GONE);
-                    }
-                    if(chat.getUid().equals(mUid)){
-                        cmvHolder.aq.id(R.id.my_chat_image).image(uri.toString());
-                        cmvHolder.my_time.setText(sendTime);
-
-                        cmvHolder.my_chat_image.setVisibility(View.VISIBLE);
-                        cmvHolder.my_time.setVisibility(View.VISIBLE);
-
-                        cmvHolder.profileImage.setVisibility(View.GONE);
-                        cmvHolder.profileName.setVisibility(View.GONE);
-                        cmvHolder.other_time.setVisibility(View.GONE);
-                        cmvHolder.other_chat_image.setVisibility(View.GONE);
-                    }
-                    // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
-                    else {
-
-                        cmvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
-                        cmvHolder.profileName.setText(mUserData.getName());
-                        cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
-                        cmvHolder.other_time.setText(sendTime);
-
-                        cmvHolder.profileImage.setVisibility(View.VISIBLE);
-                        cmvHolder.profileName.setVisibility(View.VISIBLE);
-                        cmvHolder.other_time.setVisibility(View.VISIBLE);
-                        cmvHolder.other_chat_image.setVisibility(View.VISIBLE);
-
-                        cmvHolder.my_chat_image.setVisibility(View.GONE);
-                        cmvHolder.my_time.setVisibility(View.GONE);
-
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                }
-            });
+            ChatMediaViewHolder cmvHolder = (ChatMediaViewHolder) holder;
+            if(chat.getFirst()){
+                cmvHolder.date.setText(sendDate);
+                cmvHolder.date.setVisibility(View.VISIBLE);
+            }
+            else{
+                cmvHolder.date.setVisibility(View.GONE);
+            }
+            if(chat.getUid().equals(mUid)){
+                cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
+                cmvHolder.my_time.setText(sendTime);
+                cmvHolder.my_chat_image.setVisibility(View.VISIBLE);
+                cmvHolder.my_time.setVisibility(View.VISIBLE);
+                cmvHolder.profileImage.setVisibility(View.GONE);
+                cmvHolder.profileName.setVisibility(View.GONE);
+                cmvHolder.other_time.setVisibility(View.GONE);
+                cmvHolder.other_chat_image.setVisibility(View.GONE);
+            }
+            // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
+            else {
+                cmvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
+                cmvHolder.profileName.setText(mUserData.getName());
+                cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
+                cmvHolder.other_time.setText(sendTime);
+                cmvHolder.profileImage.setVisibility(View.VISIBLE);
+                cmvHolder.profileName.setVisibility(View.VISIBLE);
+                cmvHolder.other_time.setVisibility(View.VISIBLE);
+                cmvHolder.other_chat_image.setVisibility(View.VISIBLE);
+                cmvHolder.my_chat_image.setVisibility(View.GONE);
+                cmvHolder.my_time.setVisibility(View.GONE);
+            }
         }
         else{
             ChatSystemViewHolder csvHolder = (ChatSystemViewHolder) holder;//채팅방 내용이 없으면 그냥 만들면 first == true 일듯

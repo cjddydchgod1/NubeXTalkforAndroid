@@ -38,11 +38,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data, String uid) {
+    public FriendListAdapter(Context context, ArrayList<User> data, String uid, AQuery aq) {
         this.mDataSet = data;
         this.mContext = context;
         this.uid = uid;
-        this.aq = new AQuery(context);
+        this.aq = aq;
     }
 
 

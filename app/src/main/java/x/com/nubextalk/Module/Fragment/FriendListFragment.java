@@ -131,6 +131,15 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         aq              = new AQuery(getActivity());
 
         /**
+         * recyclerview 디자인 및 애니매이션
+         */
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.scheduleLayoutAnimation();
+
+        /**
          * Firestore에서 realm으로 migration
          */
         Gson gson = new Gson();
@@ -147,6 +156,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                             JSONObject json = new JSONObject(gson.toJson(document.getData()));
                                             jsonArray.put(json);
+                                            Log.d(TAG+"document", document.getData().toString());
                                         }
                                         realm.createOrUpdateAllFromJson(User.class, jsonArray);
                                     } catch (JSONException e) {
@@ -211,12 +221,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        realm.close();
         Log.i(TAG, "OnDetach");
     }
 
@@ -236,18 +246,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid);
+        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid, aq);
         ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
-
-        /**
-         * recyclerview 디자인 및 애니매이션
-         */
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.scheduleLayoutAnimation();
+
         makeProfile();
     }
 

@@ -41,12 +41,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -81,6 +83,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm realm;
+    FirebaseStoreManager firebaseStoreManager;
+
     private ViewGroup rootview;
     private LinearLayout mBottomWrapper;
     private RecyclerView mRecyclerView;
@@ -108,6 +112,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         myUid = UtilityManager.getUid();
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
+        firebaseStoreManager = new FirebaseStoreManager();
         Log.i(TAG, "OnCreate");
     }
 
@@ -128,12 +133,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Firestore에서 realm으로 migration
          */
-        FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
-        DocumentReference hospital = fireStore.collection("hospital").document("w34qjptO0cYSJdAwScFQ");
         Gson gson = new Gson();
-        hospital.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        firebaseStoreManager.getReference("users").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -447,7 +448,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 public void onClick(View v) {
                     chatButton.setVisibility(View.VISIBLE);
                     statusLayout.setVisibility(View.INVISIBLE);
-                    FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
                     switch (v.getId()) {
                         case R.id.working_status :
                             firebaseStoreManager.updateProfileStatus(0, myUid);
@@ -551,7 +551,30 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * 이미지값을 저장한다.
                      * 해당 이미지값을 Storage에 올린다.
                      */
-                    FirebaseStorageManager.uploadProfileImg(imgUri,myUid);
+                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri,"profiles/"+myUid);
+                    Task<Uri> urlTask = uploadTask
+                            .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                                @Override
+                                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                    if(!task.isSuccessful()) {
+                                        throw task.getException();
+                                    }
+                                    return FirebaseStorageManager.downloadFile("profiles/"+myUid);
+                                }
+                            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    if(task.isSuccessful()) {
+                                        Uri imgUri = task.getResult();
+                                        if (imgUri != null){
+                                            FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                                            firebaseStoreManager.updateProfileImg(imgUri.toString(), myUid);
+                                         }
+                                     else
+                                         Log.i("FirebaseStorageManager", "uploadProfileImgFail");
+                                    }
+                                }
+                            });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

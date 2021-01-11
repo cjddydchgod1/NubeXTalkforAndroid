@@ -23,24 +23,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.google.gson.Gson;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
-import x.com.nubextalk.Model.User;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity2 extends AppCompatActivity {
 
     private FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
     private DocumentReference hospital = fireStore.collection("hospital").document("w34qjptO0cYSJdAwScFQ");
@@ -56,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-        final LoginActivity activity = this;
+        final LoginActivity2 activity = this;
 
         EditText id = findViewById(R.id.editId);
         TextView loginButton = findViewById(R.id.login);

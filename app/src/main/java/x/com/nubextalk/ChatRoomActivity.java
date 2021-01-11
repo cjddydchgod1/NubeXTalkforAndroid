@@ -45,6 +45,7 @@ import com.joanzapata.iconify.widget.IconButton;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import io.realm.Realm;
@@ -75,6 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private IconButton mSendButton;
     private String mRoomId;
     private String mUid;
+    private String mHid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         //
         mUid = UtilityManager.getUid();
+        mHid = "w34qjptO0cYSJdAwScFQ";
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
@@ -265,7 +268,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Uri file = data.getData();
-            UploadTask uploadTask = FirebaseStorageManager.uploadFile(file,"images/");
+            Date date = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(yyyy-MM-dd'T'hh:mm:ss)");
+
+            UploadTask uploadTask = FirebaseStorageManager.uploadFile(file,"hospital/" + mHid + "/chatroom/" + mRoomId + "/" + mUid + simpleDateFormat.format(date) );
 
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -385,6 +391,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         else {
 
             Date date = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
 //          채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
             ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",mRoomId).findFirst();
@@ -393,13 +400,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             //서버에 채팅방 업데이트 시간 업뎃
             fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
                     .collection("chatRoom").document(mRoomId)
-                    .update("updatedDate",date);
+                    .update("updatedDate",simpleDateFormat.format(date));
 
             Map<String, Object> chat = new HashMap<>();
             chat.put("cid", null);
             chat.put("uid", mUid);
             chat.put("content", content);
-            chat.put("sendDate",  new SimpleDateFormat("yyyy.MM.dd E HH:mm:ss").format(date));
+            chat.put("sendDate",  simpleDateFormat.format(date));
             chat.put("type", "0");
             if(DateManager.isSameDay(date,roomUpdateDate)){
                 chat.put("isFirst","false");

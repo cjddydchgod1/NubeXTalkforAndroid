@@ -95,7 +95,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     .equalTo("rid", roomId)
                     .sort("sendDate", Sort.DESCENDING).findFirst();
 
-            if (!roomImgUrl.isEmpty()) {
+            if (roomImgUrl != null) {
                 aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
             } else {
                 aq.view(mHolder.profileImg).image(R.drawable.baseline_account_circle_black_24dp);

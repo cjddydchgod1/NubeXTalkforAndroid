@@ -136,40 +136,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
-        mRecyclerView.scheduleLayoutAnimation();
-
-        /**
-         * Firestore에서 realm으로 migration
-         */
-        Gson gson = new Gson();
-        firebaseStoreManager.getReference("users").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.i(TAG, "TaskSuccess");
-                            realm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    try {
-                                        JSONArray jsonArray = new JSONArray();
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            JSONObject json = new JSONObject(gson.toJson(document.getData()));
-                                            jsonArray.put(json);
-                                            Log.d(TAG+"document", document.getData().toString());
-                                        }
-                                        realm.createOrUpdateAllFromJson(User.class, jsonArray);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            makeData();
-                        } else {
-                            Log.i(TAG,"TaskFail");
-                        }
-                    }
-                });
 
         /**
          * search를 FriendListFragment에서 사용가능하게
@@ -183,12 +149,21 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        /**
+         * recyclerview data 넣기
+         */
+        makeData();
         Log.i(TAG, "OnActivityCreated");
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        /**
+         * recyclerview 애니매이션
+         */
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.scheduleLayoutAnimation();
         Log.i(TAG, "OnStart");
 
     }

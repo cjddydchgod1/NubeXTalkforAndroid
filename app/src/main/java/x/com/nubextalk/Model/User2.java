@@ -12,18 +12,18 @@ import io.realm.annotations.PrimaryKey;
 public class User2 extends RealmObject {
     @NonNull
     @PrimaryKey
-    private String code;
+    private String code; // user id(고유)
     @NonNull
-    private String userId;
-    private String lastName;
-    private String typeCode;
-    private String typeCodeName;
-    private String removed;
+    private String userId; // id(로그인)
+    private String lastName; // ??
+    private String typeCode; // 직책번호
+    private String typeCodeName; // 직책
+    private String removed; // ??
 
-    private String appImagePath;
-    private String appStatus;
-    private String appName;
-    private String appFcmKey;
+    private String appImagePath; // image값
+    private String appStatus; // 상태정보
+    private String appName; // 이름
+    private String appFcmKey; // FCM key값 저장
 
     @NonNull
     public String getCode() {

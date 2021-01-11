@@ -24,13 +24,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ApiManager apiManager;
     private Realm realm;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +71,46 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", body.toString());
+                        /**
+                         * userlist -> realm 저장
+                         */
+                        try{
+                            /**
+                             * String(body) -> JSONArray
+                             */
+                            JSONArray jsonArray = new JSONArray(body);
+                            /**
+                             * JSONArray -> JSONObject
+                             * field명 바꾸기
+                             * JSONObject -> JSONArray
+                             */
+                            int len = jsonArray.length();
+                            for(int i=0; i<len; i++) {
+                                JSONObject jsonObject = (JSONObject) (jsonArray.get(i));
+                                jsonObject.put("userId", jsonObject.get("userid"))
+                                        .put("lastName", jsonObject.get("lastname"))
+                                        .put("typeCode", jsonObject.get("typecode"))
+                                        .put("typeCodeName", jsonObject.get("typecodename"))
+                                        .put("appImagePath", jsonObject.get("app_IMG_PATH"))
+                                        .put("appStatus", jsonObject.get("app_STATUS"))
+                                        .put("appName", jsonObject.get("app_NAME"))
+                                        .put("appFcmKey", jsonObject.get("app_FCM_KEY"));
+                                jsonObject.remove("userid"); jsonObject.remove("lastname");
+                                jsonObject.remove("typecode"); jsonObject.remove("typecodename");
+                                jsonObject.remove("app_IMG_PATH"); jsonObject.remove("app_STATUS");
+                                jsonObject.remove("app_NAME"); jsonObject.remove("app_FCM_KEY");
+                                jsonArray.put(jsonObject);
+                            }
+                            /**
+                             * JSONArray -> Realm
+                             */
+                            realm.executeTransaction(realm1 -> {
+                                realm1.where(User2.class).findAll().deleteAllFromRealm();
+                                realm1.createOrUpdateAllFromJson(User2.class, jsonArray);
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }

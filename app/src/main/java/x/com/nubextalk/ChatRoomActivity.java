@@ -76,6 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private IconButton mSendButton;
     private String mRoomId;
     private String mUid;
+    private String mHid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         //
         mUid = UtilityManager.getUid();
+        mHid = "w34qjptO0cYSJdAwScFQ";
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
         Intent intent = getIntent();
@@ -266,7 +268,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Uri file = data.getData();
-            UploadTask uploadTask = FirebaseStorageManager.uploadFile(file,"images/");
+            Date date = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(yyyy-MM-dd'T'hh:mm:ss)");
+
+            UploadTask uploadTask = FirebaseStorageManager.uploadFile(file,"hospital/" + mHid + "/chatroom/" + mRoomId + "/" + mUid + simpleDateFormat.format(date) );
 
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override

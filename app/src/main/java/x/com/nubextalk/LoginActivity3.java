@@ -37,7 +37,7 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_login3);
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        apiManager = new ApiManager(this, realm);
+
 
         mEditHospital = (EditText)findViewById(R.id.login_hospital_edit);
         mEditId = (EditText)findViewById(R.id.login_id_edit);
@@ -53,10 +53,14 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
+        final LoginActivity3 activity = this;
+
         switch (view.getId()){
             case R.id.login_sign_up:
+                startActivity(new Intent(activity, RegisterActivity.class));
                 break;
             case R.id.login_sign_in:
+                apiManager = new ApiManager(this, realm);
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
                 apiManager.login(id, password, new ApiManager.onApiListener() { // lee777 , tech1!

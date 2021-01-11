@@ -44,7 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                realm.executeTransactionAsync(new Realm.Transaction() {
+                realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
                         Config serverInfo = Config.getServerInfo(realm);
@@ -57,21 +57,14 @@ public class RegisterActivity extends AppCompatActivity {
                         String host = hostInput.getText().toString().equals("") ? "192.168.3.156" : hostInput.getText().toString();
                         String port = portInput.getText().toString().equals("") ? "" : ":".concat(portInput.getText().toString());
                         String name = nameInput.getText().toString().equals("") ? "" : nameInput.getText().toString();
+                        serverInfo.setOid(name);
                         serverInfo.setExt1(ssl);
                         serverInfo.setExt2(host);
                         serverInfo.setExt3(port);
                         serverInfo.setExt4(name);
                         realm.copyToRealmOrUpdate(serverInfo);
-                    }
-                }, new Realm.Transaction.OnSuccess() {
-                    @Override
-                    public void onSuccess() {
-                        try {
-                            startActivity(new Intent(activity, LoginActivity.class));
-                            finish();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        startActivity(new Intent(activity, LoginActivity3.class));
+                        finish();
                     }
                 });
             }

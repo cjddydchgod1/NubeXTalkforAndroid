@@ -107,4 +107,12 @@ public class Config extends RealmObject {
             e.printStackTrace();
         }
     }
+
+    public static Config getMyAccount(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "MyAccount").findFirst();
+    }
+
+    public static Config getServerInfo(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "ServerInfo").findFirst();
+    }
 }

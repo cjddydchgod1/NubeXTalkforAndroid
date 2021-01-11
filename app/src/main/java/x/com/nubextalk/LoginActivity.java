@@ -16,7 +16,9 @@ import x.com.nubextalk.Model.User2;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.PACS.Protocol;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -46,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
-
+        final LoginActivity activity = this;
         apiManager = new ApiManager(this, realm);
 
         Button btn = findViewById(R.id.btn);
@@ -91,10 +93,10 @@ public class LoginActivity extends AppCompatActivity {
                                         .put("lastName", jsonObject.get("lastname"))
                                         .put("typeCode", jsonObject.get("typecode"))
                                         .put("typeCodeName", jsonObject.get("typecodename"))
-                                        .put("appImagePath", jsonObject.get("app_IMG_PATH"))
-                                        .put("appStatus", jsonObject.get("app_STATUS"))
-                                        .put("appName", jsonObject.get("app_NAME"))
-                                        .put("appFcmKey", jsonObject.get("app_FCM_KEY"));
+                                        .put("appImagePath", jsonObject.get("app_IMG_PATH").equals(null) ? "https://storage.googleapis.com/nubextalkforandroid.appspot.com/profiles/thumb_6G67LygR16Xcp0vX65iS?GoogleAccessId=firebase-adminsdk-qxfsz%40nubextalkforandroid.iam.gserviceaccount.com&Expires=16730323200&Signature=Jp1ORSOTdYpCVBYTROs3ZPXUWUZpMJ7TEROGu9M882RbsnSy%2FIeyZiUc6ECC3GYaAXXzS4gQSBmAo3KVcewQAz%2Bmi9hUq7JHEvvJ5wLZduK1JUBnB2dWBe1Mi1jV%2FBMJxqoJSGlD%2FtawK6VTYmnTHwDivOX0ut7iEE6fGhQ5Z2OhVVotGPupX41esM4hidnldmLPsQouOYcHxRbKlB6FS57C7T%2FL5hOIcZOGqwPqr6jubvvuF7To95V2czS6DjUI3cGkh7zSyWdbpilCnK2PXvsp8JQVck1bJAUAw05WHu9rSud8aFJpyo0eZlxwnfXkbvoWJLruB%2FgFJWl4im5GDg%3D%3D": jsonObject.get("app_IMG_PATH"))
+                                        .put("appStatus", jsonObject.get("app_STATUS").equals(null) ? "0" : jsonObject.get("app_STATUS"))
+                                        .put("appName", jsonObject.get("app_NAME").equals(null) ? "no" : jsonObject.get("app_NAME"))
+                                        .put("appFcmKey", jsonObject.get("app_FCM_KEY").equals(null) ? null : jsonObject.get("app_FCM_KEY"));
                                 jsonObject.remove("userid"); jsonObject.remove("lastname");
                                 jsonObject.remove("typecode"); jsonObject.remove("typecodename");
                                 jsonObject.remove("app_IMG_PATH"); jsonObject.remove("app_STATUS");
@@ -111,6 +113,8 @@ public class LoginActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        Intent intent = new Intent(activity, MainActivity.class);
+                        startActivity(intent);
                     }
                 });
             }

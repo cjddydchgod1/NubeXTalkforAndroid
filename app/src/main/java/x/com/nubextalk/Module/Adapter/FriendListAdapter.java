@@ -21,28 +21,29 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Model.User2;
 import x.com.nubextalk.R;
 
 public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<User> mDataSet;
+    private ArrayList<User2> mDataSet;
     private Context mContext;
     private String uid;
     private onItemSelectedListener listener;
     private AQuery aq;
 
     public interface onItemSelectedListener{
-        void onSelected(User address);
+        void onSelected(User2 address);
     }
     public void setOnItemSelectedListener(onItemSelectedListener listener){
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data, String uid) {
+    public FriendListAdapter(Context context, ArrayList<User2> data, String uid, AQuery aq) {
         this.mDataSet = data;
         this.mContext = context;
         this.uid = uid;
-        this.aq = new AQuery(context);
+        this.aq = aq;
     }
 
 
@@ -57,7 +58,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // LinkedList에서 하나씩.
-        User mCurrent = mDataSet.get(position);
+        User2 mCurrent = mDataSet.get(position);
 
         FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
         friendViewHolder.bintTo(mCurrent);
@@ -86,27 +87,28 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileImage = itemView.findViewById(R.id.profileImage);
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
-        public void bintTo(User user) {
-            String name = user.getDepartment() + " ";
-            if(user.getNickname()==null) {
-                name += user.getName();
-            } else {
-                name += user.getNickname();
-            }
-            profileName.setText(name);
-            if(!user.getProfileImg().isEmpty()){
-                aq.view(profileImage).image(user.getProfileImg());
+        public void bintTo(User2 user) {
+//            String name = user.getDepartment() + " ";
+//            if(user.getNickname()==null) {
+//                name += user.getName();
+//            } else {
+//                name += user.getNickname();
+//            }
+//            profileName.setText(name);
+            profileName.setText(user.getAppName());
+            if(!user.getAppImagePath().isEmpty()){
+                aq.view(profileImage).image(user.getAppImagePath());
             }
             // 초록
-            switch(user.getStatus()) {
-                case 0 :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-                    break;
-                case 1 :
+            switch(user.getAppStatus()) {
+                case "1" :
                     aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                     break;
-                case 2 :
+                case "2" :
                     aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                    break;
+                default :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                     break;
             }
         }

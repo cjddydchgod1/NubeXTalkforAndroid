@@ -76,6 +76,7 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Model.User2;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.R;
 
@@ -89,8 +90,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private LinearLayout mBottomWrapper;
     private RecyclerView mRecyclerView;
     private FriendListAdapter mAdapter;
-    private RealmResults<User> mResults;
-    private ArrayList<User> mList; // mResults를 복사
+    private RealmResults<User2> mResults;
+    private ArrayList<User2> mList; // mResults를 복사
     private ChatRoomMember mChat;
     private AQuery aq;
 
@@ -109,7 +110,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * uid를 받아온다.
          */
-        myUid = UtilityManager.getUid();
+        myUid = "1";
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         firebaseStoreManager = new FirebaseStoreManager();
@@ -131,35 +132,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         aq              = new AQuery(getActivity());
 
         /**
-         * Firestore에서 realm으로 migration
+         * recyclerview 디자인 및 애니매이션
          */
-        Gson gson = new Gson();
-        firebaseStoreManager.getReference("users").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.i(TAG, "TaskSuccess");
-                            realm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    try {
-                                        JSONArray jsonArray = new JSONArray();
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            JSONObject json = new JSONObject(gson.toJson(document.getData()));
-                                            jsonArray.put(json);
-                                        }
-                                        realm.createOrUpdateAllFromJson(User.class, jsonArray);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            makeData();
-                        } else {
-                            Log.i(TAG,"TaskFail");
-                        }
-                    }
-                });
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         /**
          * search를 FriendListFragment에서 사용가능하게
@@ -173,12 +150,21 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+       /**
+         * recyclerview data 넣기
+         */
+        makeData();
         Log.i(TAG, "OnActivityCreated");
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        /**
+         * recyclerview 애니매이션
+         */
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.scheduleLayoutAnimation();
         Log.i(TAG, "OnStart");
 
     }
@@ -211,12 +197,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        realm.close();
         Log.i(TAG, "OnDetach");
     }
 
@@ -225,7 +211,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
          */
-        mResults = realm.where(User.class).notEqualTo("uid", myUid).findAll();
+        mResults = realm.where(User2.class).notEqualTo("code", myUid).findAll();
 
         /**
          * Search하기 위해 mResult -> mList
@@ -236,45 +222,39 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid);
+        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid, aq);
         ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
-
-        /**
-         * recyclerview 디자인 및 애니매이션
-         */
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.scheduleLayoutAnimation();
+
         makeProfile();
     }
 
     public void makeProfile() {
-        User myProfile = realm.where(User.class).equalTo("uid", myUid).findFirst();
+        User2 myProfile = realm.where(User2.class).equalTo("code", myUid).findFirst();
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
-        String name = myProfile.getDepartment() + " ";
-        if(!myProfile.getProfileImg().isEmpty()){
-            aq.view(myProfileImage).image(myProfile.getProfileImg());
-        }
-        if(myProfile.getNickname()==null) {
-            name += myProfile.getName();
-        } else {
-            name += myProfile.getNickname();
-        }
-        myProfileName.setText(name);
-        switch(myProfile.getStatus()) {
-            case 0 :
-                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-                break;
-            case 1 :
+//        String name = myProfile.getDepartment() + " ";
+//        if(!myProfile.getAppImagePath().isEmpty()){
+//            aq.view(myProfileImage).image(myProfile.getAppImagePath());
+//        }
+//        if(myProfile.getNickname()==null) {
+//            name += myProfile.getName();
+//        } else {
+//            name += myProfile.getNickname();
+//        }
+//        myProfileName.setText(name);
+        Log.d("Tlqkf", myProfile.getAppName());
+        myProfileName.setText(myProfile.getAppName());
+        switch(myProfile.getAppStatus()) {
+            case "1" :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
-            case 2 :
+            case "2" :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                break;
+            default :
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                 break;
             }
         rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
@@ -315,20 +295,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
             Log.i(TAG, "notInput Alldata");
-            mResults = realm.where(User.class).findAll();
+            mResults = realm.where(User2.class).findAll();
             mList.addAll(realm.copyFromRealm(mResults));
         }
         // 문자 입력을 할때..
         else
         {
             Log.i(TAG, "Input data");
-            mList.add(realm.where(User.class).equalTo("uid", myUid).findFirst());
-            mList.addAll(realm.where(User.class).isNull("nickname")
+            mList.add(realm.where(User2.class).equalTo("uid", myUid).findFirst());
+            mList.addAll(realm.where(User2.class).isNull("nickname")
                         .contains("name", query)
                         .or()
                         .contains("department", query.toUpperCase())
                         .findAll());
-            mList.addAll(realm.where(User.class).isNotNull("nickname")
+            mList.addAll(realm.where(User2.class).isNotNull("nickname")
                           .contains("nickname", query)
                           .or()
                           .contains("department", query.toUpperCase())
@@ -343,7 +323,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
 
     @Override
-    public void onSelected(User address) {
+    public void onSelected(User2 address) {
         initBottomsheet(address);
         new AnimManager(
                 AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(3000).translationY(0).setInterpolator(new DecelerateInterpolator())
@@ -351,7 +331,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    protected void initBottomsheet(User address) {
+    protected void initBottomsheet(User2 address) {
         // 프로필 이름, 이미지, 상태
         TextView profileName = mBottomWrapper.findViewById(R.id.profileName);
         ImageView profileImage = mBottomWrapper.findViewById(R.id.profileImage);
@@ -366,19 +346,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
         // 프로필 이름 설정
-        String name;
-        if(address.getNickname()==null) {
-            name = address.getName();
-        } else {
-            name = address.getNickname();
-        }
-        profileName.setText(name);
+//        String name;
+//        if(address.getNickname()==null) {
+//            name = address.getName();
+//        } else {
+//            name = address.getNickname();
+//        }
+//        profileName.setText(name);
+        profileName.setText(address.getAppName());
         // profilestatus 수정 버튼
-        switch(address.getStatus()) {
-            case 1 :
+        switch(address.getAppStatus()) {
+            case "1" :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
-            case 2 :
+            case "2" :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
                 break;
             default : // 0과 기본으로 되어있는 설정
@@ -390,7 +371,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          * 데이터 초기화
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if(address.getUid().equals(myUid)){
+        if(address.getCode().equals(myUid)){
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
             profileStatus.setClickable(true);
@@ -405,23 +386,23 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         modifyNameButton.setText("수정");
 
         // 프로필 사진
-        if(!address.getProfileImg().isEmpty()) {
-            aq.view(profileImage).image(address.getProfileImg());
+        if(!address.getAppImagePath().isEmpty()) {
+            aq.view(profileImage).image(address.getAppImagePath());
         }
 
         // Nickname 변
-        modifyNameButton.setOnClickListener(v -> {
-            String buttonName = modifyNameButton.getText().toString();
-            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
-                modifyNameButton.setText("완료");
-                profileName.setVisibility(View.GONE);
-                modifyName.setVisibility(View.VISIBLE);
-                modifyName.setText(profileName.getText().toString());
-            } else { // 완료버튼을 눌렀을 경우
-                updateNickname(address, modifyName.getText().toString());
-                refreshFragment();
-            }
-        });
+//        modifyNameButton.setOnClickListener(v -> {
+//            String buttonName = modifyNameButton.getText().toString();
+//            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
+//                modifyNameButton.setText("완료");
+//                profileName.setVisibility(View.GONE);
+//                modifyName.setVisibility(View.VISIBLE);
+//                modifyName.setText(profileName.getText().toString());
+//            } else { // 완료버튼을 눌렀을 경우
+//                updateNickname(address, modifyName.getText().toString());
+//                refreshFragment();
+//            }
+//        });
 
         // 프로필 사진 변경 (myProfile만 가능)
         modifyImageButton.setOnClickListener(v -> {
@@ -474,10 +455,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
               * 2. ChatRoomMember에서 해당 uid와, 내 uid를 갖고 있는 rid를 찾는다.
               * 3. rid를 가지고 와서 intent로 넘겨준다.
               */
-            mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getUid()).findFirst();
+            mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getCode()).findFirst();
             if(mChat==null){
                 // 새로만든 채팅이 없다면 새로 만든다.
-                temporary(address);
+//                temporary(address);
             } else {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                 intent.putExtra("rid", mChat.getRid());

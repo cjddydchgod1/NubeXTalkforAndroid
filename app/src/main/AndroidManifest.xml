@@ -18,7 +18,6 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".LoginActivity3"></activity>
         <activity android:name=".LoginActivity"></activity> <!-- FireBase -->
-        <activity android:name=".LoginActivity2" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

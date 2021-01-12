@@ -108,10 +108,4 @@ public class User extends RealmObject {
             e.printStackTrace();
         }
     }
-
-
-    public static RealmResults<User> getAll(Realm realm){
-        return realm.where(User.class).findAll();
-    }
-
 }

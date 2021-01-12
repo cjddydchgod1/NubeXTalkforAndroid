@@ -6,7 +6,10 @@
 package x.com.nubextalk.Model;
 
 import androidx.annotation.NonNull;
+
+import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 
 public class User2 extends RealmObject {
@@ -107,4 +110,10 @@ public class User2 extends RealmObject {
         this.appFcmKey = appFcmKey;
     }
 
+    public static RealmObject getMyAccountInfo(Realm realm) {
+        return realm.where(User2.class).equalTo("userId", Config.getMyAccount(realm).getExt1()).findFirst();
+    }
+    public static RealmResults<User2> getUserlist(Realm realm) {
+        return realm.where(User2.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();
+    }
 }

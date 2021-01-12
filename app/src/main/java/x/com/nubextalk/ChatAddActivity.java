@@ -108,9 +108,16 @@ public class ChatAddActivity extends AppCompatActivity implements
 
     @Override
     public void onClick(View v) {
+        ArrayList<User> selectedUser = memberAdapter.getUserList();
+        String roomName = chatRoomNameInput.getText().toString();
         switch (v.getId()) {
             case R.id.chat_add_confirm_btn:
-                createNewChat();
+                if(createNewChat(realm, selectedUser, roomName)) {
+                    setResult(RESULT_OK); //MainActivity 로 결과 전달
+                    finish();
+                } else {
+                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT ).show();
+                }
                 break;
 
             case R.id.chat_add_cancel_btn:
@@ -119,50 +126,46 @@ public class ChatAddActivity extends AppCompatActivity implements
         }
     }
 
-    public boolean createNewChat() {
-        Config myProfile = realm.where(Config.class).equalTo("CODENAME", "CODENAME").findFirst();
-        String token = myProfile.getExt1();
+    public static boolean createNewChat(Realm realm, ArrayList<User> list, String name) {
+        Config myProfile = realm.where(Config.class).equalTo("CODENAME", "MyAccount").findFirst();
+//        String token = myProfile.getExt1();
+        String token = myProfile.getExt4();
         Gson gson = new Gson();
-
         String hospital = "w34qjptO0cYSJdAwScFQ";
-        String roomName = chatRoomNameInput.getText().toString();
-        ArrayList<User> selectedUser = memberAdapter.getUserList();
-
         Map<String, Object> value = new HashMap<>();
         value.put("token", token);
         value.put("hospital", hospital);
 
         JSONArray jsonArray = new JSONArray();
-        for(User user : selectedUser){
+        for(User user : list){
             jsonArray.put(user.getUid());
         }
-        jsonArray.put(myProfile.getOid());
+//        jsonArray.put(myProfile.getOid());
+        jsonArray.put(myProfile.getExt1());
         value.put("members",  jsonArray);
         Log.d("test", value.toString());
 
 
-        if (selectedUser.size() == 1) { /** 선택된 유저가 한명일 때 **/
-            if (!roomName.isEmpty()) { // 채팅방 이름을 입력했을 때
-                value.put("title", roomName);
+        if (list.size() == 1) { /** 선택된 유저가 한명일 때 **/
+            if (!name.isEmpty()) { // 채팅방 이름을 입력했을 때
+                value.put("title", name);
             } else { // 채팅방 이름 입력 안했을 때 = 상대방 이름으로 채팅방 이름 설정
-                value.put("title", selectedUser.get(0).getName());
+                value.put("title", list.get(0).getName());
             }
-            value.put("roomImgUrl", selectedUser.get(0).getProfileImg());
+            value.put("roomImgUrl", list.get(0).getProfileImg());
         } else {
-            if (!roomName.isEmpty()) {
-                value.put("title", roomName);
+            if (!name.isEmpty()) {
+                value.put("title", name);
             } else {
-                Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT ).show();
                 return false;
             }
-            value.put("roomImgUrl", selectedUser.get(0).getProfileImg());
+            value.put("roomImgUrl", list.get(0).getProfileImg());
         }
-
         FirebaseFunctionsManager.createChatRoom(token, value);
 
 
 //        /**확인 버튼을 누르면 새로운 ChatRoom 생성하고 해당 rid 를 ChatRoomMember 에 rid, uid 넣어서 생성**/
-//        ArrayList<User> selectedUser = memberAdapter.getUserList();
+//        ArrayList<User> list = memberAdapter.getUserList();
 //        String rid = getRandomString().toString();
 //        ChatRoom newChatRoom = new ChatRoom();
 //        newChatRoom.setRid(rid);
@@ -216,8 +219,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 //            }
 //        });
 
-        setResult(RESULT_OK); //MainActivity 로 결과 전달
-        finish();
+
         return true;
     }
 }

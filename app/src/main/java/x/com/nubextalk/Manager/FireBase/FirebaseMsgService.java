@@ -80,7 +80,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
         DateManager dm = new DateManager();
         Map<String, String> data = remoteMessage.getData();
-        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\n" + data.get("chatRoomId"));
+        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date"));
         switch (data.get("CODE")) {
 
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
@@ -134,6 +134,9 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                         realm.copyToRealmOrUpdate(chat);
                     }
                 });
+
+            case "CHAT_ROOM_INVITED":
+                Log.d("TOKEN", "room invited!!");
 
                 // Chatting Message(Notification Message)
                 // System Message

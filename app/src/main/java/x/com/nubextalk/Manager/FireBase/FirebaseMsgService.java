@@ -40,21 +40,20 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         super.onNewToken(s);
         Log.d("FCM_TOKEN_OnNew : ", s);
 
-//        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                Config userMe = realm.where(Config.class).equalTo("CODE", "USER_ME").findFirst();
-//                if (userMe == null) {
-//                    userMe = new Config();
-//                    userMe.setCODENAME("USER");
-//                    userMe.setCODE("USER_ME");
-//                }
-//                userMe.setExt1(s);
-//
-//                realm.copyToRealmOrUpdate(userMe);
-//            }
-//        });
+        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Config userMe = realm.where(Config.class).equalTo("CODE", "MyAccount").findFirst();
+                if (userMe == null) {
+                    userMe = new Config();
+                    userMe.setCODENAME("MyAccount");
+                    userMe.setCODE("MyAccount");
+                }
+                userMe.setExt4(s);
+                realm.copyToRealmOrUpdate(userMe);
+            }
+        });
 
 
         /**

@@ -40,7 +40,7 @@ public class LoginActivity2 extends AppCompatActivity {
     private Config config;
     private String fcm;
     private String id1;
-    private String test = "vpUrLKpjM1mzXsQDT5CH";
+    private String test = "zwnQyY3IlK6OXqkaq6Hv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

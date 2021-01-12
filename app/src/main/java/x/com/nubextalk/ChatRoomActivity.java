@@ -288,14 +288,19 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             });
         }
         else if(requestCode == 2 && resultCode == RESULT_OK) {
-//            Uri file = data.getData();
-            Uri file = mImageCaptureUri;
             Bitmap image = (Bitmap) data.getExtras().get("data");
-            Log.d("camera", file.toString());
-
             Date date = new Date();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(yyyy-MM-dd'T'hh:mm:ss)");
-            UploadTask uploadTask = FirebaseStorageManager.uploadFile(file, "hospital/" + mHid + "/chatroom/" + mRoomId + "/" + mUid + simpleDateFormat.format(date));
+            UploadTask uploadTask = FirebaseStorageManager.uploadFile(image, "hospital/" + mHid + "/chatroom/" + mRoomId + "/" + mUid + simpleDateFormat.format(date));
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                }
+            });
 
         }
     }

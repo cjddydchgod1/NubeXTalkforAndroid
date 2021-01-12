@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddChatMemberActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/add_chat_member_tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:subtitle="대화상대 추가" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/add_chat_member_added_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_chat_member_tool_bar"
+         />
+
+    <co.moonmonkeylabs.realmsearchview.RealmSearchView
+        android:id="@+id/add_chat_member_search_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_chat_member_added_view"
+        app:layout_constraintBottom_toTopOf="@+id/add_chat_linear_layout"
+        app:rsvHint="@string/search_hint">
+    </co.moonmonkeylabs.realmsearchview.RealmSearchView>
+
+    <LinearLayout
+        android:id="@+id/add_chat_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_chat_member_search_view">
+
+        <Button
+            android:id="@+id/add_chat_confirm_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="@dimen/margin_s"
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:text="확   인" />
+
+        <Button
+            android:id="@+id/add_chat_cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_s"
+            android:layout_weight="1"
+
+            android:background="@color/colorPrimaryDark"
+            android:text="취   소" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

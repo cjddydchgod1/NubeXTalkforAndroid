@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.api.Http;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.gson.Gson;
@@ -187,4 +188,14 @@ public class FirebaseFunctionsManager {
                 });
     }
 
+    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(Map value) {
+        return notifyToChatRoomAddedUser(value, null);
+    }
+
+    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(Map value, OnCompleteListsner onCompleteListsner) {
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        return functions
+                .getHttpsCallable("notifyToChatRoomAddedUser")
+                .call(value);
+    }
 }

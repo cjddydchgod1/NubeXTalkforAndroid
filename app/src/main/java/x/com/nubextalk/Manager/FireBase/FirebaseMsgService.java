@@ -5,27 +5,36 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
+import androidx.core.app.NotificationCompat;
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-
 import io.realm.Realm;
+import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.Config;
-import x.com.nubextalk.Module.Adapter.ChatAdapter;
+import x.com.nubextalk.Model.User;
+import x.com.nubextalk.R;
 
 /**
  * Firebase Message Service
@@ -34,6 +43,9 @@ import x.com.nubextalk.Module.Adapter.ChatAdapter;
  * - 참고 : https://firebase.google.com/docs/cloud-messaging/android/client?authuser=0
  */
 public class FirebaseMsgService extends FirebaseMessagingService {
+    String CHANNEL_ID = "0608";
+    Realm realm;
+    NotificationManager notificationManager;
 
     @Override
     public void onNewToken(String s) {
@@ -76,13 +88,35 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        DateManager dm = new DateManager();
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String cid;
+        String uid;
+        String rid;
+        int type;
+        String content;
+        Date date;
+        Boolean isFirst;
+
         Map<String, String> data = remoteMessage.getData();
         Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date"));
         switch (data.get("CODE")) {
 
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
+                cid = data.get("chatContentId");
+                uid = data.get("senderId");
+                rid = data.get("chatRoomId");
+                type = Integer.parseInt(data.get("contentType"));
+                content = data.get("content");
+                date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
+                isFirst = Boolean.parseBoolean(data.get("isFirst"));
+
+                if (!UtilityManager.getUid().equals(uid)) {
+                    makeChannel(CHANNEL_ID);
+                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
+                }
+
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -92,21 +126,34 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                         ChatContent chat = new ChatContent();
 
-                        chat.setCid(data.get("chatContentId")); // Content ID 자동으로 유니크한 값 설정
-                        chat.setUid(data.get("senderId")); // UID 보내는 사람
-                        chat.setRid(data.get("chatRoomId")); // RID 채팅방 아이디
-                        chat.setType(Integer.parseInt(data.get("contentType")));
-                        chat.setContent(data.get("content"));
-                        chat.setSendDate(DateManager.
-                                convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
-                        chat.setFirst(Boolean.parseBoolean(data.get("isFirst")));
+                        chat.setCid(cid); // Content ID 자동으로 유니크한 값 설정
+                        chat.setUid(uid); // UID 보내는 사람
+                        chat.setRid(rid); // RID 채팅방 아이디
+                        chat.setType(type);
+                        chat.setContent(content);
+                        chat.setSendDate(date);
+                        chat.setFirst(isFirst);
                         realm.copyToRealmOrUpdate(chat);
                     }
                 });
 
+                if (!UtilityManager.getUid().equals(uid)) {
+                    makeChannel(CHANNEL_ID);
+                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
+                }
+
                 break;
             case "FIRST_CHAT_CREATED": //채팅방이 생성되고 처음 메세지가 생성된 경우 채팅방과 채팅메세지 생성
                 FirebaseFunctionsManager.getChatRoom(data.get("hospitalId"), data.get("chatRoomId"));
+
+                cid = data.get("chatContentId");
+                uid = data.get("senderId");
+                rid = data.get("chatRoomId");
+                type = Integer.parseInt(data.get("contentType"));
+                content = data.get("content");
+                date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
+                isFirst = Boolean.parseBoolean(data.get("isFirst"));
+
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -122,23 +169,99 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                         realm.copyToRealmOrUpdate(notifyChat);
 
                         ChatContent chat = new ChatContent();
-                        chat.setCid(data.get("chatContentId"));
-                        chat.setRid(data.get("chatRoomId"));
-                        chat.setUid(data.get("senderId"));
-                        chat.setType(Integer.parseInt(data.get("contentType")));
-                        chat.setContent(data.get("content"));
-                        chat.setSendDate(DateManager.
-                                convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
-                        chat.setFirst(Boolean.parseBoolean(data.get("isFirst")));
+                        chat.setCid(cid); // Content ID 자동으로 유니크한 값 설정
+                        chat.setUid(uid); // UID 보내는 사람
+                        chat.setRid(rid); // RID 채팅방 아이디
+                        chat.setType(type);
+                        chat.setContent(content);
+                        chat.setSendDate(date);
+                        chat.setFirst(isFirst);
                         realm.copyToRealmOrUpdate(chat);
                     }
                 });
 
+                if (!UtilityManager.getUid().equals(uid)) {
+                    makeChannel(CHANNEL_ID);
+                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
+                }
+                break;
             case "CHAT_ROOM_INVITED":
                 Log.d("TOKEN", "room invited!!");
 
                 // Chatting Message(Notification Message)
                 // System Message
+                
         }
+    }
+
+    public void makeChannel(String id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (notificationManager.getNotificationChannel(id) == null) {
+                String channelName = "chat_notify";
+                String description = "chatting";
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+                NotificationChannel channel = new NotificationChannel(id, channelName, importance);
+                channel.setDescription(description);
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    public NotificationCompat.Builder makeBuilder(String rid, String uid, int type, String content) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+        User userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+
+        Bitmap userProfileImg = getImageFromURL(userInfo.getProfileImg());
+
+        Intent intent = new Intent(this, ChatRoomActivity.class);
+        intent.putExtra("rid", rid);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setSmallIcon(R.drawable.nube_x_logo)
+                .setContentTitle(roomInfo.getRoomName())
+                .setLargeIcon(userProfileImg)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setChannelId(CHANNEL_ID)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+        if (type == 1) {
+            builder.setContentText("사진");
+        } else {
+            builder.setContentText(content);
+        }
+        return builder;
+    }
+
+    public static Bitmap getImageFromURL(String imageURL) {
+        Bitmap imgBitmap = null;
+        HttpURLConnection conn = null;
+        BufferedInputStream bis = null;
+
+        try {
+            URL url = new URL(imageURL);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.connect();
+
+            int nSize = conn.getContentLength();
+            bis = new BufferedInputStream(conn.getInputStream(), nSize);
+            imgBitmap = BitmapFactory.decodeStream(bis);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                }
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+        return imgBitmap;
     }
 }

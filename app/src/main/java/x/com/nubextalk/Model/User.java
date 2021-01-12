@@ -1,111 +1,119 @@
 /*
- * Created By Jong Ho, Lee on  2020.
+ * Created By Jong Ho, Lee on  2021.
  * Copyright 테크하임(주). All rights reserved.
  */
 
 package x.com.nubextalk.Model;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Iterator;
-
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
-import x.com.nubextalk.Manager.UtilityManager;
 
 public class User extends RealmObject {
     @NonNull
     @PrimaryKey
-    private String uid;
+    private String code; // user id(고유)
     @NonNull
-    private String name;
-    private String nickname;
-    @NonNull
-    private String profileImg;
-    @NonNull
-    private int status;
-    @NonNull
-    private String department;
+    private String userId; // id(로그인)
+    private String lastName; // ??
+    private String typeCode; // 직책번호
+    private String typeCodeName; // 직책
+    private String removed; // ??
 
-    @NonNull
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(@NonNull String uid) { this.uid = uid; }
+    private String appImagePath; // image값
+    private String appStatus; // 상태정보
+    private String appName; // 이름
+    private String appFcmKey; // FCM key값 저장
 
     @NonNull
-    public String getName() {
-        return name;
+    public String getCode() {
+        return code;
     }
 
-    public void setName(@NonNull String name) { this.name = name; }
+    public void setCode(@NonNull String code) {
+        this.code = code;
+    }
 
     @NonNull
-    public String getProfileImg() {
-        return profileImg;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setProfileImg(@NonNull String profileImg) {
-        this.profileImg = profileImg;
+    public void setUserId(@NonNull String userId) {
+        this.userId = userId;
     }
 
-    public int getStatus() {
-        return status;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getTypeCode() {
+        return typeCode;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setTypeCode(String typeCode) {
+        this.typeCode = typeCode;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getTypeCodeName() {
+        return typeCodeName;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setTypeCodeName(String typeCodeName) {
+        this.typeCodeName = typeCodeName;
     }
-    /**
-     * Data 초기화 함수
-     *
-     * @param realm
-     */
-        public static void init(Context context, Realm realm) {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_user.json")); //json 파일 추가
-            RealmList<User> list = new RealmList<>();
-            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
-                String uid = it.next();
-                jsonObject.getJSONObject(uid).put("uid", uid);
-                jsonArray.put(jsonObject.getJSONObject(uid));
-            }
 
-            realm.executeTransaction(realm1 -> {
-                realm1.where(User.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(User.class, jsonArray);
-            });
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public String getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(String removed) {
+        this.removed = removed;
+    }
+
+    public String getAppImagePath() {
+        return appImagePath;
+    }
+
+    public void setAppImagePath(String appImagePath) {
+        this.appImagePath = appImagePath;
+    }
+
+    public String getAppStatus() {
+        return appStatus;
+    }
+
+    public void setAppStatus(String appStatus) {
+        this.appStatus = appStatus;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getAppFcmKey() {
+        return appFcmKey;
+    }
+
+    public void setAppFcmKey(String appFcmKey) {
+        this.appFcmKey = appFcmKey;
+    }
+
+    public static RealmObject getMyAccountInfo(Realm realm) {
+        return realm.where(User.class).equalTo("userId", Config.getMyAccount(realm).getExt1()).findFirst();
+    }
+    public static RealmResults<User> getUserlist(Realm realm) {
+        return realm.where(User.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();
     }
 }

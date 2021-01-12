@@ -33,7 +33,7 @@ import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
 
 /**
@@ -211,9 +211,9 @@ public class FirebaseMsgService extends FirebaseMessagingService {
     public NotificationCompat.Builder makeBuilder(String rid, String uid, int type, String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-        User userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+        User3 user3Info = realm.where(User3.class).equalTo("uid", uid).findFirst();
 
-        Bitmap userProfileImg = getImageFromURL(userInfo.getProfileImg());
+        Bitmap userProfileImg = getImageFromURL(user3Info.getProfileImg());
 
         Intent intent = new Intent(this, ChatRoomActivity.class);
         intent.putExtra("rid", rid);

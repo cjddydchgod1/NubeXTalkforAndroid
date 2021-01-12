@@ -5,7 +5,6 @@
 
 package x.com.nubextalk;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,33 +12,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.functions.FirebaseFunctionsException;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
 import io.realm.Realm;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatContent;
-import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
@@ -101,7 +90,7 @@ public class ChatAddActivity extends AppCompatActivity implements
      **/
     @Override
     public void onItemSelected(User user) {
-        String userName = user.getName();
+        String userName = user.getAppName();
         memberAdapter.addItem(user);
         memberAdapter.notifyDataSetChanged();
     }
@@ -138,7 +127,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
         JSONArray jsonArray = new JSONArray();
         for(User user : list){
-            jsonArray.put(user.getUid());
+            jsonArray.put(user.getUserId());
         }
 //        jsonArray.put(myProfile.getOid());
         jsonArray.put(myProfile.getExt1());
@@ -150,16 +139,16 @@ public class ChatAddActivity extends AppCompatActivity implements
             if (!name.isEmpty()) { // 채팅방 이름을 입력했을 때
                 value.put("title", name);
             } else { // 채팅방 이름 입력 안했을 때 = 상대방 이름으로 채팅방 이름 설정
-                value.put("title", list.get(0).getName());
+                value.put("title", list.get(0).getAppName());
             }
-            value.put("roomImgUrl", list.get(0).getProfileImg());
+            value.put("roomImgUrl", list.get(0).getAppImagePath());
         } else {
             if (!name.isEmpty()) {
                 value.put("title", name);
             } else {
                 return false;
             }
-            value.put("roomImgUrl", list.get(0).getProfileImg());
+            value.put("roomImgUrl", list.get(0).getAppImagePath());
         }
         FirebaseFunctionsManager.createChatRoom(token, value);
 

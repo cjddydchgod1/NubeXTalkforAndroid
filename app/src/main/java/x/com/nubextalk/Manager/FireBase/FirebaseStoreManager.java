@@ -20,12 +20,6 @@ public class FirebaseStoreManager {
     private DocumentReference hospital = fireStore.collection("hospital").document(hid);
     private String TAG = "FirebaseStoreManager";
 
-    public void updateProfileImg(String imgUrl, String uid) {
-        hospital.collection("users").document(uid).update("profileImg", imgUrl);
-    }
-    public void updateProfileStatus(int status, String uid) {
-        hospital.collection("users").document(uid).update("status", status);
-    }
     public void updateUser(String userid, String token) {
         Map<String, Object> data = new HashMap<>();
         data.put("userid", userid);

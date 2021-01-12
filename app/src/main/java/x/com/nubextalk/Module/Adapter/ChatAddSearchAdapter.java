@@ -6,8 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,17 +57,16 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
     public void onBindRealmViewHolder(ViewItemHolder viewHolder, int position) {
         if (viewHolder instanceof ViewItemHolder) {
             User user = realmResults.get(position);
-            viewHolder.profileName.setText(user.getName());
+            viewHolder.profileName.setText(user.getAppName());
 
-            if (!user.getProfileImg().isEmpty()) {
-                aq.view(viewHolder.profileImage).image(user.getProfileImg());
-            } else {
+            aq.view(viewHolder.profileImage).image(user.getAppImagePath());
+            if(viewHolder.profileImage.getDrawable() == null) {
                 aq.view(viewHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
-
             }
-            if (user.getStatus() == 0) { // 초록
+
+            if (user.getAppStatus().equals("0")) { // 초록
                 viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-            } else if (user.getStatus() == 1) { // 빨강
+            } else if (user.getAppStatus().equals("1")) { // 빨강
                 viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_red_800_24dp);
             } else { // 노랑
                 viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);

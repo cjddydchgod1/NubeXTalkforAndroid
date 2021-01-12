@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONArray;
@@ -41,7 +40,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
     private RecyclerView selectedMemberView;
     private ChatAddSearchAdapter mAdapter;
     private ChatAddMemberAdapter memberAdapter;
-    private ArrayList<User> userList = new ArrayList<User>();
+    private ArrayList<User> user3List = new ArrayList<User>();
     private Button chatAddConfirmButton;
     private Button chatAddCancelButton;
 
@@ -68,7 +67,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         mAdapter.setItemSelectedListener(this);
         realmSearchView.setAdapter(mAdapter);
 
-        memberAdapter = new ChatAddMemberAdapter(this, userList);
+        memberAdapter = new ChatAddMemberAdapter(this, user3List);
         selectedMemberView.
                 setLayoutManager(new LinearLayoutManager(
                         this, LinearLayoutManager.HORIZONTAL, false));
@@ -88,9 +87,9 @@ public class AddChatMemberActivity extends AppCompatActivity implements
      * 사용자 아이템 클릭
      **/
     @Override
-    public void onItemSelected(User user) {
-        String userName = user.getName();
-        memberAdapter.addItem(user);
+    public void onItemSelected(User user3) {
+        String userName = user3.getName();
+        memberAdapter.addItem(user3);
         memberAdapter.notifyDataSetChanged();
     }
 
@@ -118,12 +117,12 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         FirebaseFirestore fs = FirebaseFirestore.getInstance();
 
         try {
-            for (User user : selectedUser) {
+            for (User user3 : selectedUser) {
                 Map<String, Object> data = new HashMap<>();
                 fs.collection("hospital").document(hospital)
                         .collection("chatRoom").document(chatRoomId)
                         .collection("chatRoomMember")
-                        .document(user.getUid()).set(data)
+                        .document(user3.getUid()).set(data)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -133,8 +132,8 @@ public class AddChatMemberActivity extends AppCompatActivity implements
             }
             Map<String, Object> data = new HashMap<>();
             JSONArray jsonArray = new JSONArray();
-            for(User user : selectedUser){
-                jsonArray.put(user.getUid());
+            for(User user3 : selectedUser){
+                jsonArray.put(user3.getUid());
             }
             data.put("hospitalId", hospital);
             data.put("membersId", jsonArray);

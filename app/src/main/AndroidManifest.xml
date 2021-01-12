@@ -4,7 +4,9 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
+    <uses-feature android:name="android.hardware.camera" android:required="true"/>
     <application
         android:name=".xApplicationNubeXTalk"
         android:allowBackup="true"
@@ -15,9 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".RegisterActivity"></activity>
-        <activity android:name=".LoginActivity3"></activity>
-        <activity android:name=".LoginActivity"></activity> <!-- FireBase -->
+        <activity android:name=".AddChatMemberActivity"></activity>
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".LoginActivity3" />
+        <activity android:name=".LoginActivity" /> <!-- FireBase -->
+        <activity android:name=".LoginActivity2" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

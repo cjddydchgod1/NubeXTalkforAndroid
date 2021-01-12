@@ -28,6 +28,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
+import x.com.nubextalk.AddChatMemberActivity;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -60,8 +61,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 //        if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
-        mAdapter.setItemLongSelectedListener(this::onItemLongSelected);
-        mAdapter.setItemSelectedListener(this::onItemSelected);
+        mAdapter.setItemLongSelectedListener(this);
+        mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
 
@@ -122,6 +123,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 refreshChatList();
                                 break;
                             case 1: /**대화상대 추가 이벤트 구현**/
+                                startActivity(new Intent(getContext(), AddChatMemberActivity.class)
+                                        .putExtra("rid", chatRoom.getRid()));
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트 구현**/
                                 updateChatRoomFixTop(chatRoom);

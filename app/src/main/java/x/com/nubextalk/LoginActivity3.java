@@ -14,9 +14,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import io.realm.Realm;
 import okhttp3.Response;
+import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.PACS.ApiManager;
 
 public class LoginActivity3 extends AppCompatActivity implements View.OnClickListener {
@@ -67,8 +71,15 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());
+                        /**
+                         * uid, token을 firestore에 올리는 작업
+                         */
+                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+
                         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 });
                 break;

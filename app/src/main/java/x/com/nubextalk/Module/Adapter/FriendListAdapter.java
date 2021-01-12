@@ -96,8 +96,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //            }
 //            profileName.setText(name);
             profileName.setText(user.getAppName());
-            if(!user.getAppImagePath().isEmpty()){
-                aq.view(profileImage).image(user.getAppImagePath());
+            aq.view(profileImage).image(user.getAppImagePath());
+            if(profileImage.getDrawable() == null) {
+                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
             }
             // 초록
             switch(user.getAppStatus()) {

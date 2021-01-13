@@ -416,7 +416,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             Date roomUpdateDate = roomInfo.getUpdatedDate();
 
             //서버에 채팅방 업데이트 시간 업뎃
-            fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+            fs.collection("hospital").document(mHid)
                     .collection("chatRoom").document(mRoomId)
                     .update("updatedDate", simpleDateFormat.format(date));
 
@@ -433,13 +433,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
             }
             //서버에 채팅 추가
-            fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+            fs.collection("hospital").document(mHid)
                     .collection("chatRoom").document(mRoomId)
                     .collection("chatContent").add(chat)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+                            fs.collection("hospital").document(mHid)
                                     .collection("chatRoom").document(mRoomId)
                                     .collection("chatContent").document(documentReference.getId())
                                     .update("cid", documentReference.getId());

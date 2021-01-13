@@ -65,10 +65,8 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.login_sign_in:
                 apiManager = new ApiManager(this, realm);
-//                String id = String.valueOf(mEditId.getText());
-                String id = "han03";
-//                String password = String.valueOf(mEditPassword.getText());
-                String password = "tech1!";
+                String id = String.valueOf(mEditId.getText());
+                String password = String.valueOf(mEditPassword.getText());
                 apiManager.login(id, password, new ApiManager.onApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {

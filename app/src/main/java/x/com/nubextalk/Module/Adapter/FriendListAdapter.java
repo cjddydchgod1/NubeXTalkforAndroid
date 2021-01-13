@@ -6,9 +6,11 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,6 +31,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private String uid;
     private onItemSelectedListener listener;
     private AQuery aq;
+    private String TAG = "FriendListAdapter";
 
     public interface onItemSelectedListener{
         void onSelected(User address);
@@ -94,9 +97,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //            }
 //            profileName.setText(name);
             profileName.setText(user.getAppName());
-            aq.view(profileImage).image(user.getAppImagePath());
-            if(profileImage.getDrawable() == null) {
+            if(URLUtil.isValidUrl(user.getAppImagePath())){
+                aq.view(profileImage).image(user.getAppImagePath());
+                Log.d(TAG, "valid");
+            } else {
                 aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+                Log.d(TAG, "invalid");
             }
             // 초록
             switch(user.getAppStatus()) {

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import io.realm.Realm;
 import okhttp3.Response;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.PACS.ApiManager;
 
@@ -34,7 +35,6 @@ public class LoginActivity extends AppCompatActivity {
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         final LoginActivity activity = this;
         apiManager = new ApiManager(this, realm);
-
         Button btn = findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override

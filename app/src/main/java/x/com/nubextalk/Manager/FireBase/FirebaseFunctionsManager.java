@@ -5,8 +5,6 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Continuation;

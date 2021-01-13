@@ -26,6 +26,7 @@ import io.realm.RealmResults;
 
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
@@ -44,7 +45,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-        this.mUid = UtilityManager.getUid();
+        this.mUid = Config.getMyUID(realm);
     }
 
     @NonNull
@@ -71,7 +72,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return;
         }
         String uid = chat.getUid();
-        mUserData = realm.where(User.class).equalTo("uid", uid).findFirst();
+        mUserData = realm.where(User.class).equalTo("userId", uid).findFirst();
 
         // 시간 형식 나누기
         SimpleDateFormat formatChatTime = new SimpleDateFormat("HH:mm");

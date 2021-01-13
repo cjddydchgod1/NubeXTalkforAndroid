@@ -15,8 +15,13 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -113,10 +118,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
                 isFirst = Boolean.parseBoolean(data.get("isFirst"));
 
-                if (!UtilityManager.getUid().equals(uid)) {
-                    makeChannel(CHANNEL_ID);
-                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
-                }
 
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
@@ -138,15 +139,13 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                     }
                 });
 
-                if (!UtilityManager.getUid().equals(uid)) {
+                if (!Config.getMyUID(realm).equals(uid)) {
                     makeChannel(CHANNEL_ID);
                     notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
                 }
 
                 break;
             case "FIRST_CHAT_CREATED": //채팅방이 생성되고 처음 메세지가 생성된 경우 채팅방과 채팅메세지 생성
-                FirebaseFunctionsManager.getChatRoom(data.get("hospitalId"), data.get("chatRoomId"));
-
                 cid = data.get("chatContentId");
                 uid = data.get("senderId");
                 rid = data.get("chatRoomId");
@@ -155,36 +154,43 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
                 isFirst = Boolean.parseBoolean(data.get("isFirst"));
 
-                realm.executeTransaction(new Realm.Transaction() {
+                FirebaseFunctionsManager.getChatRoom(data.get("hospitalId"), data.get("chatRoomId")).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                     @Override
-                    public void execute(Realm realm) {
-                        ChatContent notifyChat = new ChatContent();
-                        notifyChat.setCid("sys".concat(data.get("chatContentId")));
-                        notifyChat.setRid(data.get("chatRoomId"));
-                        notifyChat.setType(9);
-                        notifyChat.setContent("채팅방이 개설되었습니다.");
-                        notifyChat.setSendDate(DateManager.
-                                convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
-                        notifyChat.setIsRead(true);
-                        notifyChat.setFirst(false);
-                        realm.copyToRealmOrUpdate(notifyChat);
+                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                ChatContent notifyChat = new ChatContent();
+                                notifyChat.setCid("sys".concat(cid));
+                                notifyChat.setRid(rid);
+                                notifyChat.setType(9);
+                                notifyChat.setContent("채팅방이 개설되었습니다.");
+                                notifyChat.setSendDate(DateManager.
+                                        convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
+                                notifyChat.setIsRead(true);
+                                notifyChat.setFirst(false);
+                                realm.copyToRealmOrUpdate(notifyChat);
 
-                        ChatContent chat = new ChatContent();
-                        chat.setCid(cid); // Content ID 자동으로 유니크한 값 설정
-                        chat.setUid(uid); // UID 보내는 사람
-                        chat.setRid(rid); // RID 채팅방 아이디
-                        chat.setType(type);
-                        chat.setContent(content);
-                        chat.setSendDate(date);
-                        chat.setFirst(isFirst);
-                        realm.copyToRealmOrUpdate(chat);
+                                ChatContent chat = new ChatContent();
+                                chat.setCid(cid); // Content ID 자동으로 유니크한 값 설정
+                                chat.setUid(uid); // UID 보내는 사람
+                                chat.setRid(rid); // RID 채팅방 아이디
+                                chat.setType(type);
+                                chat.setContent(content);
+                                chat.setSendDate(date);
+                                chat.setFirst(isFirst);
+                                realm.copyToRealmOrUpdate(chat);
+                            }
+                        });
+
+                        if (!Config.getMyUID(realm).equals(uid)) {
+                            makeChannel(CHANNEL_ID);
+                            notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
+                        }
                     }
                 });
-
-                if (!UtilityManager.getUid().equals(uid)) {
-                    makeChannel(CHANNEL_ID);
-                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
-                }
+//
                 break;
             case "CHAT_ROOM_INVITED":
                 Log.d("TOKEN", "room invited!!");
@@ -210,9 +216,10 @@ public class FirebaseMsgService extends FirebaseMessagingService {
     }
 
     public NotificationCompat.Builder makeBuilder(String rid, String uid, int type, String content) {
+        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-        User userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+        User userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
 
         Bitmap userProfileImg = getImageFromURL(userInfo.getAppImagePath());
 

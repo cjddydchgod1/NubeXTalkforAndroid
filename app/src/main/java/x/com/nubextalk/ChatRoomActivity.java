@@ -53,6 +53,7 @@ import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
@@ -87,7 +88,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         fs = FirebaseFirestore.getInstance();
 
         //
-        mUid = UtilityManager.getUid();
+        mUid = Config.getMyUID(realm);
         mHid = "w34qjptO0cYSJdAwScFQ";
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴

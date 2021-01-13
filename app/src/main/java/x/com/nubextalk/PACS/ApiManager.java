@@ -11,6 +11,7 @@ import io.realm.Realm;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 
@@ -157,6 +158,7 @@ public class ApiManager {
 
         RequestBody formBody  = new FormBody.Builder()
                 .add("code", user.getCode())
+                .add("employtype", user.getTypeCode())
                 .add("APP_IMG_PATH", user.getAppImagePath())
                 .add("APP_NAME", user.getAppName())
                 .add("APP_STATUS", user.getAppStatus())
@@ -181,6 +183,9 @@ public class ApiManager {
         if(myAccount == null){
             return;
         }
+        if(!UtilityManager.checkString(studyId)){
+            return;
+        }
 
         new Protocol(context)
                 .setSessionId(myAccount.getExt3())
@@ -193,8 +198,9 @@ public class ApiManager {
                     }
                 })
                 .exec(CONTEXT_PATH + "/app/getSeries?studyId="+studyId);
-
     }
+
+
 
 
 }

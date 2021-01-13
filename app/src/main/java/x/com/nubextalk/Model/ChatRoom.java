@@ -35,6 +35,7 @@ public class ChatRoom extends RealmObject {
     private Boolean settingFixTop = false;
     @NonNull
     private Date updatedDate;
+    private String notificationId;
 
     @NonNull
     public String getRid() {
@@ -72,6 +73,10 @@ public class ChatRoom extends RealmObject {
     public void setSettingFixTop(Boolean settingFixTop) {
         this.settingFixTop = settingFixTop;
     }
+
+    public String getNotificationId() { return notificationId; }
+
+    public void setNotificationId(String notificationId) { this.notificationId = notificationId; }
 
     @NonNull
     public Date getUpdatedDate() {

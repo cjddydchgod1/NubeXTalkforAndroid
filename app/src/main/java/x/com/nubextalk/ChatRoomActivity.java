@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
@@ -39,6 +40,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.UploadTask;
 import com.joanzapata.iconify.widget.IconButton;
 
+import org.jsoup.select.Evaluator;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +56,9 @@ import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
@@ -74,7 +79,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private String mRoomId;
     private String mUid;
     private String mHid;
-    private Uri mImageCaptureUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -307,6 +311,16 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private void setNavigationView(ChatRoom roomInfo) {
         Menu menu = mNavigationView.getMenu();
+        MenuItem item = menu.findItem(R.id.menu_chat_member);
+        SubMenu subMenu = item.getSubMenu();
+
+        RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", mRoomId).findAll();
+
+        int menuId = 2131313;
+        for (ChatRoomMember member : chatRoomMembers) {
+            String userName = realm.where(User.class).equalTo("userId", member.getUid()).findFirst().getAppName();
+            subMenu.add(0, menuId++, 0, userName);
+        }
         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_fix_top)).findViewById(R.id.drawer_switch);
         SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_alarm)).findViewById(R.id.drawer_switch);
 

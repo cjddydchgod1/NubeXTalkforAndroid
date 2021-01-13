@@ -44,27 +44,19 @@ import com.aquery.AQuery;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import io.realm.Sort;
+import okhttp3.Response;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
@@ -74,9 +66,9 @@ import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
-import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
+import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.R;
 
 import static android.app.Activity.RESULT_OK;
@@ -93,9 +85,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private ArrayList<User> mList; // mResults를 복사
     private ChatRoomMember mChat;
     private AQuery aq;
-
+    private ApiManager apiManager;
     private String myUid; // Uid
     private String TAG = "FriendListFragment";
+    private User myProfile;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -106,13 +99,63 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /**
-         * uid를 받아온다.
-         */
-        myUid = UtilityManager.getUid();
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         firebaseStoreManager = new FirebaseStoreManager();
+        apiManager = new ApiManager(getActivity(), realm);
+
+        /**
+         * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
+         */
+        apiManager.getEmployeeList(new ApiManager.onApiListener() {
+            @Override
+            public void onSuccess(Response response, String body) {
+                Log.d("asdf", body.toString());
+                /**
+                 * userlist -> realm 저장
+                 */
+                try{
+                    /**
+                     * String(body) -> JSONArray
+                     */
+                    JSONArray jsonArray = new JSONArray(body);
+                    /**
+                     * JSONArray -> JSONObject
+                     * field명 바꾸기
+                     * JSONObject -> JSONArray
+                     */
+                    int len = jsonArray.length();
+                    for(int i=0; i<len; i++) {
+                        JSONObject jsonObject = (JSONObject) (jsonArray.get(i));
+                        Log.d("json",jsonObject.toString());
+                        jsonObject.put("userId", jsonObject.get("userid"))
+                                .put("lastName", jsonObject.get("lastname"))
+                                .put("typeCode", jsonObject.get("typecode"))
+                                .put("typeCodeName", jsonObject.get("typecodename"))
+                                .put("appName", jsonObject.get("app_NAME").equals(null) ? jsonObject.get("lastname") : jsonObject.get("app_NAME"))
+                                .put("appImagePath", jsonObject.get("app_IMG_PATH").equals(null) ? R.drawable.baseline_account_circle_black_24dp : jsonObject.get("app_IMG_PATH"))
+                                .put("appStatus", jsonObject.get("app_STATUS").equals(null) ? "0" : jsonObject.get("app_STATUS"))
+                                .put("appFcmKey", jsonObject.get("app_FCM_KEY").equals(null) ? "test null" : jsonObject.get("app_FCM_KEY"));
+                        jsonObject.remove("userid"); jsonObject.remove("lastname");
+                        jsonObject.remove("typecode"); jsonObject.remove("typecodename");
+                        jsonObject.remove("app_IMG_PATH"); jsonObject.remove("app_STATUS");
+                        jsonObject.remove("app_NAME"); jsonObject.remove("app_FCM_KEY");
+                        jsonArray.put(jsonObject);
+                    }
+                    /**
+                     * JSONArray -> Realm
+                     */
+                    realm.executeTransaction(realm1 -> {
+                        realm1.where(User.class).findAll().deleteAllFromRealm();
+                        realm1.createOrUpdateAllFromJson(User.class, jsonArray);
+                    });
+                    makeData();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         Log.i(TAG, "OnCreate");
     }
 
@@ -131,41 +174,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         aq              = new AQuery(getActivity());
 
         /**
-         * Firestore에서 realm으로 migration
+         * recyclerview 디자인 및 애니매이션
          */
-        Gson gson = new Gson();
-        firebaseStoreManager.getReference("users").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.i(TAG, "TaskSuccess");
-                            realm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    try {
-                                        JSONArray jsonArray = new JSONArray();
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            JSONObject json = new JSONObject(gson.toJson(document.getData()));
-                                            jsonArray.put(json);
-                                        }
-                                        realm.createOrUpdateAllFromJson(User.class, jsonArray);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            makeData();
-                        } else {
-                            Log.i(TAG,"TaskFail");
-                        }
-                    }
-                });
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        /**
-         * search를 FriendListFragment에서 사용가능하게
-         */
-        setHasOptionsMenu(true);
-        getActivity().invalidateOptionsMenu();
         Log.i(TAG, "OncreateView");
         return rootview;
     }
@@ -173,12 +187,22 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        /**
+         * search를 FriendListFragment에서 사용가능하게
+         */
+        setHasOptionsMenu(true);
+        getActivity().invalidateOptionsMenu();
         Log.i(TAG, "OnActivityCreated");
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        /**
+         * recyclerview 애니매이션
+         */
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.scheduleLayoutAnimation();
         Log.i(TAG, "OnStart");
 
     }
@@ -211,12 +235,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        realm.close();
         Log.i(TAG, "OnDetach");
     }
 
@@ -225,7 +249,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
          */
-        mResults = realm.where(User.class).notEqualTo("uid", myUid).findAll();
+        mResults = User.getUserlist(realm);
 
         /**
          * Search하기 위해 mResult -> mList
@@ -236,45 +260,39 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid);
+        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid, aq);
         ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
-
-        /**
-         * recyclerview 디자인 및 애니매이션
-         */
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.scheduleLayoutAnimation();
+
         makeProfile();
     }
 
     public void makeProfile() {
-        User myProfile = realm.where(User.class).equalTo("uid", myUid).findFirst();
+        myProfile = (User) User.getMyAccountInfo(realm);
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
-        String name = myProfile.getDepartment() + " ";
-        if(!myProfile.getProfileImg().isEmpty()){
-            aq.view(myProfileImage).image(myProfile.getProfileImg());
+        aq.view(myProfileImage).image(myProfile.getAppImagePath());
+        if(myProfileImage.getDrawable() == null) {
+            aq.view(myProfileImage).image(R.drawable.baseline_account_circle_black_24dp);
         }
-        if(myProfile.getNickname()==null) {
-            name += myProfile.getName();
-        } else {
-            name += myProfile.getNickname();
-        }
-        myProfileName.setText(name);
-        switch(myProfile.getStatus()) {
-            case 0 :
-                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-                break;
-            case 1 :
+//        String name = myProfile.getDepartment() + " ";
+//        if(myProfile.getNickname()==null) {
+//            name += myProfile.getName();
+//        } else {
+//            name += myProfile.getNickname();
+//        }
+//        myProfileName.setText(name);
+        myProfileName.setText(myProfile.getAppName());
+        switch(myProfile.getAppStatus()) {
+            case "1" :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
-            case 2 :
+            case "2" :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                break;
+            default :
+                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                 break;
             }
         rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
@@ -366,31 +384,37 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
         // 프로필 이름 설정
-        String name;
-        if(address.getNickname()==null) {
-            name = address.getName();
-        } else {
-            name = address.getNickname();
-        }
-        profileName.setText(name);
-        // profilestatus 수정 버튼
-        switch(address.getStatus()) {
-            case 1 :
+//        String name;
+//        if(address.getNickname()==null) {
+//            name = address.getName();
+//        } else {
+//            name = address.getNickname();
+//        }
+//        profileName.setText(name);
+        profileName.setText(address.getAppName());
+        // profilestatus
+        switch(address.getAppStatus()) {
+            case "1" :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
-            case 2 :
+            case "2" :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
                 break;
             default : // 0과 기본으로 되어있는 설정
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                 break;
         }
+        // 프로필 사진
+        aq.view(profileImage).image(address.getAppImagePath());
+        if(profileImage.getDrawable() == null) {
+            aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+        }
 
         /**
          * 데이터 초기화
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if(address.getUid().equals(myUid)){
+        if(address.getCode().equals(myUid)){
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
             profileStatus.setClickable(true);
@@ -404,24 +428,19 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         profileName.setVisibility(View.VISIBLE);
         modifyNameButton.setText("수정");
 
-        // 프로필 사진
-        if(!address.getProfileImg().isEmpty()) {
-            aq.view(profileImage).image(address.getProfileImg());
-        }
-
         // Nickname 변
-        modifyNameButton.setOnClickListener(v -> {
-            String buttonName = modifyNameButton.getText().toString();
-            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
-                modifyNameButton.setText("완료");
-                profileName.setVisibility(View.GONE);
-                modifyName.setVisibility(View.VISIBLE);
-                modifyName.setText(profileName.getText().toString());
-            } else { // 완료버튼을 눌렀을 경우
-                updateNickname(address, modifyName.getText().toString());
-                refreshFragment();
-            }
-        });
+//        modifyNameButton.setOnClickListener(v -> {
+//            String buttonName = modifyNameButton.getText().toString();
+//            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
+//                modifyNameButton.setText("완료");
+//                profileName.setVisibility(View.GONE);
+//                modifyName.setVisibility(View.VISIBLE);
+//                modifyName.setText(profileName.getText().toString());
+//            } else { // 완료버튼을 눌렀을 경우
+//                updateNickname(address, modifyName.getText().toString());
+//                refreshFragment();
+//            }
+//        });
 
         // 프로필 사진 변경 (myProfile만 가능)
         modifyImageButton.setOnClickListener(v -> {
@@ -450,13 +469,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     statusLayout.setVisibility(View.INVISIBLE);
                     switch (v.getId()) {
                         case R.id.working_status :
-                            firebaseStoreManager.updateProfileStatus(0, myUid);
+                            /**
+                             * PACS서버에 status 변
+                             */
                             break;
                         case R.id.leaving_status :
-                            firebaseStoreManager.updateProfileStatus(1, myUid);
                             break;
                         case R.id.vacation_status :
-                            firebaseStoreManager.updateProfileStatus(2, myUid);
                             break;
                     }
                     refreshFragment();
@@ -474,10 +493,14 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
               * 2. ChatRoomMember에서 해당 uid와, 내 uid를 갖고 있는 rid를 찾는다.
               * 3. rid를 가지고 와서 intent로 넘겨준다.
               */
-            mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getUid()).findFirst();
+//            mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getCode()).findFirst();
+            mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getUserId()).findFirst();
             if(mChat==null){
                 // 새로만든 채팅이 없다면 새로 만든다.
-                temporary(address);
+                ArrayList<User> list = new ArrayList<>();
+                list.add(myProfile);
+//                ChatAddActivity.createNewChat(realm, list, null);
+
             } else {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                 intent.putExtra("rid", mChat.getRid());
@@ -567,11 +590,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if(task.isSuccessful()) {
                                         Uri imgUri = task.getResult();
                                         if (imgUri != null){
-                                            FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                                            firebaseStoreManager.updateProfileImg(imgUri.toString(), myUid);
+                                            /**
+                                             * PACS서버에 imagePath 수정
+                                             */
                                          }
                                      else
-                                         Log.i("FirebaseStorageManager", "uploadProfileImgFail");
+                                         Log.i("FriendListFragment", "uploadProfileImgFail");
                                     }
                                 }
                             });
@@ -587,90 +611,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         ft.detach(this).attach(this).commit();
     }
 
-    public void updateNickname(User user, String name) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                user.setNickname(name);
-                realm.copyToRealmOrUpdate(user);
-            }
-        });
-    }
-
-    /** 현재 ChatAddActivity에서 가지고 온 코드 **/
-
-    public void temporary(User address) {
-        String rid = getRandomString().toString();
-        ChatRoom newChatRoom = new ChatRoom();
-        newChatRoom.setRid(rid);
-        newChatRoom.setRoomName(address.getName());
-        newChatRoom.setRoomImg(address.getProfileImg());
-
-        Date date = new Date();
-        newChatRoom.setUpdatedDate(new Date());
-
-
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(newChatRoom);
-
-                ChatRoomMember chatMember = new ChatRoomMember();
-                chatMember.setRid(rid);
-                chatMember.setUid(address.getUid());
-                /**
-                 * ChatRoomMember 모델이 Primary Key 가 없어서 copyToRealmOrUpdate 함수는
-                 * 사용하지 못하기 때문에 copyToRealm 함수를 사용함.
-                 * 참고: https://stackoverflow.com/questions/40999299/android-create-realm-table-without-primary-key
-                 **/
-                realm.copyToRealm(chatMember);
-                ChatContent chat = new ChatContent();
-                chat.setCid(""); // Content ID 자동으로 유니크한 값 설정
-                chat.setRid(rid); // RID 채팅방 아이디
-                chat.setType(9); // 시스템 메세지
-                chat.setContent("채팅방이 개설 되었습니다.");
-                chat.setIsRead(true);
-                chat.setSendDate(date);
-                realm.copyToRealmOrUpdate(chat);
-            }
-
-        });
-
-//        setResult(RESULT_OK); //MainActivity 로 결과 전달
-//        finish();
-    }
-
-
-    public StringBuffer getRandomString() {
-        StringBuffer temp = new StringBuffer();
-        Random rnd = new Random();
-        rnd.setSeed(System.currentTimeMillis());
-        for (int i = 0; i < 20; i++) {
-            int rIndex = rnd.nextInt(3);
-            switch (rIndex) {
-                case 0:
-                    // a-z
-                    temp.append((char) ((int) (rnd.nextInt(26)) + 97));
-                    break;
-                case 1:
-                    // A-Z
-                    temp.append((char) ((int) (rnd.nextInt(26)) + 65));
-                    break;
-                case 2:
-                    // 0-9
-                    temp.append((rnd.nextInt(10)));
-                    break;
-            }
-        }
-        return temp;
-    }
-
-
-
-
-
-
-
-
+//    public void updateNickname(User3 user3, String name) {
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                user3.setNickname(name);
+//                realm.copyToRealmOrUpdate(user3);
+//            }
+//        });
+//    }
 }

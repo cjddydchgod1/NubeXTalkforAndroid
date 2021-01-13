@@ -7,19 +7,12 @@ package x.com.nubextalk.PACS;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import io.realm.Realm;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Model.User2;
 
 public class ApiManager {
 
@@ -115,13 +108,13 @@ public class ApiManager {
      * @param user
      * @param listener
      */
-    public void getEmployeeList(User2 user, onApiListener listener){
+    public void getEmployeeList(User user, onApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if(myAccount == null){
             return;
         }
         if(user == null){
-            user = new User2();
+            user = new User();
         }
 
         RequestBody formBody  = new FormBody.Builder()
@@ -150,7 +143,7 @@ public class ApiManager {
      * @param user
      * @param listener
      */
-    public void setEmployeeAppInfo(User2 user, onApiListener listener){
+    public void setEmployeeAppInfo(User user, onApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if(myAccount == null){
             return;

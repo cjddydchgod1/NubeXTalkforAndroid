@@ -6,12 +6,9 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,10 +47,10 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
-            mHolder.profileName.setText(userList.get(position).getName());
+            mHolder.profileName.setText(userList.get(position).getAppName());
 
-            if (!userList.get(position).getProfileImg().isEmpty()) {
-                aq.view(mHolder.profileImage).image(userList.get(position).getProfileImg());
+            if (!userList.get(position).getAppImagePath().isEmpty()) {
+                aq.view(mHolder.profileImage).image(userList.get(position).getAppImagePath());
             } else {
                 aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
             }

@@ -53,6 +53,7 @@ import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
@@ -87,7 +88,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         fs = FirebaseFirestore.getInstance();
 
         //
-        mUid = UtilityManager.getUid();
+        mUid = Config.getMyUID(realm);
         mHid = "w34qjptO0cYSJdAwScFQ";
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
@@ -416,7 +417,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             Date roomUpdateDate = roomInfo.getUpdatedDate();
 
             //서버에 채팅방 업데이트 시간 업뎃
-            fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+            fs.collection("hospital").document(mHid)
                     .collection("chatRoom").document(mRoomId)
                     .update("updatedDate", simpleDateFormat.format(date));
 
@@ -433,13 +434,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
             }
             //서버에 채팅 추가
-            fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+            fs.collection("hospital").document(mHid)
                     .collection("chatRoom").document(mRoomId)
                     .collection("chatContent").add(chat)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            fs.collection("hospital").document("w34qjptO0cYSJdAwScFQ")
+                            fs.collection("hospital").document(mHid)
                                     .collection("chatRoom").document(mRoomId)
                                     .collection("chatContent").document(documentReference.getId())
                                     .update("cid", documentReference.getId());

@@ -6,7 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +37,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data, String uid) {
+    public FriendListAdapter(Context context, ArrayList<User> data, String uid, AQuery aq) {
         this.mDataSet = data;
         this.mContext = context;
         this.uid = uid;
-        this.aq = new AQuery(context);
+        this.aq = aq;
     }
 
 
@@ -87,26 +86,28 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
         public void bintTo(User user) {
-            String name = user.getDepartment() + " ";
-            if(user.getNickname()==null) {
-                name += user.getName();
-            } else {
-                name += user.getNickname();
-            }
-            profileName.setText(name);
-            if(!user.getProfileImg().isEmpty()){
-                aq.view(profileImage).image(user.getProfileImg());
+//            String name = user.getDepartment() + " ";
+//            if(user.getNickname()==null) {
+//                name += user.getName();
+//            } else {
+//                name += user.getNickname();
+//            }
+//            profileName.setText(name);
+            profileName.setText(user.getAppName());
+            aq.view(profileImage).image(user.getAppImagePath());
+            if(profileImage.getDrawable() == null) {
+                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
             }
             // 초록
-            switch(user.getStatus()) {
-                case 0 :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-                    break;
-                case 1 :
+            switch(user.getAppStatus()) {
+                case "1" :
                     aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                     break;
-                case 2 :
+                case "2" :
                     aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                    break;
+                default :
+                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                     break;
             }
         }

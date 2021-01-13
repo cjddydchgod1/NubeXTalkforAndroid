@@ -8,8 +8,6 @@ package x.com.nubextalk.Module.Adapter;
 // 채팅방 액티비티와 Chat class 어댑터
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,24 +18,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
@@ -56,7 +45,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-        this.mUid = UtilityManager.getUid();
+        this.mUid = Config.getMyUID(realm);
     }
 
     @NonNull
@@ -83,7 +72,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return;
         }
         String uid = chat.getUid();
-        mUserData = realm.where(User.class).equalTo("uid", uid).findFirst();
+        mUserData = realm.where(User.class).equalTo("userId", uid).findFirst();
 
         // 시간 형식 나누기
         SimpleDateFormat formatChatTime = new SimpleDateFormat("HH:mm");
@@ -117,8 +106,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
-                cvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
-                cvHolder.profileName.setText(mUserData.getName());
+                cvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
+                cvHolder.profileName.setText(mUserData.getAppName());
                 cvHolder.other_chat_text.setText(chat.getContent());
                 cvHolder.other_time.setText(sendTime);
 
@@ -152,8 +141,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
-                cmvHolder.aq.id(R.id.profile_image).image(mUserData.getProfileImg());
-                cmvHolder.profileName.setText(mUserData.getName());
+                cmvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
+                cmvHolder.profileName.setText(mUserData.getAppName());
                 cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
                 cmvHolder.other_time.setText(sendTime);
                 cmvHolder.profileImage.setVisibility(View.VISIBLE);

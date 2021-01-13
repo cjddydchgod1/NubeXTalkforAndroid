@@ -57,6 +57,7 @@ import java.util.Random;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import okhttp3.Response;
+import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
@@ -87,6 +88,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private AQuery aq;
     private ApiManager apiManager;
     private String myUid; // Uid
+    private String mHid = "w34qjptO0cYSJdAwScFQ";
     private String TAG = "FriendListFragment";
     private User myProfile;
 
@@ -103,7 +105,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         firebaseStoreManager = new FirebaseStoreManager();
         apiManager = new ApiManager(getActivity(), realm);
-
         /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
          */
@@ -269,6 +270,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
     public void makeProfile() {
         myProfile = (User) User.getMyAccountInfo(realm);
+        myUid = myProfile.getUserId();
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
@@ -340,17 +342,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         else
         {
             Log.i(TAG, "Input data");
-            mList.add(realm.where(User.class).equalTo("uid", myUid).findFirst());
-            mList.addAll(realm.where(User.class).isNull("nickname")
-                        .contains("name", query)
-                        .or()
-                        .contains("department", query.toUpperCase())
-                        .findAll());
-            mList.addAll(realm.where(User.class).isNotNull("nickname")
-                          .contains("nickname", query)
-                          .or()
-                          .contains("department", query.toUpperCase())
-                          .findAll());
+            mList.addAll(realm.where(User.class).equalTo("appName", query).findAll());
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
         Log.i(TAG, "Notify");
@@ -406,15 +398,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         }
         // 프로필 사진
         aq.view(profileImage).image(address.getAppImagePath());
-        if(profileImage.getDrawable() == null) {
-            aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
-        }
+//        if(profileImage.getDrawable() == null) {
+//            aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+//        }
 
         /**
          * 데이터 초기화
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if(address.getCode().equals(myUid)){
+        /**
+         * if(address.getCode().equals(myUid))
+         */
+        if(address.getUserId().equals(myUid)){
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
             profileStatus.setClickable(true);
@@ -469,15 +464,21 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     statusLayout.setVisibility(View.INVISIBLE);
                     switch (v.getId()) {
                         case R.id.working_status :
-                            /**
-                             * PACS서버에 status 변
-                             */
+                            address.setAppStatus("0");
                             break;
                         case R.id.leaving_status :
+                            address.setAppStatus("1");
                             break;
                         case R.id.vacation_status :
+                            address.setAppStatus("2");
                             break;
                     }
+                    apiManager.setEmployeeAppInfo(address, new ApiManager.onApiListener() {
+                        @Override
+                        public void onSuccess(Response response, String body) {
+                            Log.d("setEmplyee", body);
+                        }
+                    });
                     refreshFragment();
                 }
             };
@@ -499,7 +500,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 // 새로만든 채팅이 없다면 새로 만든다.
                 ArrayList<User> list = new ArrayList<>();
                 list.add(myProfile);
-//                ChatAddActivity.createNewChat(realm, list, null);
+                ChatAddActivity.createNewChat(realm, list, null);
 
             } else {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
@@ -574,7 +575,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * 이미지값을 저장한다.
                      * 해당 이미지값을 Storage에 올린다.
                      */
-                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri,"profiles/"+myUid);
+                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri,"hosptial/"+mHid+"profiles"+myUid);
                     Task<Uri> urlTask = uploadTask
                             .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                                 @Override
@@ -582,7 +583,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if(!task.isSuccessful()) {
                                         throw task.getException();
                                     }
-                                    return FirebaseStorageManager.downloadFile("profiles/"+myUid);
+                                    return FirebaseStorageManager.downloadFile("hosptial/"+mHid+"profiles"+myUid);
                                 }
                             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override
@@ -590,9 +591,23 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if(task.isSuccessful()) {
                                         Uri imgUri = task.getResult();
                                         if (imgUri != null){
-                                            /**
-                                             * PACS서버에 imagePath 수정
-                                             */
+                                            Log.d("before test", myProfile.getAppImagePath());
+                                            realm.executeTransaction(realm1 -> {
+                                                myProfile.setAppImagePath(imgUri.toString());
+                                            });
+//                                            User user = new User();
+//                                            user.setCode(myProfile.getCode());
+//                                            user.setAppImagePath(imgUri.toString());
+//                                            user.setAppName(myProfile.getAppName());
+//                                            user.setAppStatus(myProfile.getAppStatus());
+                                            Log.d("after test", myProfile.getAppImagePath());
+                                            apiManager.setEmployeeAppInfo(myProfile, new ApiManager.onApiListener() {
+                                                    @Override
+                                                    public void onSuccess(Response response, String body) {
+                                                        Log.d("AppImagePath", body);
+                                                    }
+                                                });
+
                                          }
                                      else
                                          Log.i("FriendListFragment", "uploadProfileImgFail");

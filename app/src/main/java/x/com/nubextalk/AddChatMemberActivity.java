@@ -87,9 +87,9 @@ public class AddChatMemberActivity extends AppCompatActivity implements
      * 사용자 아이템 클릭
      **/
     @Override
-    public void onItemSelected(User user3) {
-        String userName = user3.getName();
-        memberAdapter.addItem(user3);
+    public void onItemSelected(User user) {
+        String userName = user.getAppName();
+        memberAdapter.addItem(user);
         memberAdapter.notifyDataSetChanged();
     }
 
@@ -117,12 +117,12 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         FirebaseFirestore fs = FirebaseFirestore.getInstance();
 
         try {
-            for (User user3 : selectedUser) {
+            for (User user : selectedUser) {
                 Map<String, Object> data = new HashMap<>();
                 fs.collection("hospital").document(hospital)
                         .collection("chatRoom").document(chatRoomId)
                         .collection("chatRoomMember")
-                        .document(user3.getUid()).set(data)
+                        .document(user.getCode()).set(data)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -132,8 +132,8 @@ public class AddChatMemberActivity extends AppCompatActivity implements
             }
             Map<String, Object> data = new HashMap<>();
             JSONArray jsonArray = new JSONArray();
-            for(User user3 : selectedUser){
-                jsonArray.put(user3.getUid());
+            for(User user : selectedUser){
+                jsonArray.put(user.getCode());
             }
             data.put("hospitalId", hospital);
             data.put("membersId", jsonArray);

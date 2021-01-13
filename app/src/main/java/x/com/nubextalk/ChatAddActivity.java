@@ -43,8 +43,6 @@ public class ChatAddActivity extends AppCompatActivity implements
     private ChatAddSearchAdapter mAdapter;
     private ChatAddMemberAdapter memberAdapter;
     private ArrayList<User> userList = new ArrayList<User>();
-    private FirebaseFirestore fs;
-
 
     private Button chatAddConfirmButton;
     private Button chatAddCancelButton;
@@ -53,14 +51,12 @@ public class ChatAddActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_add);
-        fs = FirebaseFirestore.getInstance();
 
         chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
         chatAddConfirmButton = findViewById(R.id.chat_add_confirm_btn);
         chatAddCancelButton = findViewById(R.id.chat_add_cancel_btn);
         chatAddConfirmButton.setOnClickListener(this::onClick);
         chatAddCancelButton.setOnClickListener(this::onClick);
-
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         realmSearchView = findViewById(R.id.chat_add_member_search_view);
@@ -90,7 +86,6 @@ public class ChatAddActivity extends AppCompatActivity implements
      **/
     @Override
     public void onItemSelected(User user) {
-        String userName = user.getAppName();
         memberAdapter.addItem(user);
         memberAdapter.notifyDataSetChanged();
     }
@@ -117,9 +112,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
     public static boolean createNewChat(Realm realm, ArrayList<User> list, String name) {
         Config myProfile = realm.where(Config.class).equalTo("CODENAME", "MyAccount").findFirst();
-//        String token = myProfile.getExt1();
         String token = myProfile.getExt4();
-        Gson gson = new Gson();
         String hospital = "w34qjptO0cYSJdAwScFQ";
         Map<String, Object> value = new HashMap<>();
         value.put("token", token);
@@ -129,23 +122,21 @@ public class ChatAddActivity extends AppCompatActivity implements
         for(User user : list){
             jsonArray.put(user.getUserId());
         }
-//        jsonArray.put(myProfile.getOid());
         jsonArray.put(myProfile.getExt1());
         value.put("members",  jsonArray);
-        Log.d("test", value.toString());
 
 
         if (list.size() == 1) { /** 선택된 유저가 한명일 때 **/
-            if (!name.isEmpty()) { // 채팅방 이름을 입력했을 때
+            if (!name.equals("")) { // 채팅방 이름을 입력했을 때
                 value.put("title", name);
-            } else { // 채팅방 이름 입력 안했을 때 = 상대방 이름으로 채팅방 이름 설정
-                value.put("title", list.get(0).getAppName());
+            } else { // 채팅방 이름 입력 안했을 때 = "" 빈 내용으로 입력
+                value.put("title", "");
             }
             value.put("roomImgUrl", list.get(0).getAppImagePath());
         } else {
-            if (!name.isEmpty()) {
+            if (!name.equals("")) { // 채팅방 이름을 입력했을 때
                 value.put("title", name);
-            } else {
+            } else { // 채팅방 이름 입력 안했을 때, 단톡방에서는 무조건 채팅방 이름 입력 하도록
                 return false;
             }
             value.put("roomImgUrl", list.get(0).getAppImagePath());

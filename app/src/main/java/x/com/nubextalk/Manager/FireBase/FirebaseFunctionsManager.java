@@ -5,6 +5,8 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Continuation;
@@ -24,6 +26,8 @@ import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
+import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Model.User;
 
 /**
  * FireBase Functions 함수 기능 부분
@@ -117,6 +121,24 @@ public class FirebaseFunctionsManager {
                                                   }
                                               });
                                           }
+                                          if(memberIdList.size() == 2 && value.get("title").toString().length() == 0) { // 1:1 채팅방일 때
+                                              realm.executeTransaction(new Realm.Transaction() {
+                                                  @Override
+                                                  public void execute(Realm realm) {
+                                                      String myId = Config.getMyUID(realm);
+                                                      String anotherId = "";
+                                                      for(String id : memberIdList){
+                                                          if(!id.equals(myId)){
+                                                              anotherId = id;
+                                                          }
+                                                      }
+                                                      User anotherUser = realm.where(User.class).equalTo("userId", anotherId).findFirst();
+                                                      ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                                                      chatRoom.setRoomName(anotherUser.getAppName());
+                                                      realm.copyToRealmOrUpdate(chatRoom);
+                                                  }
+                                              });
+                                          }
                                       }
                                       return null;
                                   }
@@ -171,6 +193,25 @@ public class FirebaseFunctionsManager {
                                         chatRoomMember.setRid(rid);
                                         chatRoomMember.setUid(memberIdList.get(finalI));
                                         realm.copyToRealm(chatRoomMember);
+                                    }
+                                });
+                            }
+                            if(memberIdList.size() == 2 && 
+                                    result.getJSONObject("chatRoom").getString("roomName").length() == 0) { // 1:1 채팅방일 때
+                                realm.executeTransaction(new Realm.Transaction() {
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        String myId = Config.getMyUID(realm);
+                                        String anotherId = "";
+                                        for(String id : memberIdList){
+                                            if(!id.equals(myId)){
+                                                anotherId = id;
+                                            }
+                                        }
+                                        User anotherUser = realm.where(User.class).equalTo("userId", anotherId).findFirst();
+                                        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                                        chatRoom.setRoomName(anotherUser.getAppName());
+                                        realm.copyToRealmOrUpdate(chatRoom);
                                     }
                                 });
                             }

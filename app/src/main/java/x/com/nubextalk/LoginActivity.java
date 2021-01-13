@@ -5,38 +5,22 @@
 
 package x.com.nubextalk;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import io.realm.Realm;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.User2;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.PACS.ApiManager;
-import x.com.nubextalk.PACS.Protocol;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -107,8 +91,8 @@ public class LoginActivity extends AppCompatActivity {
                              * JSONArray -> Realm
                              */
                             realm.executeTransaction(realm1 -> {
-                                realm1.where(User2.class).findAll().deleteAllFromRealm();
-                                realm1.createOrUpdateAllFromJson(User2.class, jsonArray);
+                                realm1.where(User.class).findAll().deleteAllFromRealm();
+                                realm1.createOrUpdateAllFromJson(User.class, jsonArray);
                             });
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -124,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                User2 user = new User2();
+                User user = new User();
                 user.setCode("1");
                 user.setAppImagePath("TEST");
                 user.setAppName("TEST");

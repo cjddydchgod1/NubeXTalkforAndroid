@@ -7,7 +7,6 @@ package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -45,27 +44,18 @@ import com.aquery.AQuery;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import io.realm.Sort;
 import okhttp3.Response;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
@@ -76,9 +66,7 @@ import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
-import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Model.User2;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.R;
@@ -93,14 +81,14 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private LinearLayout mBottomWrapper;
     private RecyclerView mRecyclerView;
     private FriendListAdapter mAdapter;
-    private RealmResults<User2> mResults;
-    private ArrayList<User2> mList; // mResults를 복사
+    private RealmResults<User> mResults;
+    private ArrayList<User> mList; // mResults를 복사
     private ChatRoomMember mChat;
     private AQuery aq;
     private ApiManager apiManager;
     private String myUid; // Uid
     private String TAG = "FriendListFragment";
-    private User2 myProfile;
+    private User myProfile;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -158,8 +146,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * JSONArray -> Realm
                      */
                     realm.executeTransaction(realm1 -> {
-                        realm1.where(User2.class).findAll().deleteAllFromRealm();
-                        realm1.createOrUpdateAllFromJson(User2.class, jsonArray);
+                        realm1.where(User.class).findAll().deleteAllFromRealm();
+                        realm1.createOrUpdateAllFromJson(User.class, jsonArray);
                     });
                     makeData();
                 } catch (JSONException e) {
@@ -261,7 +249,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
          */
-        mResults = User2.getUserlist(realm);
+        mResults = User.getUserlist(realm);
 
         /**
          * Search하기 위해 mResult -> mList
@@ -280,7 +268,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     public void makeProfile() {
-        myProfile = (User2) User2.getMyAccountInfo(realm);
+        myProfile = (User) User.getMyAccountInfo(realm);
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
@@ -345,20 +333,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
             Log.i(TAG, "notInput Alldata");
-            mResults = realm.where(User2.class).findAll();
+            mResults = realm.where(User.class).findAll();
             mList.addAll(realm.copyFromRealm(mResults));
         }
         // 문자 입력을 할때..
         else
         {
             Log.i(TAG, "Input data");
-            mList.add(realm.where(User2.class).equalTo("uid", myUid).findFirst());
-            mList.addAll(realm.where(User2.class).isNull("nickname")
+            mList.add(realm.where(User.class).equalTo("uid", myUid).findFirst());
+            mList.addAll(realm.where(User.class).isNull("nickname")
                         .contains("name", query)
                         .or()
                         .contains("department", query.toUpperCase())
                         .findAll());
-            mList.addAll(realm.where(User2.class).isNotNull("nickname")
+            mList.addAll(realm.where(User.class).isNotNull("nickname")
                           .contains("nickname", query)
                           .or()
                           .contains("department", query.toUpperCase())
@@ -373,7 +361,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
 
     @Override
-    public void onSelected(User2 address) {
+    public void onSelected(User address) {
         initBottomsheet(address);
         new AnimManager(
                 AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(3000).translationY(0).setInterpolator(new DecelerateInterpolator())
@@ -381,7 +369,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    protected void initBottomsheet(User2 address) {
+    protected void initBottomsheet(User address) {
         // 프로필 이름, 이미지, 상태
         TextView profileName = mBottomWrapper.findViewById(R.id.profileName);
         ImageView profileImage = mBottomWrapper.findViewById(R.id.profileImage);
@@ -509,9 +497,9 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             mChat = realm.where(ChatRoomMember.class).equalTo("uid", address.getUserId()).findFirst();
             if(mChat==null){
                 // 새로만든 채팅이 없다면 새로 만든다.
-                ArrayList<User2> list = new ArrayList<>();
+                ArrayList<User> list = new ArrayList<>();
                 list.add(myProfile);
-                ChatAddActivity.createNewChat(realm, list, null);
+//                ChatAddActivity.createNewChat(realm, list, null);
 
             } else {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
@@ -623,90 +611,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         ft.detach(this).attach(this).commit();
     }
 
-    public void updateNickname(User user, String name) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                user.setNickname(name);
-                realm.copyToRealmOrUpdate(user);
-            }
-        });
-    }
-
-    /** 현재 ChatAddActivity에서 가지고 온 코드 **/
-
-    public void temporary(User address) {
-        String rid = getRandomString().toString();
-        ChatRoom newChatRoom = new ChatRoom();
-        newChatRoom.setRid(rid);
-        newChatRoom.setRoomName(address.getName());
-        newChatRoom.setRoomImg(address.getProfileImg());
-
-        Date date = new Date();
-        newChatRoom.setUpdatedDate(new Date());
-
-
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(newChatRoom);
-
-                ChatRoomMember chatMember = new ChatRoomMember();
-                chatMember.setRid(rid);
-                chatMember.setUid(address.getUid());
-                /**
-                 * ChatRoomMember 모델이 Primary Key 가 없어서 copyToRealmOrUpdate 함수는
-                 * 사용하지 못하기 때문에 copyToRealm 함수를 사용함.
-                 * 참고: https://stackoverflow.com/questions/40999299/android-create-realm-table-without-primary-key
-                 **/
-                realm.copyToRealm(chatMember);
-                ChatContent chat = new ChatContent();
-                chat.setCid(""); // Content ID 자동으로 유니크한 값 설정
-                chat.setRid(rid); // RID 채팅방 아이디
-                chat.setType(9); // 시스템 메세지
-                chat.setContent("채팅방이 개설 되었습니다.");
-                chat.setIsRead(true);
-                chat.setSendDate(date);
-                realm.copyToRealmOrUpdate(chat);
-            }
-
-        });
-
-//        setResult(RESULT_OK); //MainActivity 로 결과 전달
-//        finish();
-    }
-
-
-    public StringBuffer getRandomString() {
-        StringBuffer temp = new StringBuffer();
-        Random rnd = new Random();
-        rnd.setSeed(System.currentTimeMillis());
-        for (int i = 0; i < 20; i++) {
-            int rIndex = rnd.nextInt(3);
-            switch (rIndex) {
-                case 0:
-                    // a-z
-                    temp.append((char) ((int) (rnd.nextInt(26)) + 97));
-                    break;
-                case 1:
-                    // A-Z
-                    temp.append((char) ((int) (rnd.nextInt(26)) + 65));
-                    break;
-                case 2:
-                    // 0-9
-                    temp.append((rnd.nextInt(10)));
-                    break;
-            }
-        }
-        return temp;
-    }
-
-
-
-
-
-
-
-
+//    public void updateNickname(User3 user3, String name) {
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                user3.setNickname(name);
+//                realm.copyToRealmOrUpdate(user3);
+//            }
+//        });
+//    }
 }

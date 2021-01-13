@@ -6,7 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,25 +20,24 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Model.User2;
 import x.com.nubextalk.R;
 
 public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<User2> mDataSet;
+    private ArrayList<User> mDataSet;
     private Context mContext;
     private String uid;
     private onItemSelectedListener listener;
     private AQuery aq;
 
     public interface onItemSelectedListener{
-        void onSelected(User2 address);
+        void onSelected(User address);
     }
     public void setOnItemSelectedListener(onItemSelectedListener listener){
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User2> data, String uid, AQuery aq) {
+    public FriendListAdapter(Context context, ArrayList<User> data, String uid, AQuery aq) {
         this.mDataSet = data;
         this.mContext = context;
         this.uid = uid;
@@ -58,7 +56,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // LinkedList에서 하나씩.
-        User2 mCurrent = mDataSet.get(position);
+        User mCurrent = mDataSet.get(position);
 
         FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
         friendViewHolder.bintTo(mCurrent);
@@ -87,7 +85,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileImage = itemView.findViewById(R.id.profileImage);
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
-        public void bintTo(User2 user) {
+        public void bintTo(User user) {
 //            String name = user.getDepartment() + " ";
 //            if(user.getNickname()==null) {
 //                name += user.getName();

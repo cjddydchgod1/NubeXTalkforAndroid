@@ -5,27 +5,19 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
-import com.google.api.Http;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.realm.Realm;
@@ -182,6 +174,7 @@ public class FirebaseFunctionsManager {
                                     }
                                 });
                             }
+                            return task.getResult();
                         }
                         return null;
                     }

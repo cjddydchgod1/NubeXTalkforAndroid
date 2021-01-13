@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                apiManager.login("lee777", "tech1!", new ApiManager.onApiListener() {
+                apiManager.login("han03", "tech1!", new ApiManager.onApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());
@@ -72,7 +72,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 User2 user = new User2();
-                user.setCode("1");
+                user.setCode("220");
+                user.setTypeCode("50");
                 user.setAppImagePath("TEST");
                 user.setAppName("TEST");
                 user.setAppStatus("0");

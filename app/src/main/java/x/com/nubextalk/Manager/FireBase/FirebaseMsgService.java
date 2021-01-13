@@ -185,8 +185,9 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                         });
 
                         if (!Config.getMyUID(realm).equals(uid)) {
+                            int channelId = Integer.parseInt(realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
                             makeChannel(CHANNEL_ID);
-                            notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
+                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
                         }
                     }
                 });

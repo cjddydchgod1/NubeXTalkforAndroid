@@ -7,11 +7,14 @@ package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,6 +54,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
@@ -105,6 +110,23 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         firebaseStoreManager = new FirebaseStoreManager();
         apiManager = new ApiManager(getActivity(), realm);
+        Log.i(TAG, "OnCreate");
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.i(TAG, "OnViewCreated");
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
+        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
+        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
+        aq              = new AQuery(getActivity());
+
         /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
          */
@@ -134,7 +156,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                 .put("typeCode", jsonObject.get("typecode"))
                                 .put("typeCodeName", jsonObject.get("typecodename"))
                                 .put("appName", jsonObject.get("app_NAME").equals(null) ? jsonObject.get("lastname") : jsonObject.get("app_NAME"))
-                                .put("appImagePath", jsonObject.get("app_IMG_PATH").equals(null) ? R.drawable.baseline_account_circle_black_24dp : jsonObject.get("app_IMG_PATH"))
+                                .put("appImagePath", jsonObject.get("app_IMG_PATH").equals(null) ? "TEST" : jsonObject.get("app_IMG_PATH"))
                                 .put("appStatus", jsonObject.get("app_STATUS").equals(null) ? "0" : jsonObject.get("app_STATUS"))
                                 .put("appFcmKey", jsonObject.get("app_FCM_KEY").equals(null) ? "test null" : jsonObject.get("app_FCM_KEY"));
                         jsonObject.remove("userid"); jsonObject.remove("lastname");
@@ -157,22 +179,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             }
         });
 
-        Log.i(TAG, "OnCreate");
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.i(TAG, "OnViewCreated");
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
-        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
-        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
-        aq              = new AQuery(getActivity());
 
         /**
          * recyclerview 디자인 및 애니매이션
@@ -274,9 +280,15 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
-        aq.view(myProfileImage).image(myProfile.getAppImagePath());
-        if(myProfileImage.getDrawable() == null) {
+        /**
+         * profileImage valid check
+         */
+        if(URLUtil.isValidUrl(myProfile.getAppImagePath())){
+            aq.view(myProfileImage).image(myProfile.getAppImagePath());
+            Log.d(TAG, "valid");
+        } else {
             aq.view(myProfileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            Log.d(TAG, "invalid");
         }
 //        String name = myProfile.getDepartment() + " ";
 //        if(myProfile.getNickname()==null) {
@@ -342,7 +354,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         else
         {
             Log.i(TAG, "Input data");
-            mList.addAll(realm.where(User.class).equalTo("appName", query).findAll());
+            mList.addAll(realm.where(User.class).contains("appName", query).findAll());
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
         Log.i(TAG, "Notify");
@@ -376,13 +388,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
         // 프로필 이름 설정
-//        String name;
-//        if(address.getNickname()==null) {
-//            name = address.getName();
-//        } else {
-//            name = address.getNickname();
-//        }
-//        profileName.setText(name);
         profileName.setText(address.getAppName());
         // profilestatus
         switch(address.getAppStatus()) {
@@ -397,10 +402,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 break;
         }
         // 프로필 사진
-        aq.view(profileImage).image(address.getAppImagePath());
-//        if(profileImage.getDrawable() == null) {
-//            aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
-//        }
+        if(URLUtil.isValidUrl(address.getAppImagePath())){
+            aq.view(profileImage).image(address.getAppImagePath());
+            Log.d(TAG, "valid");
+        } else {
+            aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            Log.d(TAG, "invalid");
+        }
 
         /**
          * 데이터 초기화
@@ -423,7 +431,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         profileName.setVisibility(View.VISIBLE);
         modifyNameButton.setText("수정");
 
-        // Nickname 변
+        // Nickname 변경
 //        modifyNameButton.setOnClickListener(v -> {
 //            String buttonName = modifyNameButton.getText().toString();
 //            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
@@ -462,17 +470,19 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 public void onClick(View v) {
                     chatButton.setVisibility(View.VISIBLE);
                     statusLayout.setVisibility(View.INVISIBLE);
-                    switch (v.getId()) {
-                        case R.id.working_status :
-                            address.setAppStatus("0");
-                            break;
-                        case R.id.leaving_status :
-                            address.setAppStatus("1");
-                            break;
-                        case R.id.vacation_status :
-                            address.setAppStatus("2");
-                            break;
-                    }
+                    realm.executeTransaction(realm1 -> {
+                        switch (v.getId()) {
+                            case R.id.working_status :
+                                address.setAppStatus("0");
+                                break;
+                            case R.id.leaving_status :
+                                address.setAppStatus("1");
+                                break;
+                            case R.id.vacation_status :
+                                address.setAppStatus("2");
+                                break;
+                        }
+                    });
                     apiManager.setEmployeeAppInfo(address, new ApiManager.onApiListener() {
                         @Override
                         public void onSuccess(Response response, String body) {
@@ -591,23 +601,15 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if(task.isSuccessful()) {
                                         Uri imgUri = task.getResult();
                                         if (imgUri != null){
-                                            Log.d("before test", myProfile.getAppImagePath());
                                             realm.executeTransaction(realm1 -> {
                                                 myProfile.setAppImagePath(imgUri.toString());
                                             });
-//                                            User user = new User();
-//                                            user.setCode(myProfile.getCode());
-//                                            user.setAppImagePath(imgUri.toString());
-//                                            user.setAppName(myProfile.getAppName());
-//                                            user.setAppStatus(myProfile.getAppStatus());
-                                            Log.d("after test", myProfile.getAppImagePath());
                                             apiManager.setEmployeeAppInfo(myProfile, new ApiManager.onApiListener() {
                                                     @Override
                                                     public void onSuccess(Response response, String body) {
                                                         Log.d("AppImagePath", body);
                                                     }
                                                 });
-
                                          }
                                      else
                                          Log.i("FriendListFragment", "uploadProfileImgFail");

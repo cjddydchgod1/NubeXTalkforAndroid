@@ -101,10 +101,10 @@ public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearch
     public void filter(String input) {
         RealmQuery<User> where = this.realm.where(User.class);
         if (!input.isEmpty()) {
-            where = where.contains("name", input);
+            where = where.contains("appName", input);
         }
         RealmResults businesses;
-        businesses = where.sort("name", Sort.ASCENDING).findAll();
+        businesses = where.sort("appName", Sort.ASCENDING).findAll();
         this.updateRealmResults(businesses);
     }
 }

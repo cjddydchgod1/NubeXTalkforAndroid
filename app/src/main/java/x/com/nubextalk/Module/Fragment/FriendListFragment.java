@@ -451,8 +451,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             } else {
                 startGallery();
-                // refresh
-                refreshFragment();
             }
         });
 
@@ -486,10 +484,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     apiManager.setEmployeeAppInfo(address, new ApiManager.onApiListener() {
                         @Override
                         public void onSuccess(Response response, String body) {
+                            refreshFragment();
                             Log.d("setEmplyee", body);
                         }
                     });
-                    refreshFragment();
                 }
             };
             working.setOnClickListener(onClickListener);
@@ -607,7 +605,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                             apiManager.setEmployeeAppInfo(myProfile, new ApiManager.onApiListener() {
                                                     @Override
                                                     public void onSuccess(Response response, String body) {
-                                                        Log.d("AppImagePath", body);
+                                                        refreshFragment();
                                                     }
                                                 });
                                          }

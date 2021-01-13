@@ -208,7 +208,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
     public NotificationCompat.Builder makeBuilder(String rid, String uid, int type, String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-        User userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+        User userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
 
         Bitmap userProfileImg = getImageFromURL(userInfo.getAppImagePath());
 

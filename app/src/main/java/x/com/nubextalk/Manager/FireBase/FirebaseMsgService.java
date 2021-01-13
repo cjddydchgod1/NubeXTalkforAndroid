@@ -113,10 +113,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
                 isFirst = Boolean.parseBoolean(data.get("isFirst"));
 
-                if (!UtilityManager.getUid().equals(uid)) {
-                    makeChannel(CHANNEL_ID);
-                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
-                }
 
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
@@ -138,7 +134,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                     }
                 });
 
-                if (!UtilityManager.getUid().equals(uid)) {
+                if (!Config.getMyUID(realm).equals(uid)) {
                     makeChannel(CHANNEL_ID);
                     notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
                 }
@@ -181,7 +177,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                     }
                 });
 
-                if (!UtilityManager.getUid().equals(uid)) {
+                if (!Config.getMyUID(realm).equals(uid)) {
                     makeChannel(CHANNEL_ID);
                     notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
                 }

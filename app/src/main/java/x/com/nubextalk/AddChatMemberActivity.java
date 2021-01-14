@@ -27,6 +27,7 @@ import java.util.Map;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
 import io.realm.Realm;
+import io.realm.RealmList;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.User;
@@ -40,7 +41,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
     private RecyclerView selectedMemberView;
     private ChatAddSearchAdapter mAdapter;
     private ChatAddMemberAdapter memberAdapter;
-    private ArrayList<User> user3List = new ArrayList<User>();
+    private ArrayList<User> userList = new ArrayList<User>();
     private Button chatAddConfirmButton;
     private Button chatAddCancelButton;
 
@@ -67,7 +68,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         mAdapter.setItemSelectedListener(this);
         realmSearchView.setAdapter(mAdapter);
 
-        memberAdapter = new ChatAddMemberAdapter(this, user3List);
+        memberAdapter = new ChatAddMemberAdapter(this, userList);
         selectedMemberView.
                 setLayoutManager(new LinearLayoutManager(
                         this, LinearLayoutManager.HORIZONTAL, false));

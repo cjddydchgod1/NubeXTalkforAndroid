@@ -6,13 +6,11 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,10 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
 import com.joanzapata.iconify.widget.IconButton;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
@@ -35,10 +29,10 @@ import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    SimpleDateFormat df = new SimpleDateFormat("MM월 dd일 HH:mm");
     private RealmResults<ChatRoom> mDataset;
     private final LayoutInflater mInflater;
     private Realm realm;
@@ -90,16 +84,20 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ChatContent lastContent;
 
             String roomId = mDataset.get(position).getRid();
+            ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", roomId).findFirst();
             String roomImgUrl = mDataset.get(position).getRoomImg();
-            lastContent = realm.where(ChatContent.class)
+            lastContent = realm.where(ChatContent.class) // 이 방식은 나중에 채팅 메세지가 많아지면 별로 좋은 방법이 아니므로 ChatRoom 에 lastContentId 를 넣는건 어떨
                     .equalTo("rid", roomId)
                     .sort("sendDate", Sort.DESCENDING).findFirst();
 
-            if (roomImgUrl != null) {
-                aq.view(mHolder.profileImg).image(mDataset.get(position).getRoomImg());
+            if (URLUtil.isValidUrl(roomImgUrl)) {
+                aq.view(mHolder.profileImg).image(roomImgUrl);
             } else {
-                aq.view(mHolder.profileImg).image(R.drawable.baseline_account_circle_black_24dp);
-
+                if (chatRoom.getChatRoomUsers(realm, roomId).size() > 2) {
+                    aq.view(mHolder.profileImg).image(R.drawable.ic_twotone_group_24);
+                } else {
+                    aq.view(mHolder.profileImg).image(R.drawable.baseline_account_circle_black_24dp);
+                }
             }
             mHolder.friendName.setText(mDataset.get(position).getRoomName());
 
@@ -122,6 +120,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         mDataset.get(position).getUpdatedDate(), dataPattern);
                 mHolder.time.setText(DateManager.getTimeInterval(convertedDate, dataPattern));
 
+                setStatusImg(mHolder, position);
                 setNotify(mHolder, position);
             }
 
@@ -209,7 +208,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         chatContents = realm.where(ChatContent.class).equalTo("rid", chatRoom.getRid()).findAll();
 
         for (ChatContent chatContent : chatContents) {
-            if (chatContent.getIsRead() == false) {
+            if (!chatContent.getIsRead()) {
                 unreadMessages += 1;
             }
         }
@@ -232,17 +231,29 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      **/
     public void setStatusImg(@NonNull ViewItemHolder holder, int position) {
         String rid = mDataset.get(position).getRid();
-        int memberNum = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll().size();
-        if (memberNum <= 2) { // 1 대 1 채팅방인 경우
-
-        } else {
-
+        User myAccount = (User) User.getMyAccountInfo(realm);
+        RealmResults<ChatRoomMember> users = ChatRoom.getChatRoomUsers(realm, rid);
+        Log.d("CHATROOM", "멤버수: " + users.size());
+        if (users.size() == 2) { // 1 대 1 채팅방인 경우
+            for (ChatRoomMember user : users) {
+                if (!user.getUid().equals(myAccount.getUserId())) {
+                    // profilestatus
+                    User anotherUser = realm.where(User.class).equalTo("userId", user.getUid()).findFirst();
+                    switch (anotherUser.getAppStatus()) {
+                        case "1":
+                            aq.view(holder.statusImg).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                            break;
+                        case "2":
+                            aq.view(holder.statusImg).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                            break;
+                        default: // 0과 기본으로 되어있는 설정
+                            aq.view(holder.statusImg).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                            break;
+                    }
+                }
+            }
         }
-//        if (mDataset.get(position).getStatus() == 0) {
-//            holder.statusImg.setImageResource(R.drawable.oval_status_off);
-//        } else if (mDataset.get(position).getStatus() == 1) {
-//            holder.statusImg.setImageResource(R.drawable.oval_status_on);
-//        }
+
     }
 
     @Override

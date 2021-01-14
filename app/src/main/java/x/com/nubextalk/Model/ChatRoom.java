@@ -13,15 +13,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.R;
+
 
 public class ChatRoom extends RealmObject {
     @NonNull
@@ -42,12 +47,18 @@ public class ChatRoom extends RealmObject {
         return rid;
     }
 
-    public void setRid(@NonNull String rid) { this.rid = rid; }
+    public void setRid(@NonNull String rid) {
+        this.rid = rid;
+    }
 
     @NonNull
-    public String getRoomName() { return roomName; }
+    public String getRoomName() {
+        return roomName;
+    }
 
-    public void setRoomName(@NonNull String roomName) { this.roomName = roomName; }
+    public void setRoomName(@NonNull String roomName) {
+        this.roomName = roomName;
+    }
 
     @NonNull
     public String getRoomImg() {
@@ -74,9 +85,13 @@ public class ChatRoom extends RealmObject {
         this.settingFixTop = settingFixTop;
     }
 
-    public String getNotificationId() { return notificationId; }
+    public String getNotificationId() {
+        return notificationId;
+    }
 
-    public void setNotificationId(String notificationId) { this.notificationId = notificationId; }
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
 
     @NonNull
     public Date getUpdatedDate() {
@@ -86,8 +101,9 @@ public class ChatRoom extends RealmObject {
     public void setUpdatedDate(@NonNull Date updatedDate) {
         this.updatedDate = updatedDate;
     }
+
     /**
-         * Data 초기화 함수
+     * Data 초기화 함수
      *
      * @param realm
      */
@@ -107,16 +123,83 @@ public class ChatRoom extends RealmObject {
                 realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
                 realm1.createOrUpdateAllFromJson(ChatRoom.class, jsonArray);
             });
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public static RealmResults<ChatRoom> getAll(Realm realm){
+    public static RealmResults<ChatRoom> getAll(Realm realm) {
         return realm.where(ChatRoom.class).findAll();
     }
 
+    public static void createChatRoom(Realm realm, Map data, ArrayList<User> userList) {
+        User myAccount = (User) User.getMyAccountInfo(realm);
 
+        userList.add(myAccount);
+
+        Date newDate = new Date();
+        String rid = data.get("rid") == null ? myAccount.getUserId().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString();
+        String roomName = data.get("title") == null ? "" : data.get("title").toString();
+        String roomImg = data.get("roomImgUrl") == null ? "" : data.get("roomImgUrl").toString();
+        Date updatedDate = data.get("updatedDate") == null
+                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'hh:mm:ss");
+        String notificationId = data.get("notificationId") == null
+                ? String.valueOf(newDate.getTime()) : data.get("notificationId").toString();
+
+        if (userList.size() == 2) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
+            for (User user : userList) {
+                if (!user.equals(myAccount)) {
+                    roomName = user.getAppName();
+                    roomImg = user.getAppImagePath();
+                }
+            }
+        }
+
+        if (userList.size() > 2) { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
+            roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
+        }
+
+        String finalRoomName = roomName;
+        String finalRoomImg = roomImg;
+        realm.executeTransactionAsync(new Realm.Transaction() { //realm 로컬 채팅방 생성
+            @Override
+            public void execute(@NonNull Realm realm) {
+                ChatRoom chatRoom = new ChatRoom();
+                chatRoom.setRid(rid);
+                chatRoom.setRoomName(finalRoomName);
+                chatRoom.setRoomImg(finalRoomImg);
+                chatRoom.setUpdatedDate(updatedDate);
+                chatRoom.setNotificationId(notificationId);
+                realm.copyToRealmOrUpdate(chatRoom);
+            }
+        });
+        for (User user : userList) {
+            realm.beginTransaction();
+            ChatRoomMember chatRoomMember = new ChatRoomMember();
+            chatRoomMember.setRid(rid);
+            chatRoomMember.setUid(user.getUserId());
+            realm.copyToRealm(chatRoomMember);
+            realm.commitTransaction();
+        }
+    }
+
+    public static void deleteChatRoom(Realm realm, String rid) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
+                RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
+                chatRoom.deleteFromRealm();
+                chatContents.deleteAllFromRealm();
+                chatRoomMembers.deleteAllFromRealm();
+            }
+        });
+    }
+
+    public static RealmResults<ChatRoomMember> getChatRoomUsers(Realm realm, String rid) {
+        return realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
+
+    }
 
 }

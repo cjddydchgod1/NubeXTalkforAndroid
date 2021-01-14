@@ -6,29 +6,29 @@
 package x.com.nubextalk;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
-
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
 import io.realm.Realm;
-import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
+import io.realm.RealmList;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
@@ -96,11 +96,11 @@ public class ChatAddActivity extends AppCompatActivity implements
         String roomName = chatRoomNameInput.getText().toString();
         switch (v.getId()) {
             case R.id.chat_add_confirm_btn:
-                if(createNewChat(realm, selectedUser, roomName)) {
+                if (createNewChat(realm, selectedUser, roomName)) {
                     setResult(RESULT_OK); //MainActivity 로 결과 전달
                     finish();
                 } else {
-                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -119,11 +119,11 @@ public class ChatAddActivity extends AppCompatActivity implements
         value.put("hospital", hospital);
 
         JSONArray jsonArray = new JSONArray();
-        for(User user : list){
+        for (User user : list) {
             jsonArray.put(user.getUserId());
         }
         jsonArray.put(myProfile.getExt1());
-        value.put("members",  jsonArray);
+        value.put("members", jsonArray);
 
 
         if (list.size() == 1) { /** 선택된 유저가 한명일 때 **/
@@ -141,7 +141,9 @@ public class ChatAddActivity extends AppCompatActivity implements
             }
             value.put("roomImgUrl", list.get(0).getAppImagePath());
         }
-        FirebaseFunctionsManager.createChatRoom(token, value);
+
+//        FirebaseFunctionsManager.createChatRoom(token, value);
+        ChatRoom.createChatRoom(realm, value, list);
 
         return true;
     }

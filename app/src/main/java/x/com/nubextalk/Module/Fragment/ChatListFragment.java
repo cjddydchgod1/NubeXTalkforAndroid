@@ -58,7 +58,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
         chatContentResults = ChatContent.getAll(realm);
-//        if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
         mAdapter.setItemLongSelectedListener(this);
@@ -131,7 +130,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 refreshChatList();
                                 break;
                             case 3: /**채팅방 나가기 이벤트 구현**/
-                                exitChatRoom(chatRoom);
+                                ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
                                 refreshChatList();
                                 break;
                         }
@@ -189,22 +188,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         });
     }
 
-    public void exitChatRoom(ChatRoom chatRoom) {
-        String rid = chatRoom.getRid();
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
-                RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
-
-                for (ChatRoomMember member : chatRoomMembers) { member.deleteFromRealm(); }
-                for (ChatContent content : chatContents) { content.deleteFromRealm(); }
-                chatRoom.deleteFromRealm();
-            }
-        });
-    }
-
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
         mAdapter.sortChatRoomByDate();
@@ -221,7 +204,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
             fab_sub1.show();
             fab_sub2.show();
             isFabOpen = true;
-
         }
     }
 }

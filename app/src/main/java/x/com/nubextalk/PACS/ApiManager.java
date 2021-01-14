@@ -96,6 +96,25 @@ public class ApiManager {
     }
 
     /**
+     * 서버와 연결하지 않고 사용하는 Login
+     * @param id
+     * @param pwd
+     */
+    public void login(String id, String pwd) {
+        realm.executeTransaction(realm1 -> {
+            Config myAccount = Config.getMyAccount(realm);
+            if(myAccount == null) {
+                myAccount = new Config();
+                myAccount.setCODE("MyAccount");
+                myAccount.setCODE("MyAccount");
+            }
+            myAccount.setExt1(id);
+            myAccount.setExt2(pwd);
+            realm.copyToRealmOrUpdate(myAccount);
+        });
+    }
+
+    /**
      * User 목록 Get
      * @param listener
      */

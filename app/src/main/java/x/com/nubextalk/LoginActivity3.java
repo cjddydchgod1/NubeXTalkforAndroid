@@ -67,21 +67,30 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                 apiManager = new ApiManager(this, realm);
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
-                apiManager.login(id, password, new ApiManager.onApiListener() { // lee777 , tech1!
-                    @Override
-                    public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", response.toString());
-                        /**
-                         * uid, token을 firestore에 올리는 작업
-                         */
-                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
-
-                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
+//                apiManager.login(id, password, new ApiManager.onApiListener() { // lee777 , tech1!
+//                    @Override
+//                    public void onSuccess(Response response, String body) {
+//                        Log.d("RESUlT", response.toString());
+//                        /**
+//                         * uid, token을 firestore에 올리는 작업
+//                         */
+//                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+//                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+//
+//                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }
+//                });
+                apiManager.login(id,password);
+                /**
+                 * uid, token을 firestore에 올리는 작업
+                 */
+                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
     }

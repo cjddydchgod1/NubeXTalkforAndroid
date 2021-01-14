@@ -57,6 +57,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Random;
 
 import io.realm.Realm;
@@ -72,6 +73,7 @@ import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
@@ -88,7 +90,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private RecyclerView mRecyclerView;
     private FriendListAdapter mAdapter;
     private RealmResults<User> mResults;
-    private ArrayList<User> mList; // mResults를 복사
+    private ArrayList<User> mUserList; // mResults를 복사
     private ChatRoomMember mChat;
     private AQuery aq;
     private ApiManager apiManager;
@@ -125,60 +127,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
         mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
         mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
+        mUserList       = new ArrayList<>();
         aq              = new AQuery(getActivity());
-
-        /**
-         * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
-         */
-        apiManager.getEmployeeList(new ApiManager.onApiListener() {
-            @Override
-            public void onSuccess(Response response, String body) {
-                Log.d("asdf", body.toString());
-                /**
-                 * userlist -> realm 저장
-                 */
-                try{
-                    /**
-                     * String(body) -> JSONArray
-                     */
-                    JSONArray jsonArray = new JSONArray(body);
-                    /**
-                     * JSONArray -> JSONObject
-                     * field명 바꾸기
-                     * JSONObject -> JSONArray
-                     */
-                    int len = jsonArray.length();
-                    for(int i=0; i<len; i++) {
-                        JSONObject jsonObject = (JSONObject) (jsonArray.get(i));
-                        Log.d("json",jsonObject.toString());
-                        jsonObject.put("userId", jsonObject.get("userid"))
-                                .put("lastName", jsonObject.get("lastname"))
-                                .put("typeCode", jsonObject.get("typecode"))
-                                .put("typeCodeName", jsonObject.get("typecodename"))
-                                .put("appName", jsonObject.get("app_NAME").equals(null) ? jsonObject.get("lastname") : jsonObject.get("app_NAME"))
-                                .put("appImagePath", jsonObject.get("app_IMG_PATH").equals(null) ? "TEST" : jsonObject.get("app_IMG_PATH"))
-                                .put("appStatus", jsonObject.get("app_STATUS").equals(null) ? "0" : jsonObject.get("app_STATUS"))
-                                .put("appFcmKey", jsonObject.get("app_FCM_KEY").equals(null) ? "test null" : jsonObject.get("app_FCM_KEY"));
-                        jsonObject.remove("userid"); jsonObject.remove("lastname");
-                        jsonObject.remove("typecode"); jsonObject.remove("typecodename");
-                        jsonObject.remove("app_IMG_PATH"); jsonObject.remove("app_STATUS");
-                        jsonObject.remove("app_NAME"); jsonObject.remove("app_FCM_KEY");
-                        jsonArray.put(jsonObject);
-                    }
-                    /**
-                     * JSONArray -> Realm
-                     */
-                    realm.executeTransaction(realm1 -> {
-                        realm1.where(User.class).findAll().deleteAllFromRealm();
-                        realm1.createOrUpdateAllFromJson(User.class, jsonArray);
-                    });
-                    makeData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
 
         /**
          * recyclerview 디자인 및 애니매이션
@@ -186,6 +136,102 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        /**
+         * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
+         */
+//        apiManager.getEmployeeList(new ApiManager.onApiListener() {
+//            @Override
+//            public void onSuccess(Response response, String body) {
+//                Log.d("asdf", body.toString());
+//                /**
+//                 * userlist -> realm 저장
+//                 */
+//                try{
+//                    /**
+//                     * String(body) -> JSONArray
+//                     */
+//                    JSONArray jsonArray = new JSONArray(body);
+//                    /**
+//                     * JSONArray -> JSONObject
+//                     * JSONObject -> User
+//                     * User -> ArrayList
+//                     */
+//                    int len = jsonArray.length();
+//
+//                    ArrayList<User> users = new ArrayList<>();
+//                    for(int i=0; i<len; i++) {
+//                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+//
+//                        User user = new User();
+//                        user.setCode(jsonObject.getString("code"));
+//                        user.setUserId(jsonObject.getString("userid"));
+//                        user.setLastName(jsonObject.getString("lastname"));
+//                        user.setTypeCode(jsonObject.getString("typecode"));
+//                        user.setTypeCodeName(jsonObject.getString("typecodename"));
+//                        user.setRemoved(jsonObject.getString("removed"));
+//                        user.setAppImagePath(jsonObject.getString("app_IMG_PATH"));
+//                        user.setAppStatus(jsonObject.getString("app_STATUS"));
+//                        user.setAppName(jsonObject.getString("app_NAME"));
+//                        user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
+//                        Log.d(TAG, user.getLastName());
+//                        mUserList.add(user);
+//                    }
+//                    /**
+//                     * ArrayList -> Realm
+//                     */
+//                    realm.executeTransaction(realm1 -> {
+//                        realm1.where(User.class).findAll().deleteAllFromRealm();
+//                        realm1.copyToRealmOrUpdate(mUserList);
+//                    });
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+
+        try{
+                    /**
+                     * String(body) -> JSONArray
+                     */
+                    String body = UtilityManager.loadJson(getActivity(), "example_user.json");
+                    JSONArray jsonArray = new JSONArray(body);
+                    /**
+                     * JSONArray -> JSONObject
+                     * JSONObject -> User
+                     * User -> ArrayList
+                     */
+                    int len = jsonArray.length();
+
+                    ArrayList<User> users = new ArrayList<>();
+                    for(int i=0; i<len; i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        User user = new User();
+                        user.setCode(jsonObject.getString("code"));
+                        user.setUserId(jsonObject.getString("userid"));
+                        user.setLastName(jsonObject.getString("lastname"));
+                        user.setTypeCode(jsonObject.getString("typecode"));
+                        user.setTypeCodeName(jsonObject.getString("typecodename"));
+                        user.setRemoved(jsonObject.getString("removed"));
+                        user.setAppImagePath(jsonObject.getString("app_IMG_PATH"));
+                        user.setAppStatus(jsonObject.getString("app_STATUS"));
+                        user.setAppName(jsonObject.getString("app_NAME"));
+                        user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
+                        Log.d(TAG, user.getLastName());
+                        mUserList.add(user);
+                    }
+                    /**
+                     * ArrayList -> Realm
+                     */
+                    realm.executeTransaction(realm1 -> {
+                        realm1.where(User.class).findAll().deleteAllFromRealm();
+                        realm1.copyToRealmOrUpdate(mUserList);
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+        makeData();
 
         Log.i(TAG, "OncreateView");
         return rootview;
@@ -252,30 +298,28 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     public void makeData() {
-
         /**
-         * 현재 로그인 되어있는 uid와는 다른 친구들의 목록 불러오
+         * mUserList에서 나의 정보만 뺀다.
          */
-        mResults = User.getUserlist(realm);
-
-        /**
-         * Search하기 위해 mResult -> mList
-         */
-        mList = new ArrayList<>();
-        mList.addAll(realm.copyFromRealm(mResults));
+        for(User user : mUserList) {
+            if(user.getUserId().equals(Config.getMyUID(realm))) {
+                myProfile = user;
+                mUserList.remove(user);
+                break;
+            }
+        }
 
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(getActivity() ,mList, myUid, aq);
-        ((FriendListAdapter) mAdapter).setOnItemSelectedListener(this);
+        mAdapter = new FriendListAdapter(getActivity() ,mUserList, myUid, aq);
+        mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
         makeProfile();
     }
 
     public void makeProfile() {
-        myProfile = (User) User.getMyAccountInfo(realm);
         myUid = myProfile.getUserId();
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
@@ -343,18 +387,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
     public void search(String query) {
         // 문자 입력시마다 리스트를 지우고 새로 뿌려준다.
-        mList.clear();
+        mUserList.clear();
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
             Log.i(TAG, "notInput Alldata");
             mResults = realm.where(User.class).findAll();
-            mList.addAll(realm.copyFromRealm(mResults));
+            mUserList.addAll(realm.copyFromRealm(mResults));
         }
         // 문자 입력을 할때..
         else
         {
             Log.i(TAG, "Input data");
-            mList.addAll(realm.where(User.class).contains("appName", query).findAll());
+            mUserList.addAll(realm.where(User.class).contains("appName", query).findAll());
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
         Log.i(TAG, "Notify");
@@ -508,7 +552,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 // 새로만든 채팅이 없다면 새로 만든다.
                 ArrayList<User> list = new ArrayList<>();
                 list.add(myProfile);
-                ChatAddActivity.createNewChat(realm, list, null);
+                ChatAddActivity.createNewChat(realm, list, "");
 
             } else {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);

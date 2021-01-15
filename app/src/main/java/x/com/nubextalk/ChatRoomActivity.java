@@ -37,12 +37,15 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.UploadTask;
 import com.joanzapata.iconify.widget.IconButton;
 
+import org.json.JSONArray;
 import org.jsoup.select.Evaluator;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -52,6 +55,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import x.com.nubextalk.Manager.DateManager;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -437,7 +441,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 //                    .update("updatedDate", simpleDateFormat.format(date));
 
             Map<String, Object> chat = new HashMap<>();
-            chat.put("cid", null);
+            String cid = mUid.concat(String.valueOf(date.getTime()));
+            chat.put("cid", cid);
             chat.put("uid", mUid);
             chat.put("rid", mRoomId);
             chat.put("content", content);
@@ -449,9 +454,42 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 chat.put("isFirst", "true");
             }
 
+            //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
+            if(realm.where(ChatContent.class).equalTo("rid",mRoomId).findAll().isEmpty()){
+                Log.d("CHATROOM", "채팅방 서버에 생성한다잉 ");
+                Map<String, Object> chatRoomData = new HashMap<>();
+                RealmResults<ChatRoomMember> chatRoomMember = ChatRoom.getChatRoomUsers(realm, mRoomId);
+                JSONArray chatRoomMemberJsonArray = new JSONArray();
+                for( ChatRoomMember member : chatRoomMember ) {
+                    chatRoomMemberJsonArray.put(member.getUid());
+                }
+                chatRoomData.put("hospital", mHid);
+                chatRoomData.put("chatRoomId", mRoomId);
+                chatRoomData.put("members", chatRoomMemberJsonArray);
+                chatRoomData.put("title", roomInfo.getRoomName());
+                chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
+                chatRoomData.put("notificationId", roomInfo.getNotificationId());
+                FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                    @Override
+                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                        Log.d("CHATROOM", "채팅방 생성 완료!");
+                    }
+                });
+            }
+
             ChatContent.createChat(realm, chat);
 
-//            //서버에 채팅 추가
+            fs.collection("hospital").document(mHid)
+                    .collection("chatRoom").document(mRoomId)
+                    .collection("chatContent").document(cid)
+                    .set(chat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d("CHATROOM", "채팅 생성 완료!");
+                }
+            });
+
+            //서버에 채팅 추가
 //            fs.collection("hospital").document(mHid)
 //                    .collection("chatRoom").document(mRoomId)
 //                    .collection("chatContent").add(chat)

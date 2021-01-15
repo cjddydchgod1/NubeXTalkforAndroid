@@ -5,30 +5,16 @@
 
 package x.com.nubextalk.Model;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.DateManager;
-import x.com.nubextalk.Manager.UtilityManager;
 
 public class ChatContent extends RealmObject {
     @NonNull
@@ -159,6 +145,7 @@ public class ChatContent extends RealmObject {
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });
+
     }
 
 }

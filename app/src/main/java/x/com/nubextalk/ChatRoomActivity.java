@@ -32,8 +32,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -469,10 +471,19 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 chatRoomData.put("title", roomInfo.getRoomName());
                 chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
                 chatRoomData.put("notificationId", roomInfo.getNotificationId());
-                FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
                     @Override
-                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
                         Log.d("CHATROOM", "채팅방 생성 완료!");
+                        fs.collection("hospital").document(mHid)
+                            .collection("chatRoom").document(mRoomId)
+                            .collection("chatContent").document(cid)
+                            .set(chat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("CHATROOM", "채팅 생성 완료!");
+                                }}
+                            );
                     }
                 });
             }

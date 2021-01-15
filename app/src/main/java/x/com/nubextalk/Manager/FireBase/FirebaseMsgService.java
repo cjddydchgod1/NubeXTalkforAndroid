@@ -24,12 +24,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
@@ -110,88 +118,63 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         switch (data.get("CODE")) {
 
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
-                cid = data.get("chatContentId");
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("uid", data.get("senderId"));
+                payload.put("cid", data.get("chatContentId"));
+                payload.put("rid", data.get("chatRoomId"));
+                payload.put("content", data.get("content"));
+                payload.put("type", data.get("contentType"));
+                payload.put("sendDate", data.get("sendDate"));
+                payload.put("isFirst", data.get("isFirst"));
+
                 uid = data.get("senderId");
                 rid = data.get("chatRoomId");
                 type = Integer.parseInt(data.get("contentType"));
                 content = data.get("content");
-                date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
-                isFirst = Boolean.parseBoolean(data.get("isFirst"));
 
+                // 채팅방이 없으면 먼저 realm 에 생성
+                if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
+                    FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
+                            .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                                @Override
+                                public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                                    Gson gson = new Gson();
+                                    Map<String, Object> value = new HashMap<>();
+                                    try {
+                                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
+                                        JSONObject result = new JSONObject(gson.toJson(httpsCallableResult.getData()));
+                                        value.put("rid", rid);
+                                        value.put("title", result.getJSONObject("chatRoom").getString("roomName"));
+                                        value.put("roomImgUrl", result.getJSONObject("chatRoom").getString("roomImg"));
+                                        value.put("updatedDate", result.getJSONObject("chatRoom").getString("updatedDate"));
+                                        value.put("notificationId", result.getJSONObject("chatRoom").getString("notificationId"));
+                                        ArrayList<String> userIdList = new ArrayList<>();
+                                        for (int i = 0; i < result.getJSONArray("chatRoomMember").length(); i++) {
+                                            userIdList.add(result.getJSONArray("chatRoomMember").getString(i));
+                                        }
 
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst();
-                        roomInfo.setUpdatedDate(new Date());
-                        realm.copyToRealmOrUpdate(roomInfo);
-
-                        ChatContent chat = new ChatContent();
-
-                        chat.setCid(cid); // Content ID 자동으로 유니크한 값 설정
-                        chat.setUid(uid); // UID 보내는 사람
-                        chat.setRid(rid); // RID 채팅방 아이디
-                        chat.setType(type);
-                        chat.setContent(content);
-                        chat.setSendDate(date);
-                        chat.setFirst(isFirst);
-                        realm.copyToRealmOrUpdate(chat);
+                                        ChatRoom.createChatRoom(realm1, value, userIdList);
+                                        ChatContent.createChat(realm1, payload);
+                                        if (!Config.getMyUID(realm1).equals(uid)) {
+                                            int channelId = Integer.parseInt(realm1.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
+                                            makeChannel(CHANNEL_ID);
+                                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                } else {
+                    ChatContent.createChat(realm, payload);
+                    if (!Config.getMyUID(realm).equals(uid)) {
+                        int channelId = Integer.parseInt(realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
+                        makeChannel(CHANNEL_ID);
+                        notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
                     }
-                });
-
-                if (!Config.getMyUID(realm).equals(uid)) {
-                    makeChannel(CHANNEL_ID);
-                    notificationManager.notify(1, makeBuilder(rid, uid, type, content).build());
                 }
 
-                break;
-            case "FIRST_CHAT_CREATED": //채팅방이 생성되고 처음 메세지가 생성된 경우 채팅방과 채팅메세지 생성
-                cid = data.get("chatContentId");
-                uid = data.get("senderId");
-                rid = data.get("chatRoomId");
-                type = Integer.parseInt(data.get("contentType"));
-                content = data.get("content");
-                date = DateManager.convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss");
-                isFirst = Boolean.parseBoolean(data.get("isFirst"));
 
-                FirebaseFunctionsManager.getChatRoom(data.get("hospitalId"), data.get("chatRoomId")).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                    @Override
-                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                ChatContent notifyChat = new ChatContent();
-                                notifyChat.setCid("sys".concat(cid));
-                                notifyChat.setRid(rid);
-                                notifyChat.setType(9);
-                                notifyChat.setContent("채팅방이 개설되었습니다.");
-                                notifyChat.setSendDate(DateManager.
-                                        convertDatebyString(data.get("sendDate"), "yyyy-MM-dd'T'hh:mm:ss"));
-                                notifyChat.setIsRead(true);
-                                notifyChat.setFirst(false);
-                                realm.copyToRealmOrUpdate(notifyChat);
-
-                                ChatContent chat = new ChatContent();
-                                chat.setCid(cid); // Content ID 자동으로 유니크한 값 설정
-                                chat.setUid(uid); // UID 보내는 사람
-                                chat.setRid(rid); // RID 채팅방 아이디
-                                chat.setType(type);
-                                chat.setContent(content);
-                                chat.setSendDate(date);
-                                chat.setFirst(isFirst);
-                                realm.copyToRealmOrUpdate(chat);
-                            }
-                        });
-
-                        if (!Config.getMyUID(realm).equals(uid)) {
-                            int channelId = Integer.parseInt(realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
-                            makeChannel(CHANNEL_ID);
-                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-                        }
-                    }
-                });
-//
                 break;
             case "CHAT_ROOM_INVITED":
                 Log.d("TOKEN", "room invited!!");

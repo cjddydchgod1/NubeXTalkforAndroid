@@ -119,8 +119,10 @@ public class ChatAddActivity extends AppCompatActivity implements
         value.put("hospital", hospital);
 
         JSONArray jsonArray = new JSONArray();
+        ArrayList<String> userIdList = new ArrayList<>();
         for (User user : list) {
             jsonArray.put(user.getUserId());
+            userIdList.add(user.getUserId());
         }
         jsonArray.put(myProfile.getExt1());
         value.put("members", jsonArray);
@@ -143,7 +145,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         }
 
 //        FirebaseFunctionsManager.createChatRoom(token, value);
-        ChatRoom.createChatRoom(realm, value, list);
+        ChatRoom.createChatRoom(realm, value, userIdList);
 
         return true;
     }

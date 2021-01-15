@@ -132,10 +132,13 @@ public class ChatRoom extends RealmObject {
         return realm.where(ChatRoom.class).findAll();
     }
 
-    public static void createChatRoom(Realm realm, Map data, ArrayList<User> userList) {
+    public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList) {
         User myAccount = (User) User.getMyAccountInfo(realm);
 
-        userList.add(myAccount);
+//        userList.add(myAccount);
+        if(!userList.contains(myAccount.getUserId())){
+            userList.add(myAccount.getUserId());
+        }
 
         Date newDate = new Date();
         String rid = data.get("rid") == null ? myAccount.getUserId().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString();
@@ -144,11 +147,12 @@ public class ChatRoom extends RealmObject {
         Date updatedDate = data.get("updatedDate") == null
                 ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
         String notificationId = data.get("notificationId") == null
-                ? String.valueOf(newDate.getTime()) : data.get("notificationId").toString();
+                ? String.valueOf(newDate.hashCode()) : data.get("notificationId").toString();
 
         if (userList.size() == 2) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
-            for (User user : userList) {
-                if (!user.equals(myAccount)) {
+            for (String userId : userList) {
+                if (!userId.equals(myAccount.getUserId())) {
+                    User user = realm.where(User.class).equalTo("userId", userId).findFirst();
                     roomName = user.getAppName();
                     roomImg = user.getAppImagePath();
                 }
@@ -173,7 +177,8 @@ public class ChatRoom extends RealmObject {
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });
-        for (User user : userList) { //ChatRoomMember 모델에 채팅유저 생성
+        for (String userId : userList) { //ChatRoomMember 모델에 채팅유저 생성
+            User user = realm.where(User.class).equalTo("userId", userId).findFirst();
             realm.beginTransaction();
             ChatRoomMember chatRoomMember = new ChatRoomMember();
             chatRoomMember.setRid(rid);

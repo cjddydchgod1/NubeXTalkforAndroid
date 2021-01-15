@@ -142,7 +142,7 @@ public class ChatRoom extends RealmObject {
         String roomName = data.get("title") == null ? "" : data.get("title").toString();
         String roomImg = data.get("roomImgUrl") == null ? "" : data.get("roomImgUrl").toString();
         Date updatedDate = data.get("updatedDate") == null
-                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'hh:mm:ss");
+                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
         String notificationId = data.get("notificationId") == null
                 ? String.valueOf(newDate.getTime()) : data.get("notificationId").toString();
 
@@ -173,7 +173,7 @@ public class ChatRoom extends RealmObject {
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });
-        for (User user : userList) {
+        for (User user : userList) { //ChatRoomMember 모델에 채팅유저 생성
             realm.beginTransaction();
             ChatRoomMember chatRoomMember = new ChatRoomMember();
             chatRoomMember.setRid(rid);

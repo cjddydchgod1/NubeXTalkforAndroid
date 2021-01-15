@@ -42,7 +42,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         ChatListAdapter.OnItemSelectedListener, View.OnClickListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
-    private RealmResults<ChatContent> chatContentResults;
 
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
@@ -57,7 +56,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
-        chatContentResults = ChatContent.getAll(realm);
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
         mAdapter.setItemLongSelectedListener(this);

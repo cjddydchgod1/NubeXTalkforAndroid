@@ -45,6 +45,7 @@ import org.jsoup.select.Evaluator;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import io.realm.Realm;
@@ -423,7 +424,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         } else {
 
             Date date = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA);
 
 
 //          채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
@@ -431,13 +432,14 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             Date roomUpdateDate = roomInfo.getUpdatedDate();
 
             //서버에 채팅방 업데이트 시간 업뎃
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .update("updatedDate", simpleDateFormat.format(date));
+//            fs.collection("hospital").document(mHid)
+//                    .collection("chatRoom").document(mRoomId)
+//                    .update("updatedDate", simpleDateFormat.format(date));
 
             Map<String, Object> chat = new HashMap<>();
             chat.put("cid", null);
             chat.put("uid", mUid);
+            chat.put("rid", mRoomId);
             chat.put("content", content);
             chat.put("sendDate", simpleDateFormat.format(date));
             chat.put("type", "0");
@@ -445,26 +447,28 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 chat.put("isFirst", "false");
             } else {
                 chat.put("isFirst", "true");
-
             }
-            //서버에 채팅 추가
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .collection("chatContent").add(chat)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            fs.collection("hospital").document(mHid)
-                                    .collection("chatRoom").document(mRoomId)
-                                    .collection("chatContent").document(documentReference.getId())
-                                    .update("cid", documentReference.getId());
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                        }
-                    });
+
+            ChatContent.createChat(realm, chat);
+
+//            //서버에 채팅 추가
+//            fs.collection("hospital").document(mHid)
+//                    .collection("chatRoom").document(mRoomId)
+//                    .collection("chatContent").add(chat)
+//                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                        @Override
+//                        public void onSuccess(DocumentReference documentReference) {
+//                            fs.collection("hospital").document(mHid)
+//                                    .collection("chatRoom").document(mRoomId)
+//                                    .collection("chatContent").document(documentReference.getId())
+//                                    .update("cid", documentReference.getId());
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                        }
+//                    });
             mEditChat.setText("");
         }
     }

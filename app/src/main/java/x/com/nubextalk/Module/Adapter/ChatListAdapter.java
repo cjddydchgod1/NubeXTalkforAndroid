@@ -79,7 +79,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewItemHolder) {
-            String dataPattern = "yyyy년 MM월 dd일 HH:mm";
+            String dataPattern = "yyyy-MM-dd'T'HH:mm:ss";
             ViewItemHolder mHolder = (ViewItemHolder) holder;
             ChatContent lastContent;
 
@@ -233,7 +233,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         String rid = mDataset.get(position).getRid();
         User myAccount = (User) User.getMyAccountInfo(realm);
         RealmResults<ChatRoomMember> users = ChatRoom.getChatRoomUsers(realm, rid);
-        Log.d("CHATROOM", "멤버수: " + users.size());
         if (users.size() == 2) { // 1 대 1 채팅방인 경우
             for (ChatRoomMember user : users) {
                 if (!user.getUid().equals(myAccount.getUserId())) {

@@ -32,25 +32,32 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.UploadTask;
 import com.joanzapata.iconify.widget.IconButton;
 
+import org.json.JSONArray;
 import org.jsoup.select.Evaluator;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import x.com.nubextalk.Manager.DateManager;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -421,23 +428,17 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         if ((content = String.valueOf(mEditChat.getText())).equals("")) {
             aq.toast("메세지를 입력하세요");
         } else {
-
             Date date = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
-
-
-//          채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA); //시간대 한국으로 설정해줘야함
+            //채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
             ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
             Date roomUpdateDate = roomInfo.getUpdatedDate();
 
-            //서버에 채팅방 업데이트 시간 업뎃
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .update("updatedDate", simpleDateFormat.format(date));
-
             Map<String, Object> chat = new HashMap<>();
-            chat.put("cid", null);
+            String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
+            chat.put("cid", cid);
             chat.put("uid", mUid);
+            chat.put("rid", mRoomId);
             chat.put("content", content);
             chat.put("sendDate", simpleDateFormat.format(date));
             chat.put("type", "0");
@@ -445,26 +446,59 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 chat.put("isFirst", "false");
             } else {
                 chat.put("isFirst", "true");
-
             }
-            //서버에 채팅 추가
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .collection("chatContent").add(chat)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
+
+            //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
+            if(realm.where(ChatContent.class).equalTo("rid",mRoomId).findAll().isEmpty()){
+                //realm 채팅 생성
+                ChatContent.createChat(realm, chat);
+                Log.d("CHATROOM", "채팅방 서버에 생성한다잉 ");
+                Map<String, Object> chatRoomData = new HashMap<>();
+                RealmResults<ChatRoomMember> chatRoomMember = ChatRoom.getChatRoomUsers(realm, mRoomId);
+                JSONArray chatRoomMemberJsonArray = new JSONArray();
+                for( ChatRoomMember member : chatRoomMember ) {
+                    chatRoomMemberJsonArray.put(member.getUid());
+                }
+                chatRoomData.put("hospital", mHid);
+                chatRoomData.put("chatRoomId", mRoomId);
+                chatRoomData.put("members", chatRoomMemberJsonArray);
+                chatRoomData.put("title", roomInfo.getRoomName());
+                chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
+                chatRoomData.put("notificationId", roomInfo.getNotificationId());
+                FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+                    //서버에 채팅방 생성 만드는게 성공하면 서버에 채팅메세지 추가
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                        if(task.isComplete()){
+                            Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
                             fs.collection("hospital").document(mHid)
                                     .collection("chatRoom").document(mRoomId)
-                                    .collection("chatContent").document(documentReference.getId())
-                                    .update("cid", documentReference.getId());
+                                    .collection("chatContent").document(cid)
+                                    .set(chat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("CHATROOM", "서버에 채팅 생성 완료!");
+                                }
+                            });
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                        }
-                    });
+                    }
+                });
+            } else {
+                //realm 채팅 생성
+                ChatContent.createChat(realm, chat);
+
+                //서버에 채팅 추가
+                fs.collection("hospital").document(mHid)
+                        .collection("chatRoom").document(mRoomId)
+                        .collection("chatContent").document(cid)
+                        .set(chat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("CHATROOM", "서버에 채팅 생성 완료!");
+                    }
+                });
+            }
+
             mEditChat.setText("");
         }
     }

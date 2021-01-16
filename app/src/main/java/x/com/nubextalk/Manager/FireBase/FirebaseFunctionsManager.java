@@ -5,6 +5,8 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Continuation;
@@ -64,91 +66,42 @@ public class FirebaseFunctionsManager {
                 .call(params);
     }
 
-    public static Task<HttpsCallableResult> createChatRoom(String token, Map value) {
-        return createChatRoom(token, value, null);
+    /**
+     * Firebase Functions 통해 FireStore에 채팅방 생성
+     * @param data 채팅방 생성 데이터 Map
+     * @return
+     */
+    public static Task<HttpsCallableResult> createChatRoom(@NonNull Map data) {
+        return createChatRoom(data, null);
     }
 
-
-    public static Task<HttpsCallableResult> createChatRoom(String token, Map value, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> createChatRoom(@NonNull Map data, OnCompleteListsner onCompleteListsner) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
-
         Map<String, Object> params = new HashMap<>();
-        params.put("token", token);
-        params.put("hospital", value.get("hospital"));
-        params.put("members", value.get("members"));
-        params.put("title", value.get("title"));
-        params.put("roomImgUrl", value.get("roomImgUrl"));
+        params.put("hospital", data.get("hospital"));
+        params.put("chatRoomId", data.get("chatRoomId"));
+        params.put("members", data.get("members"));
+        params.put("title", data.get("title"));
+        params.put("roomImgUrl", data.get("roomImgUrl"));
+        params.put("notificationId", data.get("notificationId"));
 
-        return functions.getHttpsCallable(FUNCTION_CREATE_CHAT_ROOM)
-                .call(params)
-                .continueWith(new Continuation<HttpsCallableResult, HttpsCallableResult>() {
-                                  @Override
-                                  public HttpsCallableResult then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                                      if (task.isSuccessful()) {
-                                          Gson gson = new Gson();
-                                          JSONObject result = new JSONObject(gson.toJson(task.getResult().getData()));
-                                          Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
-                                          realm.executeTransaction(new Realm.Transaction() {
-                                              @Override
-                                              public void execute(Realm realm) {
-                                                  try {
-                                                      String rid = result.getString("rid");
-                                                      ChatRoom chatRoom = gson.fromJson(result.toString(), ChatRoom.class);
-                                                      realm.copyToRealmOrUpdate(chatRoom);
+        return functions
+                .getHttpsCallable(FUNCTION_CREATE_CHAT_ROOM)
+                .call(params);
 
-                                                  } catch (JSONException e) {
-                                                      e.printStackTrace();
-                                                  }
-
-                                              }
-                                          });
-                                          String rid = result.getString("rid");
-                                          ArrayList<String> memberIdList = new ArrayList<String>();
-                                          for (int i = 0; i < result.getJSONArray("roomMemberId").length(); i++) {
-                                              memberIdList.add(result.getJSONArray("roomMemberId").getString(i));
-                                          }
-                                          for (int i = 0; i < memberIdList.size(); i++) {
-                                              int finalI = i;
-                                              realm.executeTransaction(new Realm.Transaction() {
-                                                  @Override
-                                                  public void execute(Realm realm) {
-                                                      ChatRoomMember chatRoomMember = new ChatRoomMember();
-                                                      chatRoomMember.setRid(rid);
-                                                      chatRoomMember.setUid(memberIdList.get(finalI));
-                                                      realm.copyToRealm(chatRoomMember);
-                                                  }
-                                              });
-                                          }
-                                          if(memberIdList.size() == 2 && value.get("title").toString().length() == 0) { // 1:1 채팅방일 때
-                                              realm.executeTransaction(new Realm.Transaction() {
-                                                  @Override
-                                                  public void execute(Realm realm) {
-                                                      String myId = Config.getMyUID(realm);
-                                                      String anotherId = "";
-                                                      for(String id : memberIdList){
-                                                          if(!id.equals(myId)){
-                                                              anotherId = id;
-                                                          }
-                                                      }
-                                                      User anotherUser = realm.where(User.class).equalTo("userId", anotherId).findFirst();
-                                                      ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-                                                      chatRoom.setRoomName(anotherUser.getAppName());
-                                                      realm.copyToRealmOrUpdate(chatRoom);
-                                                  }
-                                              });
-                                          }
-                                      }
-                                      return null;
-                                  }
-                              }
-                );
     }
 
-    public static Task<HttpsCallableResult> getChatRoom(String hospitalId, String chatRoomId) {
+    /**
+     * Firbase Functions 통해 FireStore 에서 채팅방 가져오기
+     * @param hospitalId 병원 id
+     * @param chatRoomId 채팅방 id
+     * @return FireStore 채팅방 데이
+     */
+    public static Task<HttpsCallableResult> getChatRoom(@NonNull String hospitalId, @NonNull String chatRoomId) {
         return getChatRoom(hospitalId, chatRoomId, null);
     }
 
-    public static Task<HttpsCallableResult> getChatRoom(String hospitalId, String chatRoomId, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> getChatRoom(@NonNull String hospitalId, @NonNull String chatRoomId, OnCompleteListsner onCompleteListsner) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
         params.put("hospitalId", hospitalId);
@@ -156,78 +109,26 @@ public class FirebaseFunctionsManager {
 
         return functions
                 .getHttpsCallable(FUNCTION_GET_CHAT_ROOM)
-                .call(params)
-                .continueWith(new Continuation<HttpsCallableResult, HttpsCallableResult>() {
-                    @Override
-                    public HttpsCallableResult then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        if (task.isSuccessful()) {
-                            Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
-                            Gson gson = new Gson();
-                            JSONObject result = new JSONObject(gson.toJson(task.getResult().getData()));
-                            realm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    try {
-                                        ChatRoom chatRoom = gson.
-                                                fromJson(result.getJSONObject("chatRoom").toString(), ChatRoom.class);
-                                        realm.copyToRealmOrUpdate(chatRoom);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                            });
-                            String rid = result.getJSONObject("chatRoom").getString("rid");
-                            ArrayList<String> memberIdList = new ArrayList<String>();
-                            for (int i = 0; i < result.getJSONArray("chatRoomMember").length(); i++) {
-                                memberIdList.add(result.getJSONArray("chatRoomMember").getString(i));
-                            }
-                            for (int i = 0; i < memberIdList.size(); i++) {
-                                int finalI = i;
-                                realm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        ChatRoomMember chatRoomMember = new ChatRoomMember();
-                                        chatRoomMember.setRid(rid);
-                                        chatRoomMember.setUid(memberIdList.get(finalI));
-                                        realm.copyToRealm(chatRoomMember);
-                                    }
-                                });
-                            }
-                            if(memberIdList.size() == 2 && 
-                                    result.getJSONObject("chatRoom").getString("roomName").length() == 0) { // 1:1 채팅방일 때
-                                realm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        String myId = Config.getMyUID(realm);
-                                        String anotherId = "";
-                                        for(String id : memberIdList){
-                                            if(!id.equals(myId)){
-                                                anotherId = id;
-                                            }
-                                        }
-                                        User anotherUser = realm.where(User.class).equalTo("userId", anotherId).findFirst();
-                                        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-                                        chatRoom.setRoomName(anotherUser.getAppName());
-                                        realm.copyToRealmOrUpdate(chatRoom);
-                                    }
-                                });
-                            }
-                            return task.getResult();
-                        }
-                        return null;
-                    }
-                });
+                .call(params);
     }
 
-    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(Map value) {
-        return notifyToChatRoomAddedUser(value, null);
+    /**
+     * 기존 채팅방에서 새로운 유저들이 추가되면 해당 유저들에게 fcm 메세지 보내는 함수
+     * @param data 병원 id, 유저들 userId, 채팅방 id 가 담긴 데이터 Map
+     * @return
+     */
+    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(@NonNull Map data) {
+        return notifyToChatRoomAddedUser(data, null);
     }
 
-    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(Map value, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(@NonNull Map data, OnCompleteListsner onCompleteListsner) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        Map<String, Object> params = new HashMap<>();
+        params.put("hospitalId", data.get("hospitalId"));
+        params.put("membersId", data.get("membersId"));
+        params.put("chatRoomId", data.get("chatRoomId"));
         return functions
                 .getHttpsCallable("notifyToChatRoomAddedUser")
-                .call(value);
+                .call(params);
     }
 }

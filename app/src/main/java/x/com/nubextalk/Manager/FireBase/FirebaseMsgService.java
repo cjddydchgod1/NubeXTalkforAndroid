@@ -116,7 +116,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         Map<String, String> data = remoteMessage.getData();
         Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date"));
         switch (data.get("CODE")) {
-
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("uid", data.get("senderId"));
@@ -132,8 +131,9 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 type = Integer.parseInt(data.get("contentType"));
                 content = data.get("content");
 
-                // 채팅방이 없으면 먼저 realm 에 생성
+                // 채팅방이 없으면 먼저 FireStore에서 채팅방 불러오고 realm 에 채팅방 생성
                 if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
+                    //Firebase Functions 함수의 getChatRoom 함수 호출을 통해 FireStore 에 있는 채팅방 데이터 불러옴
                     FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
                             .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                                 @Override
@@ -141,6 +141,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                     Gson gson = new Gson();
                                     Map<String, Object> value = new HashMap<>();
                                     try {
+                                        // realm ChatRoom 데이터 초기화
                                         Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
                                         JSONObject result = new JSONObject(gson.toJson(httpsCallableResult.getData()));
                                         value.put("rid", rid);
@@ -153,8 +154,11 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                             userIdList.add(result.getJSONArray("chatRoomMember").getString(i));
                                         }
 
+                                        // realm ChatRoom, ChatContent 생성
                                         ChatRoom.createChatRoom(realm1, value, userIdList);
                                         ChatContent.createChat(realm1, payload);
+
+                                        // 알림 설정
                                         if (!Config.getMyUID(realm1).equals(uid)) {
                                             int channelId = Integer.parseInt(realm1.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
                                             makeChannel(CHANNEL_ID);
@@ -165,16 +169,16 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                     }
                                 }
                             });
-                } else {
+                } else { // 기존 realm 에 채팅방이 있는 경우에는 ChatContent 만 생성
                     ChatContent.createChat(realm, payload);
+
+                    // 알림 설정
                     if (!Config.getMyUID(realm).equals(uid)) {
                         int channelId = Integer.parseInt(realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
                         makeChannel(CHANNEL_ID);
                         notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
                     }
                 }
-
-
                 break;
             case "CHAT_ROOM_INVITED":
                 Log.d("TOKEN", "room invited!!");

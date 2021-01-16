@@ -66,17 +66,16 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm realm) {
-                mAdapter.notifyDataSetChanged();
-                mAdapter.sortChatRoomByDate();
+                refreshChatList();
             }
         });
 
         fab_main = rootView.findViewById(R.id.chat_fab_main);
         fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
         fab_sub2 = rootView.findViewById(R.id.chat_fab_sub2);
-        fab_main.setOnClickListener(this::onClick);
-        fab_sub1.setOnClickListener(this::onClick);
-        fab_sub2.setOnClickListener(this::onClick);
+        fab_main.setOnClickListener(this);
+        fab_sub1.setOnClickListener(this);
+        fab_sub2.setOnClickListener(this);
 
         return rootView;
     }
@@ -91,23 +90,16 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     }
 
     /**
-     * 채팅 목록에서 채팅 꾹 눌렀을 떄 이벤트
+     * 채팅방 목록 중 아이템 하나 꾹 눌렀을 떄 이벤트
      */
     @Override
     public void onItemLongSelected(ChatRoom chatRoom) {
-        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "나가기"};
         boolean fixTop = chatRoom.getSettingFixTop();
         boolean alarm = chatRoom.getSettingAlarm();
 
-        if (alarm) {
-            menuArray[0] = menuArray[0].concat(" 해제");
-        } else {
-            menuArray[0] = menuArray[0].concat(" 켜기");
-        }
-
-        if (fixTop) {
-            menuArray[2] = menuArray[2].concat(" 해제");
-        }
+        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "나가기"};
+        menuArray[0] = alarm ? menuArray[0].concat(" 해제") : menuArray[0].concat(" 켜기");
+        menuArray[2] = fixTop ? menuArray[2].concat(" 해제") : "상단 고정";
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("채팅방 설정")
@@ -115,19 +107,19 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                     @Override
                     public void onClick(DialogInterface dialog, int pos) {
                         switch (pos) {
-                            case 0: /**채팅방 알림 설정 이벤트 구현**/
+                            case 0: /**채팅방 알림 설정 이벤트**/
                                 updateChatRoomAlarm(chatRoom);
                                 refreshChatList();
                                 break;
-                            case 1: /**대화상대 추가 이벤트 구현**/
+                            case 1: /**대화상대 추가 이벤트**/
                                 startActivity(new Intent(getContext(), AddChatMemberActivity.class)
                                         .putExtra("rid", chatRoom.getRid()));
                                 break;
-                            case 2: /**채팅방 상단 고정 이벤트 구현**/
+                            case 2: /**채팅방 상단 고정 이벤트**/
                                 updateChatRoomFixTop(chatRoom);
                                 refreshChatList();
                                 break;
-                            case 3: /**채팅방 나가기 이벤트 구현**/
+                            case 3: /**채팅방 나가기 이벤트**/
                                 ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
                                 refreshChatList();
                                 break;
@@ -164,6 +156,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         }
     }
 
+    /**
+     * 채팅방 목록 상단고정 realm 설정 및 해제
+     * @param chatRoom
+     */
     public void updateChatRoomFixTop(ChatRoom chatRoom) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -175,6 +171,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         });
     }
 
+    /**
+     * 채팅방 목록 알림 realm 설정 및 해제
+     * @param chatRoom
+     */
     public void updateChatRoomAlarm(ChatRoom chatRoom) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -186,6 +186,9 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         });
     }
 
+    /**
+     * 채팅목록 리싸이클러뷰 데이터 재설정
+     */
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
         mAdapter.sortChatRoomByDate();

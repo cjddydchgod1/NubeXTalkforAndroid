@@ -37,10 +37,10 @@ import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
 public class AddChatMemberActivity extends AppCompatActivity implements
         ChatAddSearchAdapter.OnItemSelectedListner, View.OnClickListener {
     private Realm realm;
-    private RealmSearchView realmSearchView;
+    private RealmSearchView realmMemberSearchView;
     private RecyclerView selectedMemberView;
-    private ChatAddSearchAdapter mAdapter;
-    private ChatAddMemberAdapter memberAdapter;
+    private ChatAddSearchAdapter realmSearchAdapter;
+    private ChatAddMemberAdapter selectedMemberAdapter;
     private ArrayList<User> userList = new ArrayList<User>();
     private Button chatAddConfirmButton;
     private Button chatAddCancelButton;
@@ -56,7 +56,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         chatRoomId = intent.getExtras().getString("rid");
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        realmSearchView = findViewById(R.id.add_chat_member_search_view);
+        realmMemberSearchView = findViewById(R.id.add_chat_member_search_view);
         selectedMemberView = findViewById(R.id.add_chat_member_added_view);
 
         chatAddConfirmButton = findViewById(R.id.add_chat_confirm_btn);
@@ -64,15 +64,15 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         chatAddConfirmButton.setOnClickListener(this);
         chatAddCancelButton.setOnClickListener(this);
 
-        mAdapter = new ChatAddSearchAdapter(this, realm, "name");
-        mAdapter.setItemSelectedListener(this);
-        realmSearchView.setAdapter(mAdapter);
+        realmSearchAdapter = new ChatAddSearchAdapter(this, realm, "name");
+        realmSearchAdapter.setItemSelectedListener(this);
+        realmMemberSearchView.setAdapter(realmSearchAdapter);
 
-        memberAdapter = new ChatAddMemberAdapter(this, userList);
+        selectedMemberAdapter = new ChatAddMemberAdapter(this, userList);
         selectedMemberView.
                 setLayoutManager(new LinearLayoutManager(
                         this, LinearLayoutManager.HORIZONTAL, false));
-        selectedMemberView.setAdapter(memberAdapter);
+        selectedMemberView.setAdapter(selectedMemberAdapter);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class AddChatMemberActivity extends AppCompatActivity implements
     @Override
     public void onItemSelected(User user) {
         String userName = user.getAppName();
-        memberAdapter.addItem(user);
-        memberAdapter.notifyDataSetChanged();
+        selectedMemberAdapter.addItem(user);
+        selectedMemberAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -112,14 +112,21 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         }
     }
 
-    public boolean addChatMember(String chatRoomId) {
+    /**
+     * 기존 대화방 ChatRoom 에서 선택된 사용자들 추가
+     *
+     * @param chatRoomId
+     * @return
+     */
+    private boolean addChatMember(String chatRoomId) {
         String hospital = "w34qjptO0cYSJdAwScFQ";
-        ArrayList<User> selectedUser = memberAdapter.getUserList();
+        ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
         FirebaseFirestore fs = FirebaseFirestore.getInstance();
 
         try {
             for (User user : selectedUser) {
                 Map<String, Object> data = new HashMap<>();
+                //FireStore 에 해당 채팅방에 사용자 추가
                 fs.collection("hospital").document(hospital)
                         .collection("chatRoom").document(chatRoomId)
                         .collection("chatRoomMember")
@@ -127,19 +134,17 @@ public class AddChatMemberActivity extends AppCompatActivity implements
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Log.d("ADD_CHAT_MEMBER", "success");
+                                // FireStore 채팅방에 사용자 추가 후 해당 사용자들에게 fcm 메세지로 알림. 근데 이건 필요 없는 것 같음...
+                                Map<String, Object> data = new HashMap<>();
+                                JSONArray jsonArray = new JSONArray();
+                                jsonArray.put(user.getUserId());
+                                data.put("hospitalId", hospital);
+                                data.put("membersId", jsonArray);
+                                data.put("chatRoomId", chatRoomId);
+                                FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
                             }
                         });
             }
-            Map<String, Object> data = new HashMap<>();
-            JSONArray jsonArray = new JSONArray();
-            for(User user : selectedUser){
-                jsonArray.put(user.getCode());
-            }
-            data.put("hospitalId", hospital);
-            data.put("membersId", jsonArray);
-            data.put("chatRoomId", chatRoomId);
-            FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

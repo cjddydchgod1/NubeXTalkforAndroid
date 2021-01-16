@@ -132,14 +132,22 @@ public class ChatRoom extends RealmObject {
         return realm.where(ChatRoom.class).findAll();
     }
 
+    /**
+     * realm ChatRoom 과 ChatRoomMember 생성
+     *
+     * @param realm
+     * @param data 채팅방 생성을 위한 데이터 Map
+     * @param userList 채팅방 참여 사용자 (userId) 가 담긴 ArrayList
+     */
     public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList) {
         User myAccount = (User) User.getMyAccountInfo(realm);
 
-//        userList.add(myAccount);
+        // userList 에 자신의 아이디 추가
         if(!userList.contains(myAccount.getUserId())){
             userList.add(myAccount.getUserId());
         }
 
+        // 채팅방 데이터 필드 초기화
         Date newDate = new Date();
         String rid = data.get("rid") == null ? myAccount.getUserId().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString();
         String roomName = data.get("title") == null ? "" : data.get("title").toString();
@@ -165,7 +173,9 @@ public class ChatRoom extends RealmObject {
 
         String finalRoomName = roomName;
         String finalRoomImg = roomImg;
-        realm.executeTransactionAsync(new Realm.Transaction() { //realm 로컬 채팅방 생성
+
+        //realm 로컬 채팅방 생성
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
                 ChatRoom chatRoom = new ChatRoom();
@@ -177,7 +187,9 @@ public class ChatRoom extends RealmObject {
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });
-        for (String userId : userList) { //ChatRoomMember 모델에 채팅유저 생성
+
+        //ChatRoomMember 모델에 채팅유저 생성
+        for (String userId : userList) {
             User user = realm.where(User.class).equalTo("userId", userId).findFirst();
             realm.beginTransaction();
             ChatRoomMember chatRoomMember = new ChatRoomMember();
@@ -188,6 +200,12 @@ public class ChatRoom extends RealmObject {
         }
     }
 
+    /**
+     * realm ChatRoom, ChatContent, ChatRoomMember 모두 삭제
+     *
+     * @param realm
+     * @param rid 채팅방 rid
+     */
     public static void deleteChatRoom(Realm realm, String rid) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -202,6 +220,13 @@ public class ChatRoom extends RealmObject {
         });
     }
 
+    /**
+     * 채팅방 참여 사용자를 반환
+     *
+     * @param realm
+     * @param rid 채팅방 rid
+     * @return RealmResults
+     */
     public static RealmResults<ChatRoomMember> getChatRoomUsers(Realm realm, String rid) {
         return realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
 

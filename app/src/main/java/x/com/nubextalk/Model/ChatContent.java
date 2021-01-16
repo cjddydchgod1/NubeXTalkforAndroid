@@ -112,6 +112,11 @@ public class ChatContent extends RealmObject {
         return realm.where(ChatContent.class).findAll();
     }
 
+    /**
+     * realm ChatContent 생성 함수
+     * @param realm
+     * @param data 채팅 메세지 생성을 위한 데이터 Map
+     */
     public static void createChat(Realm realm, Map data) {
         User myAccount = (User) User.getMyAccountInfo(realm);
         Date newDate = new Date();

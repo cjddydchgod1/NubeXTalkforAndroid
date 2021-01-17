@@ -41,6 +41,7 @@ public class ChatRoom extends RealmObject {
     @NonNull
     private Date updatedDate;
     private String notificationId;
+    private String lastChatContentId;
 
     @NonNull
     public String getRid() {
@@ -102,6 +103,14 @@ public class ChatRoom extends RealmObject {
         this.updatedDate = updatedDate;
     }
 
+    public String getLastChatContentId() {
+        return lastChatContentId;
+    }
+
+    public void setLastChatContentId(@NonNull String lastChatContentId) {
+        this.lastChatContentId = lastChatContentId;
+    }
+
     /**
      * Data 초기화 함수
      *
@@ -156,6 +165,7 @@ public class ChatRoom extends RealmObject {
                 ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
         String notificationId = data.get("notificationId") == null
                 ? String.valueOf(newDate.hashCode()) : data.get("notificationId").toString();
+        String lastChatContentId = data.get("lastChatContentId") == null ? "" : data.get("lastChatContentId").toString();
 
         if (userList.size() == 2) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
             for (String userId : userList) {
@@ -184,6 +194,7 @@ public class ChatRoom extends RealmObject {
                 chatRoom.setRoomImg(finalRoomImg);
                 chatRoom.setUpdatedDate(updatedDate);
                 chatRoom.setNotificationId(notificationId);
+                chatRoom.setLastChatContentId(lastChatContentId);
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });

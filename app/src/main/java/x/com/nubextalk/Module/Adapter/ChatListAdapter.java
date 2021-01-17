@@ -86,9 +86,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", roomId).findFirst();
             int roomMemberCount = ChatRoom.getChatRoomUsers(realm, roomId).size();
             String roomImgUrl = mDataset.get(position).getRoomImg();
-            ChatContent lastContent = realm.where(ChatContent.class) // 이 방식은 나중에 채팅 메세지가 많아지면 별로 좋은 방법이 아니므로 ChatRoom 에 lastContentId 를 넣는건 어떨
-                    .equalTo("rid", roomId)
-                    .sort("sendDate", Sort.DESCENDING).findFirst();
+//            ChatContent lastContent = realm.where(ChatContent.class) // 이 방식은 나중에 채팅 메세지가 많아지면 별로 좋은 방법이 아니므로 ChatRoom 에 lastContentId 를 넣는건 어떨
+//                    .equalTo("rid", roomId)
+//                    .sort("sendDate", Sort.DESCENDING).findFirst();
+            String lastChatContentId = chatRoom.getLastChatContentId();
+            ChatContent lastContent = realm.where(ChatContent.class)
+                    .equalTo("cid", lastChatContentId).findFirst();
 
             //채팅방 목록 사진 설정
             if (URLUtil.isValidUrl(roomImgUrl)) {

@@ -147,6 +147,7 @@ public class ChatContent extends RealmObject {
                 realm.copyToRealmOrUpdate(chatContent);
                 ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                 chatRoom.setUpdatedDate(sendDate);
+                chatRoom.setLastChatContentId(cid);
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });

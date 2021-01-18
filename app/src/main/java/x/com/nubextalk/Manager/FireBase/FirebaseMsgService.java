@@ -209,8 +209,13 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
         User userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
 
-        Bitmap userProfileImg = getImageFromURL(userInfo.getAppImagePath());
-
+        Bitmap largeIcon;
+        if(userInfo != null) {
+             largeIcon = getImageFromURL(userInfo.getAppImagePath());
+        }
+        else{
+            largeIcon = getImageFromURL(roomInfo.getRoomImg());
+        }
         Intent intent = new Intent(this, ChatRoomActivity.class);
         intent.putExtra("rid", rid);
 
@@ -218,7 +223,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
         builder.setSmallIcon(R.drawable.nube_x_logo)
                 .setContentTitle(roomInfo.getRoomName())
-                .setLargeIcon(userProfileImg)
+                .setLargeIcon(largeIcon)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setChannelId(CHANNEL_ID)
                 .setAutoCancel(true)

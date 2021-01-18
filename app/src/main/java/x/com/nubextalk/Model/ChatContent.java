@@ -35,7 +35,7 @@ public class ChatContent extends RealmObject {
     private Boolean isRead = false;
 
     @NonNull
-    private Boolean isFirst = false;
+    private Boolean isFirst;
 
     @NonNull
     public String getCid() {

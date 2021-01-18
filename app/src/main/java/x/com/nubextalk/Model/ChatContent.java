@@ -129,7 +129,6 @@ public class ChatContent extends RealmObject {
         Integer type = Integer.parseInt(data.get("type").toString());
         Date sendDate = data.get("sendDate") == null
                 ? newDate : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
-        Boolean isFirst = Boolean.parseBoolean(data.get("isFirst").toString());
         Boolean isRead = myAccount.getUserId().equals(uid) ? true : false;
 
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -143,7 +142,6 @@ public class ChatContent extends RealmObject {
                 chatContent.setType(type);
                 chatContent.setSendDate(sendDate);
                 chatContent.setIsRead(isRead);
-                chatContent.setFirst(isFirst);
                 realm.copyToRealmOrUpdate(chatContent);
                 ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                 chatRoom.setUpdatedDate(sendDate);

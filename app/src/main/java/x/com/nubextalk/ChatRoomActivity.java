@@ -53,6 +53,7 @@ import java.util.Map;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
@@ -118,6 +119,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+        mChat = mChat.sort("sendDate", Sort.ASCENDING);
         setChatContentRead(mChat);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴

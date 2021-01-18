@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-
+import io.realm.Sort;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.Config;
@@ -39,7 +39,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context mContext;
     private String mUid;
 
-    public ChatAdapter(Context context, RealmResults<ChatContent>  mChatLog) {
+    public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog) {
         this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
 
         this.mInflater = LayoutInflater.from(context);
@@ -51,24 +51,22 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == 0){
+        if (viewType == 0) {
             View mItemView = mInflater.inflate(R.layout.item_chat, parent, false);
             return new ChatViewHolder(mItemView, this);
-        }
-        else if(viewType == 1){
+        } else if (viewType == 1) {
             View mItemView = mInflater.inflate(R.layout.item_chat_media, parent, false);
             return new ChatMediaViewHolder(mItemView, this);
-        }
-        else{
-            View mItemView = mInflater.inflate(R.layout.item_chat_system,parent,false);
-            return new ChatSystemViewHolder(mItemView,this);
+        } else {
+            View mItemView = mInflater.inflate(R.layout.item_chat_system, parent, false);
+            return new ChatSystemViewHolder(mItemView, this);
         }
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatContent chat = mChatData.get(position);
-        if(chat.getContent() == null){
+        if (chat.getContent() == null) {
             return;
         }
         String uid = chat.getUid();
@@ -79,20 +77,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         SimpleDateFormat formatChatDate = new SimpleDateFormat("yyyy.MM.dd (E)");
 
         String sendTime = formatChatTime.format(chat.getSendDate());
-        String sendDate =formatChatDate.format(chat.getSendDate());
+        String sendDate = formatChatDate.format(chat.getSendDate());
 
-        if(chat.getType() == 0){
+        if (chat.getType() == 0) {
             ChatViewHolder cvHolder = (ChatViewHolder) holder;
-            if(chat.getFirst()){
+            if (chat.getFirst()) {
                 cvHolder.date.setText(sendDate);
                 cvHolder.date.setVisibility(View.VISIBLE);
-            }
-            else{
+            } else {
                 cvHolder.date.setVisibility(View.GONE);
             }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
-            if(chat.getUid().equals(this.mUid)){
+            if (chat.getUid().equals(this.mUid)) {
                 cvHolder.my_chat_text.setText(chat.getContent());
                 cvHolder.my_time.setText(sendTime);
 
@@ -119,17 +116,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cvHolder.my_chat_text.setVisibility(View.GONE);
                 cvHolder.my_time.setVisibility(View.GONE);
             }
-        }
-        else if(chat.getType() == 1){
+        } else if (chat.getType() == 1) {
             ChatMediaViewHolder cmvHolder = (ChatMediaViewHolder) holder;
-            if(chat.getFirst()){
+            if (chat.getFirst()) {
                 cmvHolder.date.setText(sendDate);
                 cmvHolder.date.setVisibility(View.VISIBLE);
-            }
-            else{
+            } else {
                 cmvHolder.date.setVisibility(View.GONE);
             }
-            if(chat.getUid().equals(mUid)){
+            if (chat.getUid().equals(mUid)) {
                 cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
                 cmvHolder.my_time.setText(sendTime);
                 cmvHolder.my_chat_image.setVisibility(View.VISIBLE);
@@ -152,14 +147,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cmvHolder.my_chat_image.setVisibility(View.GONE);
                 cmvHolder.my_time.setVisibility(View.GONE);
             }
-        }
-        else{
+        } else {
             ChatSystemViewHolder csvHolder = (ChatSystemViewHolder) holder;//채팅방 내용이 없으면 그냥 만들면 first == true 일듯
-            if(chat.getFirst()){
+            if (chat.getFirst()) {
                 csvHolder.date.setText(sendDate);
                 csvHolder.date.setVisibility(View.VISIBLE);
-            }
-            else{
+            } else {
                 csvHolder.date.setVisibility(View.GONE);
             }
             csvHolder.chat_system.setText(chat.getContent());
@@ -170,24 +163,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         return mChatData.size();
     }
+
     @Override
-    public int getItemViewType(int position){
+    public int getItemViewType(int position) {
         ChatContent chat = mChatData.get(position);
         int type = chat.getType();
-        if(type == 0){
+        if (type == 0) {
             return 0;
-        }
-        else if(type == 1){
+        } else if (type == 1) {
             return 1;
-        }
-        else{
+        } else {
             return 9;
         }
     }
 
-    public void update(RealmResults<ChatContent> data) {
-        this.mChatData = data;
+    public void update() {
         notifyDataSetChanged();
+        this.mChatData = this.mChatData.sort("sendDate", Sort.ASCENDING);
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
@@ -201,10 +193,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView date;
         final ChatAdapter mAdapter;
 
-        private AQuery aq ;
+        private AQuery aq;
 
 
-        public ChatViewHolder(@NonNull View itemView, ChatAdapter mAdapter){
+        public ChatViewHolder(@NonNull View itemView, ChatAdapter mAdapter) {
             super(itemView);
             aq = new AQuery(itemView.getContext(), itemView);
 
@@ -220,6 +212,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.mAdapter = mAdapter;
         }
     }
+
     public static class ChatMediaViewHolder extends RecyclerView.ViewHolder {
         public ImageView profileImage;
         public TextView profileName;
@@ -231,7 +224,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView date;
         final ChatAdapter mAdapter;
 
-        private AQuery aq ;
+        private AQuery aq;
 
         public ChatMediaViewHolder(@NonNull View itemView, ChatAdapter mAdapter) {
             super(itemView);
@@ -248,6 +241,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.mAdapter = mAdapter;
         }
     }
+
     public static class ChatSystemViewHolder extends RecyclerView.ViewHolder {
         public TextView chat_system;
         public TextView date;

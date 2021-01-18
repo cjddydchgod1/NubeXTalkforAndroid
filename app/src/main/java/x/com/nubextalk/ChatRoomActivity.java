@@ -37,17 +37,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.UploadTask;
 import com.joanzapata.iconify.widget.IconButton;
 
 import org.json.JSONArray;
-import org.jsoup.select.Evaluator;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -129,7 +126,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // 버튼 아이콘 설정
         mSendButton.setText("{far-paper-plane 30dp #747475}");
-//        mMediaButton.setText("{far-image 35dp #747475}");
 
         // on click listener 설정
         mSendButton.setOnClickListener(this);
@@ -151,11 +147,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
         drawerTitle.setText(roomTitle);
 
-
         realmChangeListener = new RealmChangeListener() {
             @Override
             public void onChange(Object o) {
-                mAdapter.notifyDataSetChanged();
+                mAdapter.update();
                 if (mAdapter.getItemCount() > 0)
                     mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
             }
@@ -169,30 +164,15 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         km.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
             @Override
             public void onShowSoftKeyboard() {
-//                int keyboardHeight = km.getKeyboardHeight();
-//                Log.d("keyBoard",Integer.toString(keyboardHeight));
-//
-//                //키보드 등장할 때
-//                mRecyclerView.scrollBy(0,987);
                 mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-
             }
         });
         km.setOnHiddenKeyboard(new KeyboardManager.OnHiddenKeyboardListener() {
             @Override
             public void onHiddenSoftKeyboard() {
-//                mRecyclerView.scrollBy(0,-987);
                 mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
             }
         });
-
-//        mDrawerLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
-//             public void onGlobalLayout(){
-//                   int heightDiff = mDrawerLayout.getRootView().getHeight()- mDrawerLayout.getHeight();
-//                   Log.d("dadsasdsdasd",Integer.toString(heightDiff));
-//                }
-//        });
-
     }
 
     private void setChatContentRead(RealmResults<ChatContent> mChat) {
@@ -442,21 +422,16 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             chat.put("content", content);
             chat.put("sendDate", simpleDateFormat.format(date));
             chat.put("type", "0");
-            if (DateManager.isSameDay(date, roomUpdateDate)) {
-                chat.put("isFirst", "false");
-            } else {
-                chat.put("isFirst", "true");
-            }
 
             //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
-            if(realm.where(ChatContent.class).equalTo("rid",mRoomId).findAll().isEmpty()){
+            if (realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll().isEmpty()) {
                 //realm 채팅 생성
                 ChatContent.createChat(realm, chat);
                 Log.d("CHATROOM", "채팅방 서버에 생성한다잉 ");
                 Map<String, Object> chatRoomData = new HashMap<>();
                 RealmResults<ChatRoomMember> chatRoomMember = ChatRoom.getChatRoomUsers(realm, mRoomId);
                 JSONArray chatRoomMemberJsonArray = new JSONArray();
-                for( ChatRoomMember member : chatRoomMember ) {
+                for (ChatRoomMember member : chatRoomMember) {
                     chatRoomMemberJsonArray.put(member.getUid());
                 }
                 chatRoomData.put("hospital", mHid);
@@ -469,7 +444,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                     //서버에 채팅방 생성 만드는게 성공하면 서버에 채팅메세지 추가
                     @Override
                     public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-                        if(task.isComplete()){
+                        if (task.isComplete()) {
                             Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
                             fs.collection("hospital").document(mHid)
                                     .collection("chatRoom").document(mRoomId)

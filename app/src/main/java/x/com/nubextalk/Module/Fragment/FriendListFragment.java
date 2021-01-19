@@ -152,10 +152,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
 //                        User user = new User();
                         User user = realm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
-                        if(user == null)
+                        if(user == null) {
                             user = new User();
+                            user.setCode(jsonObject.getString("code"));
+                        }
                         realm.beginTransaction();
-                        user.setCode(jsonObject.getString("code"));
                         user.setUserId(jsonObject.getString("userid"));
                         user.setLastName(jsonObject.getString("lastname"));
                         user.setTypeCode(jsonObject.getString("typecode"));

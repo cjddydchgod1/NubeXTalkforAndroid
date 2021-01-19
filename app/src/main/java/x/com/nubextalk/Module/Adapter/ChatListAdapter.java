@@ -6,7 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,9 +110,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else {
                     mHolder.lastMsg.setText(lastContent.getContent());
                 }
-
-                String convertedDate = DateManager.convertDate(lastContent.getSendDate(), datePattern);
-                mHolder.time.setText(DateManager.getTimeInterval(convertedDate, datePattern));
+                if (lastContent.getSendDate() != null) {
+                    String convertedDate = DateManager.convertDate(lastContent.getSendDate(), datePattern);
+                    mHolder.time.setText(DateManager.getTimeInterval(convertedDate, datePattern));
+                }
 
             } else { // 채팅방 내용 없는 경우 (주로 처음 새로 만들었을 때)
                 mHolder.lastMsg.setText("");
@@ -215,6 +215,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     /**
      * 채팅방에서 안 읽은 메세지 개수 표시 함수
+     *
      * @param holder
      * @param position
      */

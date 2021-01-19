@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.Config;
@@ -31,12 +32,14 @@ import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    String FINAL_DATE = "9999-12-31 23:59:59";
+
     private Realm realm;
 
     private LayoutInflater mInflater;
+    private Context mContext;
     private User mUserData;
     private RealmResults<ChatContent> mChatData;
-    private Context mContext;
     private String mUid;
 
     public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog) {
@@ -76,8 +79,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         SimpleDateFormat formatChatTime = new SimpleDateFormat("HH:mm");
         SimpleDateFormat formatChatDate = new SimpleDateFormat("yyyy.MM.dd (E)");
 
-        String sendTime = formatChatTime.format(chat.getSendDate());
-        String sendDate = formatChatDate.format(chat.getSendDate());
+        String sendDate;
+        String sendTime;
+
+        if (DateManager.convertDate(chat.getSendDate(), "yyyy-MM-dd HH:mm:ss").equals(FINAL_DATE)) {
+            sendTime = "전송중";
+            sendDate = "";
+        } else {
+            sendTime = formatChatTime.format(chat.getSendDate());
+            sendDate = formatChatDate.format(chat.getSendDate());
+        }
 
         if (chat.getType() == 0) {
             ChatViewHolder cvHolder = (ChatViewHolder) holder;
@@ -247,7 +258,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView date;
 
         final ChatAdapter mAdapter;
-
 
         public ChatSystemViewHolder(@NonNull View itemView, ChatAdapter mAdapter) {
             super(itemView);

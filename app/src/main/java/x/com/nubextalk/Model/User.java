@@ -30,7 +30,7 @@ public class User extends RealmObject {
     private String appStatus; // 상태정보
     private String appName; // 이름
     private String appFcmKey; // FCM key값 저장
-
+    private String appNickName;
     @NonNull
     public String getCode() {
         return code;
@@ -124,5 +124,13 @@ public class User extends RealmObject {
     }
     public static RealmResults<User> getUserlist(Realm realm) {
         return realm.where(User.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();
+    }
+
+    public String getAppNickName() {
+        return appNickName;
+    }
+
+    public void setAppNickName(String appNickName) {
+        this.appNickName = appNickName;
     }
 }

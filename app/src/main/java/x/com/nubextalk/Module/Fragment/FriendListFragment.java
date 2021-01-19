@@ -218,6 +218,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         user.setAppStatus(jsonObject.getString("app_STATUS"));
                         user.setAppName(jsonObject.getString("app_NAME"));
                         user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
+
+                        user.setAppNickName(jsonObject.getString("lastname"));
                         Log.d(TAG, user.getLastName());
                         mUserList.add(user);
                     }
@@ -341,7 +343,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 //            name += myProfile.getNickname();
 //        }
 //        myProfileName.setText(name);
-        myProfileName.setText(myProfile.getAppName());
+        myProfileName.setText(myProfile.getAppNickName());
         switch(myProfile.getAppStatus()) {
             case "1" :
                 aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
@@ -432,7 +434,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 채팅 버튼
         Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
         // 프로필 이름 설정
-        profileName.setText(address.getAppName());
+        profileName.setText(address.getAppNickName());
         // profilestatus
         switch(address.getAppStatus()) {
             case "1" :
@@ -476,18 +478,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         modifyNameButton.setText("수정");
 
         // Nickname 변경
-//        modifyNameButton.setOnClickListener(v -> {
-//            String buttonName = modifyNameButton.getText().toString();
-//            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
-//                modifyNameButton.setText("완료");
-//                profileName.setVisibility(View.GONE);
-//                modifyName.setVisibility(View.VISIBLE);
-//                modifyName.setText(profileName.getText().toString());
-//            } else { // 완료버튼을 눌렀을 경우
-//                updateNickname(address, modifyName.getText().toString());
-//                refreshFragment();
-//            }
-//        });
+        modifyNameButton.setOnClickListener(v -> {
+            String buttonName = modifyNameButton.getText().toString();
+            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
+                modifyNameButton.setText("완료");
+                profileName.setVisibility(View.GONE);
+                modifyName.setVisibility(View.VISIBLE);
+                modifyName.setText(profileName.getText().toString());
+            } else { // 완료버튼을 눌렀을 경우
+                updateNickname(address, modifyName.getText().toString());
+                refreshFragment();
+            }
+        });
 
         // 프로필 사진 변경 (myProfile만 가능)
         modifyImageButton.setOnClickListener(v -> {
@@ -670,13 +672,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         ft.detach(this).attach(this).commit();
     }
 
-//    public void updateNickname(User3 user3, String name) {
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                user3.setNickname(name);
-//                realm.copyToRealmOrUpdate(user3);
-//            }
-//        });
-//    }
+    public void updateNickname(User user, String name) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                user.setAppNickName(name);
+                realm.copyToRealmOrUpdate(user);
+            }
+        });
+    }
 }

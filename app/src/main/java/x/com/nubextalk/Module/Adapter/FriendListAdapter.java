@@ -96,7 +96,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //                name += user.getNickname();
 //            }
 //            profileName.setText(name);
-            profileName.setText(user.getAppName());
+            profileName.setText(user.getAppNickName());
             if(URLUtil.isValidUrl(user.getAppImagePath())){
                 aq.view(profileImage).image(user.getAppImagePath());
                 Log.d(TAG, "valid");

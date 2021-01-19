@@ -22,7 +22,7 @@ public class FirebaseStoreManager {
 
     public void updateUser(String userid, String token) {
         Map<String, Object> data = new HashMap<>();
-        data.put("userid", userid);
+        data.put("uid", userid);
         data.put("fcm", token);
         hospital.collection("users").document(userid).set(data);
     }

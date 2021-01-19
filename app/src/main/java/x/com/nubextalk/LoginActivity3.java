@@ -82,6 +82,15 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                         finish();
                     }
                 });
+//                apiManager.login(id,password);
+//                /**
+//                 * uid, token을 firestore에 올리는 작업
+//                 */
+//                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+//                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+//                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+//                startActivity(intent);
+//                finish();
                 break;
         }
     }

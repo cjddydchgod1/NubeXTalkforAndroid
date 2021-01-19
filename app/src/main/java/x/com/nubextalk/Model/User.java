@@ -101,7 +101,10 @@ public class User extends RealmObject {
     }
 
     public String getAppName() {
-        return appName;
+        if(UtilityManager.checkString(this.appNickName))
+            return this.appNickName;
+        else
+            return appName;
     }
 
     public void setAppName(String appName) {

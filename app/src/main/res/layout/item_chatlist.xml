@@ -21,8 +21,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         app:layout_constraintBottom_toBottomOf="@id/chat_list_chat_picture"
-        app:layout_constraintEnd_toEndOf="@id/chat_list_chat_picture"
-        tools:src="@drawable/oval_status_on" />
+        app:layout_constraintEnd_toEndOf="@id/chat_list_chat_picture" />
 
 
     <TextView

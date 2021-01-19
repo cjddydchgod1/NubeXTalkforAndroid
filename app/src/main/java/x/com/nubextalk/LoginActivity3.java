@@ -35,6 +35,7 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
     private Button mSignUpBtn;
     private Button mSignInBtn;
 
+    private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +53,14 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
 
         mSignUpBtn.setOnClickListener(this);
         mSignInBtn.setOnClickListener(this);
+        /**
+         * Session ID 확인후 자동 로그인
+         */
+        intent = new Intent(getApplicationContext(), MainActivity.class);
+        if(UtilityManager.checkString(Config.getMyAccount(realm).getExt3())) {
+            startActivity(intent);
+            finish();
+        }
     }
 
 
@@ -65,10 +74,8 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.login_sign_in:
                 apiManager = new ApiManager(this, realm);
-//                String id = String.valueOf(mEditId.getText());
-                String id = "han03";
-//                String password = String.valueOf(mEditPassword.getText());
-                String password = "tech1!";
+                String id = String.valueOf(mEditId.getText());
+                String password = String.valueOf(mEditPassword.getText());
                 apiManager.login(id, password, new ApiManager.onApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
@@ -79,11 +86,20 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                         FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
                         firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
 
-                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+
                         startActivity(intent);
                         finish();
                     }
                 });
+//                apiManager.login(id,password);
+//                /**
+//                 * uid, token을 firestore에 올리는 작업
+//                 */
+//                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+//                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+//                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+//                startActivity(intent);
+//                finish();
                 break;
         }
     }

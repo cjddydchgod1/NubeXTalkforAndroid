@@ -35,7 +35,6 @@ public class ApiManager {
         String host = serverInfo == null ? "192.168.3.156" : serverInfo.getExt2();
         String port = serverInfo == null ? "" : serverInfo.getExt3();
         this.CONTEXT_PATH = ssl + host + port;
-
     }
 
     /**
@@ -97,6 +96,25 @@ public class ApiManager {
     }
 
     /**
+     * 서버와 연결하지 않고 사용하는 Login
+     * @param id
+     * @param pwd
+     */
+    public void login(String id, String pwd) {
+        realm.executeTransaction(realm1 -> {
+            Config myAccount = Config.getMyAccount(realm);
+            if(myAccount == null) {
+                myAccount = new Config();
+                myAccount.setCODE("MyAccount");
+                myAccount.setCODE("MyAccount");
+            }
+            myAccount.setExt1(id);
+            myAccount.setExt2(pwd);
+            realm.copyToRealmOrUpdate(myAccount);
+        });
+    }
+
+    /**
      * User 목록 Get
      * @param listener
      */
@@ -128,13 +146,13 @@ public class ApiManager {
         new Protocol(context)
                 .setFormData(formBody)
                 .setSessionId(myAccount.getExt3())
-                .setCallback(new Protocol.onCallback() {
-                    @Override
-                    public void onCallback(Response response, String body) {
-                        if (listener != null) {
-                            listener.onSuccess(response, body);
-                        }
-                    }
+                                         .setCallback(new Protocol.onCallback() {
+                                     @Override
+                                     public void onCallback(Response response, String body) {
+                                         if (listener != null) {
+                                             listener.onSuccess(response, body);
+                                         }
+                                     }
                 })
                 .exec(CONTEXT_PATH + "/app/getEmployeeList");
     }

@@ -40,6 +40,14 @@
         </menu>
     </item>
 
+    <item android:title="채팅방 멤버"
+        android:id="@+id/menu_chat_member">
+        <menu>
+
+        </menu>
+
+    </item>
+
      <item
          android:id="@+id/nav_exit"
          android:title="나가기" />

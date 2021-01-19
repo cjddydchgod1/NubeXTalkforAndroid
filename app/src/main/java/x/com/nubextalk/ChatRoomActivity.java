@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
@@ -31,29 +32,37 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.UploadTask;
 import com.joanzapata.iconify.widget.IconButton;
+
+import org.json.JSONArray;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import x.com.nubextalk.Manager.DateManager;
+import io.realm.Sort;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.KeyboardManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
 //채팅방 액티비티
@@ -74,7 +83,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     private String mRoomId;
     private String mUid;
     private String mHid;
-    private Uri mImageCaptureUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +118,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+        mChat = mChat.sort("sendDate", Sort.ASCENDING);
         setChatContentRead(mChat);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
@@ -118,7 +127,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // 버튼 아이콘 설정
         mSendButton.setText("{far-paper-plane 30dp #747475}");
-//        mMediaButton.setText("{far-image 35dp #747475}");
 
         // on click listener 설정
         mSendButton.setOnClickListener(this);
@@ -140,11 +148,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
         drawerTitle.setText(roomTitle);
 
-
         realmChangeListener = new RealmChangeListener() {
             @Override
             public void onChange(Object o) {
-                mAdapter.notifyDataSetChanged();
+                mAdapter.update();
                 if (mAdapter.getItemCount() > 0)
                     mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
             }
@@ -158,30 +165,15 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         km.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
             @Override
             public void onShowSoftKeyboard() {
-//                int keyboardHeight = km.getKeyboardHeight();
-//                Log.d("keyBoard",Integer.toString(keyboardHeight));
-//
-//                //키보드 등장할 때
-//                mRecyclerView.scrollBy(0,987);
                 mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-
             }
         });
         km.setOnHiddenKeyboard(new KeyboardManager.OnHiddenKeyboardListener() {
             @Override
             public void onHiddenSoftKeyboard() {
-//                mRecyclerView.scrollBy(0,-987);
                 mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
             }
         });
-
-//        mDrawerLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
-//             public void onGlobalLayout(){
-//                   int heightDiff = mDrawerLayout.getRootView().getHeight()- mDrawerLayout.getHeight();
-//                   Log.d("dadsasdsdasd",Integer.toString(heightDiff));
-//                }
-//        });
-
     }
 
     private void setChatContentRead(RealmResults<ChatContent> mChat) {
@@ -307,6 +299,16 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private void setNavigationView(ChatRoom roomInfo) {
         Menu menu = mNavigationView.getMenu();
+        MenuItem item = menu.findItem(R.id.menu_chat_member);
+        SubMenu subMenu = item.getSubMenu();
+
+        RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", mRoomId).findAll();
+
+        int menuId = 2131313;
+        for (ChatRoomMember member : chatRoomMembers) {
+            String userName = realm.where(User.class).equalTo("userId", member.getUid()).findFirst().getAppName();
+            subMenu.add(0, menuId++, 0, userName);
+        }
         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_fix_top)).findViewById(R.id.drawer_switch);
         SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_alarm)).findViewById(R.id.drawer_switch);
 
@@ -407,50 +409,71 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         if ((content = String.valueOf(mEditChat.getText())).equals("")) {
             aq.toast("메세지를 입력하세요");
         } else {
-
             Date date = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
-
-
-//          채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA); //시간대 한국으로 설정해줘야함
+            //채팅목록 최신순 정렬을 위해 ChatRoom updatedDate 갱신
             ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
             Date roomUpdateDate = roomInfo.getUpdatedDate();
 
-            //서버에 채팅방 업데이트 시간 업뎃
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .update("updatedDate", simpleDateFormat.format(date));
-
             Map<String, Object> chat = new HashMap<>();
-            chat.put("cid", null);
+            String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
+            chat.put("cid", cid);
             chat.put("uid", mUid);
+            chat.put("rid", mRoomId);
             chat.put("content", content);
-            chat.put("sendDate", simpleDateFormat.format(date));
             chat.put("type", "0");
-            if (DateManager.isSameDay(date, roomUpdateDate)) {
-                chat.put("isFirst", "false");
-            } else {
-                chat.put("isFirst", "true");
 
-            }
-            //서버에 채팅 추가
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .collection("chatContent").add(chat)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
+            //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
+            if (realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll().isEmpty()) {
+                //realm 채팅 생성
+                ChatContent.createChat(realm, chat);
+                Log.d("CHATROOM", "채팅방 서버에 생성한다잉 ");
+                Map<String, Object> chatRoomData = new HashMap<>();
+                RealmResults<ChatRoomMember> chatRoomMember = ChatRoom.getChatRoomUsers(realm, mRoomId);
+                JSONArray chatRoomMemberJsonArray = new JSONArray();
+                for (ChatRoomMember member : chatRoomMember) {
+                    chatRoomMemberJsonArray.put(member.getUid());
+                }
+                chatRoomData.put("hospital", mHid);
+                chatRoomData.put("chatRoomId", mRoomId);
+                chatRoomData.put("members", chatRoomMemberJsonArray);
+                chatRoomData.put("title", roomInfo.getRoomName());
+                chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
+                chatRoomData.put("notificationId", roomInfo.getNotificationId());
+                FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+                    //서버에 채팅방 생성 만드는게 성공하면 서버에 채팅메세지 추가
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                        if (task.isComplete()) {
+                            Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
                             fs.collection("hospital").document(mHid)
                                     .collection("chatRoom").document(mRoomId)
-                                    .collection("chatContent").document(documentReference.getId())
-                                    .update("cid", documentReference.getId());
+                                    .collection("chatContent").document(cid)
+                                    .set(chat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("CHATROOM", "서버에 채팅 생성 완료!");
+                                }
+                            });
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                        }
-                    });
+                    }
+                });
+            } else {
+                //realm 채팅 생성
+                ChatContent.createChat(realm, chat);
+
+                //서버에 채팅 추가
+                fs.collection("hospital").document(mHid)
+                        .collection("chatRoom").document(mRoomId)
+                        .collection("chatContent").document(cid)
+                        .set(chat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("CHATROOM", "서버에 채팅 생성 완료!");
+                    }
+                });
+            }
+
             mEditChat.setText("");
         }
     }

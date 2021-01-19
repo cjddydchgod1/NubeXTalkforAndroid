@@ -5,30 +5,32 @@
 
 package x.com.nubextalk;
 
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
-
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import co.moonmonkeylabs.realmsearchview.RealmSearchView;
 import io.realm.Realm;
-import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
+import io.realm.RealmList;
+import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
@@ -37,14 +39,12 @@ import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
 public class ChatAddActivity extends AppCompatActivity implements
         ChatAddSearchAdapter.OnItemSelectedListner, View.OnClickListener {
     private Realm realm;
-    private RealmSearchView realmSearchView;
+    private RealmSearchView realmMemberSearchView;
     private RecyclerView selectedMemberView;
     private EditText chatRoomNameInput;
-    private ChatAddSearchAdapter mAdapter;
-    private ChatAddMemberAdapter memberAdapter;
+    private ChatAddSearchAdapter realmSearchAdapter;
+    private ChatAddMemberAdapter selectedMemberAdapter;
     private ArrayList<User> userList = new ArrayList<User>();
-    private FirebaseFirestore fs;
-
 
     private Button chatAddConfirmButton;
     private Button chatAddCancelButton;
@@ -53,7 +53,6 @@ public class ChatAddActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_add);
-        fs = FirebaseFirestore.getInstance();
 
         chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
         chatAddConfirmButton = findViewById(R.id.chat_add_confirm_btn);
@@ -61,19 +60,18 @@ public class ChatAddActivity extends AppCompatActivity implements
         chatAddConfirmButton.setOnClickListener(this::onClick);
         chatAddCancelButton.setOnClickListener(this::onClick);
 
-
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        realmSearchView = findViewById(R.id.chat_add_member_search_view);
-        mAdapter = new ChatAddSearchAdapter(this, realm, "name");
-        mAdapter.setItemSelectedListener(this);
-        realmSearchView.setAdapter(mAdapter);
+        realmMemberSearchView = findViewById(R.id.chat_add_member_search_view);
+        realmSearchAdapter = new ChatAddSearchAdapter(this, realm, "name");
+        realmSearchAdapter.setItemSelectedListener(this);
+        realmMemberSearchView.setAdapter(realmSearchAdapter);
 
         selectedMemberView = findViewById(R.id.chat_added_member_view);
-        memberAdapter = new ChatAddMemberAdapter(this, userList);
+        selectedMemberAdapter = new ChatAddMemberAdapter(this, userList);
         selectedMemberView.
                 setLayoutManager(new LinearLayoutManager(
                         this, LinearLayoutManager.HORIZONTAL, false));
-        selectedMemberView.setAdapter(memberAdapter);
+        selectedMemberView.setAdapter(selectedMemberAdapter);
     }
 
     @Override
@@ -90,22 +88,21 @@ public class ChatAddActivity extends AppCompatActivity implements
      **/
     @Override
     public void onItemSelected(User user) {
-        String userName = user.getAppName();
-        memberAdapter.addItem(user);
-        memberAdapter.notifyDataSetChanged();
+        selectedMemberAdapter.addItem(user);
+        selectedMemberAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClick(View v) {
-        ArrayList<User> selectedUser = memberAdapter.getUserList();
+        ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
         String roomName = chatRoomNameInput.getText().toString();
         switch (v.getId()) {
             case R.id.chat_add_confirm_btn:
-                if(createNewChat(realm, selectedUser, roomName)) {
+                if (createNewChat(realm, selectedUser, roomName)) {
                     setResult(RESULT_OK); //MainActivity 로 결과 전달
                     finish();
                 } else {
-                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -115,43 +112,44 @@ public class ChatAddActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * 새로운 realm ChatRoom 생성 함수
+     *
+     * @param realm
+     * @param list  사용자 User 리스트
+     * @param name  채팅방 이름
+     * @return
+     */
     public static boolean createNewChat(Realm realm, ArrayList<User> list, String name) {
         Config myProfile = realm.where(Config.class).equalTo("CODENAME", "MyAccount").findFirst();
-//        String token = myProfile.getExt1();
         String token = myProfile.getExt4();
-        Gson gson = new Gson();
         String hospital = "w34qjptO0cYSJdAwScFQ";
-        Map<String, Object> value = new HashMap<>();
-        value.put("token", token);
-        value.put("hospital", hospital);
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("hospital", hospital);
 
-        JSONArray jsonArray = new JSONArray();
-        for(User user : list){
-            jsonArray.put(user.getUserId());
+        ArrayList<String> userIdList = new ArrayList<>();
+        for (User user : list) {
+            userIdList.add(user.getUserId());
         }
-//        jsonArray.put(myProfile.getOid());
-        jsonArray.put(myProfile.getExt1());
-        value.put("members",  jsonArray);
-        Log.d("test", value.toString());
 
-
-        if (list.size() == 1) { /** 선택된 유저가 한명일 때 **/
-            if (!name.isEmpty()) { // 채팅방 이름을 입력했을 때
-                value.put("title", name);
-            } else { // 채팅방 이름 입력 안했을 때 = 상대방 이름으로 채팅방 이름 설정
-                value.put("title", list.get(0).getAppName());
+        if (list.size() == 1) { // 1:1 채팅인 경우
+            if (!name.equals("")) { // 채팅방 이름을 입력했을 때
+                data.put("title", name);
+            } else { // 채팅방 이름 입력 안했을 때 = "" 빈 내용으로 입력
+                data.put("title", list.get(0).getAppName());
             }
-            value.put("roomImgUrl", list.get(0).getAppImagePath());
+            data.put("roomImgUrl", list.get(0).getAppImagePath());
         } else {
-            if (!name.isEmpty()) {
-                value.put("title", name);
-            } else {
+            if (!name.equals("")) { // 채팅방 이름을 입력했을 때
+                data.put("title", name);
+            } else { // 채팅방 이름 입력 안했을 때, 단톡방에서는 무조건 채팅방 이름 입력 하도록
                 return false;
             }
-            value.put("roomImgUrl", list.get(0).getAppImagePath());
+            data.put("roomImgUrl", list.get(0).getAppImagePath());
         }
-        FirebaseFunctionsManager.createChatRoom(token, value);
 
+        ChatRoom.createChatRoom(realm, data, userIdList);
         return true;
     }
 }

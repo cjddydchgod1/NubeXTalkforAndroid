@@ -5,12 +5,15 @@
 
 package x.com.nubextalk.Model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
+import x.com.nubextalk.Manager.UtilityManager;
 
 public class User extends RealmObject {
     @NonNull
@@ -27,7 +30,7 @@ public class User extends RealmObject {
     private String appStatus; // 상태정보
     private String appName; // 이름
     private String appFcmKey; // FCM key값 저장
-
+    private String appNickName;
     @NonNull
     public String getCode() {
         return code;
@@ -91,15 +94,24 @@ public class User extends RealmObject {
     }
 
     public void setAppStatus(String appStatus) {
-        this.appStatus = appStatus;
+        if(UtilityManager.checkString(appStatus))
+            this.appStatus = appStatus;
+        else
+            this.appStatus = "0";
     }
 
     public String getAppName() {
-        return appName;
+        if(UtilityManager.checkString(this.appNickName))
+            return this.appNickName;
+        else
+            return appName;
     }
 
     public void setAppName(String appName) {
-        this.appName = appName;
+        if(UtilityManager.checkString(appName))
+            this.appName = appName;
+        else
+            this.appName = lastName;
     }
 
     public String getAppFcmKey() {
@@ -115,5 +127,13 @@ public class User extends RealmObject {
     }
     public static RealmResults<User> getUserlist(Realm realm) {
         return realm.where(User.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();
+    }
+
+    public String getAppNickName() {
+        return appNickName;
+    }
+
+    public void setAppNickName(String appNickName) {
+        this.appNickName = appNickName;
     }
 }

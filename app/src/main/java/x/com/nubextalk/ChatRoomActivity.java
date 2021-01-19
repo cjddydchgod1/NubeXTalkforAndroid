@@ -54,7 +54,6 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.KeyboardManager;
@@ -422,8 +421,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             chat.put("uid", mUid);
             chat.put("rid", mRoomId);
             chat.put("content", content);
-            chat.put("sendDate", simpleDateFormat.format(date));
-            chat.put("isFirst", "false");
             chat.put("type", "0");
 
             //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가

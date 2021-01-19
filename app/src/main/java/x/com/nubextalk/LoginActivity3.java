@@ -35,6 +35,7 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
     private Button mSignUpBtn;
     private Button mSignInBtn;
 
+    private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +53,14 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
 
         mSignUpBtn.setOnClickListener(this);
         mSignInBtn.setOnClickListener(this);
+        /**
+         * Session ID 확인후 자동 로그인
+         */
+        intent = new Intent(getApplicationContext(), MainActivity.class);
+        if(UtilityManager.checkString(Config.getMyAccount(realm).getExt3())) {
+            startActivity(intent);
+            finish();
+        }
     }
 
 
@@ -77,7 +86,7 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                         FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
                         firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
 
-                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+
                         startActivity(intent);
                         finish();
                     }

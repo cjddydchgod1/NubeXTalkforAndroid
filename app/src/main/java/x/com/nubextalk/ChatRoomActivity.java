@@ -53,6 +53,7 @@ import java.util.Map;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
@@ -118,6 +119,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         // rid 참조하여 채팅내용 불러옴
         mChat = realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll();
+        mChat = mChat.sort("sendDate", Sort.ASCENDING);
         setChatContentRead(mChat);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
@@ -421,6 +423,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             chat.put("rid", mRoomId);
             chat.put("content", content);
             chat.put("sendDate", simpleDateFormat.format(date));
+            chat.put("isFirst", "false");
             chat.put("type", "0");
 
             //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가

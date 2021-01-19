@@ -105,19 +105,22 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String cid;
-        String uid;
-        String rid;
-        int type;
-        String content;
-        Date date;
-        Boolean isFirst;
 
         Map<String, String> data = remoteMessage.getData();
-        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date"));
+        Map<String, Object> payload;
+
+        String rid;
+        String uid;
+        String content;
+        int type;
+
+        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date")+ "\nCONTENT : " + data.get("content"));
         switch (data.get("CODE")) {
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
-                Map<String, Object> payload = new HashMap<>();
+                //Chatting 생성해서 Realm 에 넣기
+
+                payload = new HashMap<>();
+
                 payload.put("uid", data.get("senderId"));
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
@@ -126,12 +129,39 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
 
-                uid = data.get("senderId");
-                rid = data.get("chatRoomId");
-                type = Integer.parseInt(data.get("contentType"));
-                content = data.get("content");
+                ChatContent.createChat(realm, payload);
 
-                // 채팅방이 없으면 먼저 FireStore에서 채팅방 불러오고 realm 에 채팅방 생성
+                // 알림 설정
+
+                rid = data.get("chatRoomId");
+                uid = data.get("senderId");
+                content = data.get("content");
+                type = Integer.parseInt(data.get("contentType"));
+
+
+                if (!Config.getMyUID(realm).equals(uid)) {
+                    ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",rid).findFirst();
+                    int channelId = Integer.parseInt(roomInfo.getNotificationId());
+                    makeChannel(CHANNEL_ID);
+                    notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
+                }
+                break;
+
+            case "CHAT_SYSTEM_CREATED":
+                Log.d("TOKEN", "System Chatting Created");
+
+                payload = new HashMap<>();
+
+                payload.put("uid", data.get("senderId"));
+                payload.put("cid", data.get("chatContentId"));
+                payload.put("rid", data.get("chatRoomId"));
+                payload.put("content", data.get("content"));
+                payload.put("type", data.get("contentType"));
+                payload.put("sendDate", data.get("sendDate"));
+                payload.put("isFirst", data.get("isFirst"));
+
+                rid = data.get("chatRoomId");
+
                 if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
                     //Firebase Functions 함수의 getChatRoom 함수 호출을 통해 FireStore 에 있는 채팅방 데이터 불러옴
                     FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
@@ -153,17 +183,10 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                         for (int i = 0; i < result.getJSONArray("chatRoomMember").length(); i++) {
                                             userIdList.add(result.getJSONArray("chatRoomMember").getString(i));
                                         }
-
                                         // realm ChatRoom, ChatContent 생성
                                         ChatRoom.createChatRoom(realm1, value, userIdList);
                                         ChatContent.createChat(realm1, payload);
 
-                                        // 알림 설정
-                                        if (!Config.getMyUID(realm1).equals(uid)) {
-                                            int channelId = Integer.parseInt(realm1.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
-                                            makeChannel(CHANNEL_ID);
-                                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-                                        }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -171,21 +194,8 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                             });
                 } else { // 기존 realm 에 채팅방이 있는 경우에는 ChatContent 만 생성
                     ChatContent.createChat(realm, payload);
-
-                    // 알림 설정
-                    if (!Config.getMyUID(realm).equals(uid)) {
-                        int channelId = Integer.parseInt(realm.where(ChatRoom.class).equalTo("rid", data.get("chatRoomId")).findFirst().getNotificationId());
-                        makeChannel(CHANNEL_ID);
-                        notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-                    }
                 }
                 break;
-            case "CHAT_ROOM_INVITED":
-                Log.d("TOKEN", "room invited!!");
-
-                // Chatting Message(Notification Message)
-                // System Message
-
         }
     }
 
@@ -203,17 +213,17 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         }
     }
 
-    public NotificationCompat.Builder makeBuilder(String rid, String uid, int type, String content) {
+    public NotificationCompat.Builder makeBuilder(String rid, String uid, int type, String
+            content) {
         Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
         User userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
 
         Bitmap largeIcon;
-        if(userInfo != null) {
-             largeIcon = getImageFromURL(userInfo.getAppImagePath());
-        }
-        else{
+        if (userInfo != null) {
+            largeIcon = getImageFromURL(userInfo.getAppImagePath());
+        } else {
             largeIcon = getImageFromURL(roomInfo.getRoomImg());
         }
         Intent intent = new Intent(this, ChatRoomActivity.class);
@@ -262,7 +272,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 conn.disconnect();
             }
         }
-
         return imgBitmap;
     }
 }

@@ -119,8 +119,6 @@ public class ChatContent extends RealmObject {
      * @param data  채팅 메세지 생성을 위한 데이터 Map
      */
     public static void createChat(Realm realm, Map data) {
-        User myAccount = (User) User.getMyAccountInfo(realm);
-
         String cid = data.get("cid").toString();
         String uid = data.get("uid").toString();
         String rid = data.get("rid").toString();
@@ -128,7 +126,7 @@ public class ChatContent extends RealmObject {
         Integer type = Integer.parseInt(data.get("type").toString());
         Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString("9999-12-31 23:59:59", "yyyy-MM-dd HH:mm:ss") : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
         Boolean isFirst = data.get("isFirst") != null && Boolean.parseBoolean(data.get("isFirst").toString());
-        Boolean isRead = myAccount.getUserId().equals(uid);
+        Boolean isRead = Config.getMyAccount(realm).getExt1().equals(uid);
 
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override

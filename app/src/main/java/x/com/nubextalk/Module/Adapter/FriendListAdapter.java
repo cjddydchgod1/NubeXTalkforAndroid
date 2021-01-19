@@ -89,20 +89,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileStatus = itemView.findViewById(R.id.profileStatus);
         }
         public void bintTo(User user) {
-//            String name = user.getDepartment() + " ";
-//            if(user.getNickname()==null) {
-//                name += user.getName();
-//            } else {
-//                name += user.getNickname();
-//            }
-//            profileName.setText(name);
-            profileName.setText(user.getAppNickName());
+            profileName.setText(user.getAppName());
             if(URLUtil.isValidUrl(user.getAppImagePath())){
                 aq.view(profileImage).image(user.getAppImagePath());
-                Log.d(TAG, "valid");
             } else {
                 aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
-                Log.d(TAG, "invalid");
             }
             // 초록
             switch(user.getAppStatus()) {

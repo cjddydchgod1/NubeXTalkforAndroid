@@ -137,7 +137,7 @@ public class ChatAddActivity extends AppCompatActivity implements
             if (!name.equals("")) { // 채팅방 이름을 입력했을 때
                 data.put("title", name);
             } else { // 채팅방 이름 입력 안했을 때 = "" 빈 내용으로 입력
-                data.put("title", "");
+                data.put("title", list.get(0).getAppName());
             }
             data.put("roomImgUrl", list.get(0).getAppImagePath());
         } else {

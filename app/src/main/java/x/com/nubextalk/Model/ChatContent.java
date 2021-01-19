@@ -28,14 +28,14 @@ public class ChatContent extends RealmObject {
     private int type; // 0 = 일반 텍스트, 1 = 사진 , 9 = system
     @NonNull
     private String content;
-    @NonNull
+
     private Date sendDate;
 
     @NonNull
     private Boolean isRead = false;
 
     @NonNull
-    private Boolean isFirst = false;
+    private Boolean isFirst;
 
     @NonNull
     public String getCid() {
@@ -114,22 +114,21 @@ public class ChatContent extends RealmObject {
 
     /**
      * realm ChatContent 생성 함수
+     *
      * @param realm
-     * @param data 채팅 메세지 생성을 위한 데이터 Map
+     * @param data  채팅 메세지 생성을 위한 데이터 Map
      */
     public static void createChat(Realm realm, Map data) {
         User myAccount = (User) User.getMyAccountInfo(realm);
-        Date newDate = new Date();
 
+        String cid = data.get("cid").toString();
         String uid = data.get("uid").toString();
-        String cid = data.get("cid") == null
-                ? uid.concat(String.valueOf(newDate.getTime())) : data.get("cid").toString();
         String rid = data.get("rid").toString();
         String content = data.get("content").toString();
         Integer type = Integer.parseInt(data.get("type").toString());
-        Date sendDate = data.get("sendDate") == null
-                ? newDate : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
-        Boolean isRead = myAccount.getUserId().equals(uid) ? true : false;
+        Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString("9999-12-31 23:59:59", "yyyy-MM-dd HH:mm:ss") : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
+        Boolean isFirst = data.get("isFirst") != null && Boolean.parseBoolean(data.get("isFirst").toString());
+        Boolean isRead = myAccount.getUserId().equals(uid);
 
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -141,6 +140,7 @@ public class ChatContent extends RealmObject {
                 chatContent.setContent(content);
                 chatContent.setType(type);
                 chatContent.setSendDate(sendDate);
+                chatContent.setFirst(isFirst);
                 chatContent.setIsRead(isRead);
                 realm.copyToRealmOrUpdate(chatContent);
                 ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
@@ -148,7 +148,5 @@ public class ChatContent extends RealmObject {
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });
-
     }
-
 }

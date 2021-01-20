@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -41,7 +42,7 @@ public class ChatRoom extends RealmObject {
     @NonNull
     private Date updatedDate;
     private String notificationId;
-
+    private int memberCount;
     @NonNull
     public String getRid() {
         return rid;
@@ -157,7 +158,8 @@ public class ChatRoom extends RealmObject {
         String notificationId = data.get("notificationId") == null
                 ? String.valueOf(newDate.hashCode()) : data.get("notificationId").toString();
 
-        if (userList.size() == 2) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
+        int memberCount = userList.size();
+        if (memberCount == 2) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
             for (String userId : userList) {
                 if (!userId.equals(myAccount.getUserId())) {
                     User user = realm.where(User.class).equalTo("userId", userId).findFirst();
@@ -167,7 +169,7 @@ public class ChatRoom extends RealmObject {
             }
         }
 
-        if (userList.size() > 2) { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
+        if (memberCount > 2) { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
             roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
         }
 
@@ -184,20 +186,21 @@ public class ChatRoom extends RealmObject {
                 chatRoom.setRoomImg(finalRoomImg);
                 chatRoom.setUpdatedDate(updatedDate);
                 chatRoom.setNotificationId(notificationId);
+                chatRoom.setMemeberCount(memberCount);
                 realm.copyToRealmOrUpdate(chatRoom);
+
+                //ChatRoomMember 모델에 채팅유저 생성
+                for (String userId : userList) {
+                    if(!realm.where(User.class).equalTo("userId", userId).findAll().isEmpty()){
+                        User user = realm.where(User.class).equalTo("userId", userId).findFirst();
+                        ChatRoomMember chatRoomMember = new ChatRoomMember();
+                        chatRoomMember.setRid(rid);
+                        chatRoomMember.setUid(user.getUserId());
+                        realm.copyToRealm(chatRoomMember);
+                    }
+                }
             }
         });
-
-        //ChatRoomMember 모델에 채팅유저 생성
-        for (String userId : userList) {
-            User user = realm.where(User.class).equalTo("userId", userId).findFirst();
-            realm.beginTransaction();
-            ChatRoomMember chatRoomMember = new ChatRoomMember();
-            chatRoomMember.setRid(rid);
-            chatRoomMember.setUid(user.getUserId());
-            realm.copyToRealm(chatRoomMember);
-            realm.commitTransaction();
-        }
     }
 
     /**
@@ -232,4 +235,11 @@ public class ChatRoom extends RealmObject {
 
     }
 
+    public int getMemeberCount() {
+        return memberCount;
+    }
+
+    public void setMemeberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
 }

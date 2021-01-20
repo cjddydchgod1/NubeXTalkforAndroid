@@ -5,6 +5,8 @@
 
 package x.com.nubextalk.Model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.util.Date;
@@ -32,7 +34,7 @@ public class ChatContent extends RealmObject {
     private Date sendDate;
 
     @NonNull
-    private Boolean isRead = false;
+    private Boolean isRead;
 
     @NonNull
     private Boolean isFirst;
@@ -126,7 +128,9 @@ public class ChatContent extends RealmObject {
         Integer type = Integer.parseInt(data.get("type").toString());
         Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString("9999-12-31 23:59:59", "yyyy-MM-dd HH:mm:ss") : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
         Boolean isFirst = data.get("isFirst") != null && Boolean.parseBoolean(data.get("isFirst").toString());
-        Boolean isRead = Config.getMyAccount(realm).getExt1().equals(uid);
+        Boolean isRead =data.get("isRead") == null ?  Config.getMyAccount(realm).getExt1().equals(uid) : Boolean.parseBoolean(data.get("isRead").toString());
+
+        Log.d("chatContent", content + " " + isRead.toString());
 
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -141,8 +145,10 @@ public class ChatContent extends RealmObject {
                 chatContent.setFirst(isFirst);
                 chatContent.setIsRead(isRead);
                 realm.copyToRealmOrUpdate(chatContent);
+
                 ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                 chatRoom.setUpdatedDate(sendDate);
+
                 realm.copyToRealmOrUpdate(chatRoom);
             }
         });

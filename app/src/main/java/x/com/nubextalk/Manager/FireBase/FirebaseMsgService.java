@@ -21,6 +21,9 @@ import androidx.core.app.NotificationCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -41,6 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -114,7 +118,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         String content;
         int type;
 
-        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date")+ "\nCONTENT : " + data.get("content"));
+        Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\nCONTENT : " + data.get("content"));
         switch (data.get("CODE")) {
             case "CHAT_CONTENT_CREATED": //chat 받았을 때
                 //Chatting 생성해서 Realm 에 넣기
@@ -129,8 +133,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
 
-                ChatContent.createChat(realm, payload);
-
                 // 알림 설정
 
                 rid = data.get("chatRoomId");
@@ -140,11 +142,14 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
 
                 if (!Config.getMyUID(realm).equals(uid)) {
-                    ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid",rid).findFirst();
-                    int channelId = Integer.parseInt(roomInfo.getNotificationId());
+                    int channelId = Integer.parseInt(data.get("notificationId"));
                     makeChannel(CHANNEL_ID);
                     notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
                 }
+
+
+                ChatContent.createChat(realm, payload);
+
                 break;
 
             case "CHAT_SYSTEM_CREATED":
@@ -159,6 +164,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("type", data.get("contentType"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
+                payload.put("isRead", "true");
 
                 rid = data.get("chatRoomId");
 
@@ -197,6 +203,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 }
                 break;
         }
+
     }
 
     public void makeChannel(String id) {

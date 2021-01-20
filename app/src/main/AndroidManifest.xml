@@ -19,8 +19,8 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".AddChatMemberActivity"></activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity3" />
-        <activity android:name=".LoginActivity" /> <!-- FireBase -->
+        <activity android:name=".LoginActivity" />
+        <!-- FireBase -->
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

@@ -20,7 +20,7 @@ public class FirebaseStoreManager {
     private DocumentReference hospital = fireStore.collection("hospital").document(hid);
     private String TAG = "FirebaseStoreManager";
 
-    public Task updateUser(String userid, String token) {
+    public Task<Void> updateUser(String userid, String token) {
         Map<String, Object> data = new HashMap<>();
         data.put("uid", userid);
         data.put("fcm", token);

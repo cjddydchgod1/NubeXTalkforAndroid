@@ -80,7 +80,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
         android:background="@color/cTransparent"
-        app:layout_constraintStart_toEndOf="@+id/chat_list_friend_name"
+        app:layout_constraintStart_toEndOf="@+id/chat_member_count"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.joanzapata.iconify.widget.IconButton
@@ -92,5 +92,15 @@
         android:background="@color/cTransparent"
         app:layout_constraintStart_toEndOf="@+id/chat_list_notify1"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chat_member_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:layout_marginStart="4dp"
+        android:text=""
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chat_list_friend_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

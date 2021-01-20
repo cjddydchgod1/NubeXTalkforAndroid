@@ -20,11 +20,11 @@ public class FirebaseStoreManager {
     private DocumentReference hospital = fireStore.collection("hospital").document(hid);
     private String TAG = "FirebaseStoreManager";
 
-    public void updateUser(String userid, String token) {
+    public Task<Void> updateUser(String userid, String token) {
         Map<String, Object> data = new HashMap<>();
         data.put("uid", userid);
         data.put("fcm", token);
-        hospital.collection("users").document(userid).set(data);
+        return hospital.collection("users").document(userid).set(data);
     }
 
     public void addChatContent(){ /*send chat*/ };

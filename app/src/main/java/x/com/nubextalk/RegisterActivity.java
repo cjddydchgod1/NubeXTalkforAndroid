@@ -63,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                         serverInfo.setExt3(port);
                         serverInfo.setExt4(name);
                         realm.copyToRealmOrUpdate(serverInfo);
-                        startActivity(new Intent(activity, LoginActivity3.class));
+                        startActivity(new Intent(activity, LoginActivity.class));
                         finish();
                     }
                 });

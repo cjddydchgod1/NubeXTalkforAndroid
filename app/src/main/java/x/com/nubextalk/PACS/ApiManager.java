@@ -11,6 +11,7 @@ import io.realm.Realm;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
@@ -44,7 +45,7 @@ public class ApiManager {
     public void login(onApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if (myAccount != null) {
-            login(myAccount.getExt1(), myAccount.getExt2(), listener);
+            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getExt5(), listener);
         }
     }
 
@@ -54,12 +55,11 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, onApiListener listener) {
+    public void login(String id, String pwd, String check, onApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
                 .build();
-
         new Protocol(context)
                 .setFormData(formBody)
                 .setCallback(new Protocol.onCallback() {
@@ -81,6 +81,7 @@ public class ApiManager {
                                         myAccount.setExt1(id);
                                         myAccount.setExt2(pwd);
                                         myAccount.setExt3(cookie.toUpperCase());
+                                        myAccount.setExt5(check);
                                         realm.copyToRealmOrUpdate(myAccount);
 
                                         if (listener != null) {
@@ -109,7 +110,6 @@ public class ApiManager {
                 myAccount.setCODE("MyAccount");
             }
             myAccount.setExt1(id);
-            myAccount.setExt2(pwd);
             realm.copyToRealmOrUpdate(myAccount);
         });
     }

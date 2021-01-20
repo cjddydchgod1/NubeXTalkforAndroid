@@ -150,13 +150,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     for(int i=0; i<len; i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-//                        User user = new User();
                         User user = realm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
                         if(user == null) {
                             user = new User();
                             user.setCode(jsonObject.getString("code"));
+                        } else {
+                            user = realm.copyFromRealm(user);
                         }
-                        realm.beginTransaction();
                         user.setUserId(jsonObject.getString("userid"));
                         user.setLastName(jsonObject.getString("lastname"));
                         user.setTypeCode(jsonObject.getString("typecode"));
@@ -166,7 +166,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         user.setAppStatus(jsonObject.getString("app_STATUS"));
                         user.setAppName(jsonObject.getString("app_NAME"));
                         user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-                        realm.commitTransaction();
+
                         mUserList.add(user);
                     }
                     /**
@@ -623,7 +623,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * 이미지값을 저장한다.
                      * 해당 이미지값을 Storage에 올린다.
                      */
-                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri,"hosptial/"+mHid+"profiles"+myUid);
+                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri,"hospital/"+mHid+"/users/"+myUid);
                     Task<Uri> urlTask = uploadTask
                             .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                                 @Override
@@ -631,7 +631,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if(!task.isSuccessful()) {
                                         throw task.getException();
                                     }
-                                    return FirebaseStorageManager.downloadFile("hosptial/"+mHid+"profiles"+myUid);
+                                    return FirebaseStorageManager.downloadFile("hospital/"+mHid+"/users/"+myUid);
                                 }
                             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override

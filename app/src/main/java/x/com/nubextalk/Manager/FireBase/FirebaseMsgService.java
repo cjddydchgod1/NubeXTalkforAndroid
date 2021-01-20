@@ -134,22 +134,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
 
-
-                // 알림 설정
-
-//                rid = data.get("chatRoomId");
-//                uid = data.get("senderId");
-//                content = data.get("content");
-//                type = Integer.parseInt(data.get("contentType"));
-//
-//
-//                if (!Config.getMyUID(realm).equals(uid)) {
-//                    ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-//                    int channelId = Integer.parseInt(roomInfo.getNotificationId());
-//                    makeChannel(CHANNEL_ID);
-//                    notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-//                }
-
                 ChatContent.createChat(realm, payload);
 
                 break;

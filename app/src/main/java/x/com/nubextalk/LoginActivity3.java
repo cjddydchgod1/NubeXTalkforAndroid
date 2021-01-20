@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import io.realm.Realm;
@@ -84,11 +85,13 @@ public class LoginActivity3 extends AppCompatActivity implements View.OnClickLis
                          * uid, token을 firestore에 올리는 작업
                          */
                         FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
-
-
-                        startActivity(intent);
-                        finish();
+                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener() {
+                            @Override
+                            public void onSuccess(Object o) {
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
                     }
                 });
 //                apiManager.login(id,password);

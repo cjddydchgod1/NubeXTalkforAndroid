@@ -132,7 +132,7 @@ public class ChatContent extends RealmObject {
 
         Log.d("chatContent", content + " " + isRead.toString());
 
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 ChatContent chatContent = new ChatContent();
@@ -146,10 +146,11 @@ public class ChatContent extends RealmObject {
                 chatContent.setIsRead(isRead);
                 realm.copyToRealmOrUpdate(chatContent);
 
-                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-                chatRoom.setUpdatedDate(sendDate);
-
-                realm.copyToRealmOrUpdate(chatRoom);
+                if(!realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()){
+                    ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                    chatRoom.setUpdatedDate(sendDate);
+                    realm.copyToRealmOrUpdate(chatRoom);
+                }
             }
         });
     }

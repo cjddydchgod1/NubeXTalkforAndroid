@@ -175,7 +175,7 @@ public class ChatRoom extends RealmObject {
         String finalRoomImg = roomImg;
 
         //realm 로컬 채팅방 생성
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
                 ChatRoom chatRoom = new ChatRoom();

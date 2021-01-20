@@ -37,7 +37,7 @@ import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
 public class AddChatMemberActivity extends AppCompatActivity implements
         ChatAddSearchAdapter.OnItemSelectedListner, View.OnClickListener {
     private Realm realm;
-    private RealmSearchView realmMemberSearchView;
+    private RecyclerView realmMemberSearchView;
     private RecyclerView selectedMemberView;
     private ChatAddSearchAdapter realmSearchAdapter;
     private ChatAddMemberAdapter selectedMemberAdapter;
@@ -64,7 +64,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         chatAddConfirmButton.setOnClickListener(this);
         chatAddCancelButton.setOnClickListener(this);
 
-        realmSearchAdapter = new ChatAddSearchAdapter(this, realm, "name");
+        realmSearchAdapter = new ChatAddSearchAdapter(this, realm);
         realmSearchAdapter.setItemSelectedListener(this);
         realmMemberSearchView.setAdapter(realmSearchAdapter);
 

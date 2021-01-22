@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="대화 추가" />
+        app:subtitle="새로운 채팅방 추가" />
 
     <TextView
         android:id="@+id/chat_add_description"
@@ -34,7 +34,7 @@
         android:layout_marginLeft="@dimen/margin_m"
         android:layout_marginTop="@dimen/margin_m"
         android:layout_marginBottom="@dimen/margin_m"
-        android:text="추가된 대화 대상"
+        android:text="추가된 사용자"
         app:layout_constraintBottom_toTopOf="@id/chat_added_member_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_add_toolbar" />
@@ -63,7 +63,7 @@
         android:id="@+id/chat_add_chat_user_input"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:hint="유저 이름을 입력하세요."
+        android:hint="사용자 검색"
         app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

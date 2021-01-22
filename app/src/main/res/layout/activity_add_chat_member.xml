@@ -31,6 +31,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/add_chat_member_tool_bar" />
 
+    <EditText
+        android:id="@+id/add_chat_member_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
+        android:hint="사용자 검색"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/add_chat_member_search_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_chat_member_added_view" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/add_chat_member_search_view"
         android:layout_width="match_parent"
@@ -38,7 +51,7 @@
         app:layout_constraintBottom_toTopOf="@+id/add_chat_linear_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_chat_member_added_view"/>
+        app:layout_constraintTop_toBottomOf="@id/add_chat_member_input" />
 
     <LinearLayout
         android:id="@+id/add_chat_linear_layout"

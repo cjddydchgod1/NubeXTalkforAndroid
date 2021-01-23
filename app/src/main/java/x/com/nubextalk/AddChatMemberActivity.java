@@ -53,6 +53,8 @@ public class AddChatMemberActivity extends AppCompatActivity implements
     private RecyclerView realmMemberSearchView;
     private RecyclerView selectedMemberView;
     private Realm realm;
+
+    private String hospitalId;
     private String chatRoomId;
 
 
@@ -63,6 +65,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
 
         Intent intent = getIntent();
         chatRoomId = intent.getExtras().getString("rid");
+        hospitalId = "w34qjptO0cYSJdAwScFQ";
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -175,7 +178,8 @@ public class AddChatMemberActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add_chat_confirm_btn:
-                if (addChatMember(chatRoomId)) {
+                ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
+                if (addChatUser(realm, hospitalId, chatRoomId, selectedUser)) {
                     Toast.makeText(this, "대화 상대가 추가되었습니다.", Toast.LENGTH_SHORT)
                             .show();
                 } else {
@@ -191,37 +195,37 @@ public class AddChatMemberActivity extends AppCompatActivity implements
 
     /**
      * 기존 대화방 ChatRoom 에서 선택된 사용자들 추가
-     *
-     * @param chatRoomId
+     * @param realm
+     * @param hid
+     * @param rid
+     * @param userList
      * @return
      */
-    private boolean addChatMember(String chatRoomId) {
-        String hospital = "w34qjptO0cYSJdAwScFQ";
-        ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
-        FirebaseFirestore fs = FirebaseFirestore.getInstance();
-
+    public boolean addChatUser(Realm realm, String hid, String rid, ArrayList<User> userList) {
         try {
-            for (User user : selectedUser) {
-                Map<String, Object> data = new HashMap<>();
+            FirebaseFirestore fs = FirebaseFirestore.getInstance();
+            for (User user : userList) {
+                //Realm 에 해당 채팅방에 사용자 추가
+                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
+
                 //FireStore 에 해당 채팅방에 사용자 추가
-                fs.collection("hospital").document(hospital)
-                        .collection("chatRoom").document(chatRoomId)
+                Map<String, Object> data = new HashMap<>();
+                fs.collection("hospital").document(hid)
+                        .collection("chatRoom").document(rid)
                         .collection("chatRoomMember")
-                        .document(user.getCode()).set(data)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                // FireStore 채팅방에 사용자 추가 후 해당 사용자들에게 fcm 메세지로 알림. 근데 이건 필요 없는 것 같음...
-                                Map<String, Object> data = new HashMap<>();
-                                JSONArray jsonArray = new JSONArray();
-                                jsonArray.put(user.getUserId());
-                                data.put("hospitalId", hospital);
-                                data.put("membersId", jsonArray);
-                                data.put("chatRoomId", chatRoomId);
-                                FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
-                            }
-                        });
+                        .document(user.getUserId()).set(data);
             }
+
+            //Functions 통해 기존 사용자 및 초대된 새로운 사용자들에게 시스템 메세지 보냄
+            Map<String, Object> data = new HashMap<>();
+            JSONArray jsonArray = new JSONArray();
+            for (User user : userList) {
+                jsonArray.put(user.getUserId());
+            }
+            data.put("hospitalId", hid);
+            data.put("membersId", jsonArray);
+            data.put("chatRoomId", rid);
+            FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

@@ -191,7 +191,9 @@ public class ChatRoom extends RealmObject {
 
                 //ChatRoomMember 모델에 채팅유저 생성
                 for (String userId : userList) {
-                    if(!realm.where(User.class).equalTo("userId", userId).findAll().isEmpty()){
+                    //채팅방 목록에 없는 유저일 경우 ChatRoomMember 모델 생성
+                    if(!realm.where(User.class).equalTo("userId", userId).findAll().isEmpty()
+                    && realm.where(ChatRoomMember.class).equalTo("rid", rid).and().equalTo("uid", userId).findAll().isEmpty()){
                         User user = realm.where(User.class).equalTo("userId", userId).findFirst();
                         ChatRoomMember chatRoomMember = new ChatRoomMember();
                         chatRoomMember.setRid(rid);

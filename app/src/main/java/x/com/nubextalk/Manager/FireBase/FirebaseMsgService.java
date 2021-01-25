@@ -50,6 +50,7 @@ import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
@@ -113,6 +114,9 @@ public class FirebaseMsgService extends FirebaseMessagingService {
         Map<String, String> data = remoteMessage.getData();
         Map<String, Object> payload;
 
+        User userInfo;
+        StringBuilder sysContent;
+
         String rid;
         String uid;
         String content;
@@ -120,13 +124,21 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
         Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\nCONTENT : " + data.get("content"));
         switch (data.get("CODE")) {
-            case "CHAT_SYSTEM_CREATED":
+            case "SYSTEM_ROOM_CREATED":
                 payload = new HashMap<>();
 
-                payload.put("uid", data.get("senderId"));
+                uid = data.get("senderId");
+                userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+
+                sysContent = new StringBuilder();
+                sysContent.append(userInfo.getAppName());
+                sysContent.append("님이 채팅방을 개설 하였습니다.");
+
+
+                payload.put("uid", "system");
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
-                payload.put("content", data.get("content"));
+                payload.put("content", data.get(sysContent.toString()));
                 payload.put("type", data.get("contentType"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
@@ -135,10 +147,74 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 ChatContent.createChat(realm, payload);
                 break;
 
+            case "SYSTEM_MEMBER_ADD":
+
+                payload = new HashMap<>();
+
+                rid = data.get("chatRoomId");
+                uid = data.get("senderId");
+                userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+                String[] memberId = data.get("newAddedUserId").split(",");
+
+                sysContent = new StringBuilder();
+
+                sysContent.append(userInfo.getAppName()).append("님이");
+                for (String id : memberId) {
+                    User addUser = realm.where(User.class).equalTo("uid", id).findFirst();
+                    if (addUser != null) {
+                        sysContent.append(addUser.getAppName()).append("님 ");
+                    }
+                }
+                sysContent.append("을 초대 하였습니다.");
+
+
+                payload.put("uid", "system");
+                payload.put("cid", data.get("chatContentId"));
+                payload.put("rid", data.get("chatRoomId"));
+                payload.put("content", data.get(sysContent.toString()));
+                payload.put("type", data.get("contentType"));
+                payload.put("sendDate", data.get("sendDate"));
+                payload.put("isFirst", data.get("isFirst"));
+                payload.put("isRead", "true");
+
+                ChatRoomMember.addChatRoomMember(realm, rid, memberId);
+                ChatContent.createChat(realm, payload);
+                break;
+
+            case "SYSTEM_MEMBER_EXIT":
+
+                payload = new HashMap<>();
+
+                rid = data.get("chatRoomId");
+                uid = data.get("senderId");
+                userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+
+                sysContent = new StringBuilder();
+                sysContent.append(userInfo.getAppName());
+                sysContent.append("님이 채팅방을 나갔습니다.");
+
+                payload.put("uid", "system");
+                payload.put("cid", data.get("chatContentId"));
+                payload.put("rid", data.get("chatRoomId"));
+                payload.put("content", data.get(sysContent.toString()));
+                payload.put("type", data.get("contentType"));
+                payload.put("sendDate", data.get("sendDate"));
+                payload.put("isFirst", data.get("isFirst"));
+                payload.put("isRead", "true");
+
+                ChatRoomMember.deleteChatRoomMember(realm, rid, uid);
+                ChatContent.createChat(realm, payload);
+                break;
+
             case "CHAT_CONTENT_CREATED":
                 payload = new HashMap<>();
 
-                payload.put("uid", data.get("senderId"));
+                rid = data.get("chatRoomId");
+                uid = data.get("senderId");
+                content = data.get("content");
+                type = Integer.parseInt(data.get("contentType"));
+
+                payload.put("uid", "system");
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
                 payload.put("content", data.get("content"));
@@ -146,12 +222,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("ext1", data.get("ext1"));
-
-
-                rid = data.get("chatRoomId");
-                uid = data.get("senderId");
-                content = data.get("content");
-                type = Integer.parseInt(data.get("contentType"));
 
                 if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
                     FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid) //Firebase Functions 함수의 getChatRoom 함수 호출을 통해 FireStore 에 있는 채팅방 데이터 불러옴

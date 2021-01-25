@@ -66,15 +66,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          * SessionID가 만료가 되지 않게 id, pwd를 박아서 다시 로그인하는 방식으로 하였다.
          */
         intent = new Intent(getApplicationContext(), MainActivity.class);
-        if(UtilityManager.checkString(Config.getMyAccount(realm).getExt5())) {
-            apiManager.login(new ApiManager.onApiListener() {
-                @Override
-                public void onSuccess(Response response, String body) {
-                    startActivity(intent);
-                    finish();
-                }
-            });
+        Config myAccount = Config.getMyAccount(realm);
+        if(myAccount != null) {
+            if(UtilityManager.checkString(myAccount.getExt5())) {
+                apiManager.login(new ApiManager.onApiListener() {
+                    @Override
+                    public void onSuccess(Response response, String body) {
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            }
         }
+
     }
 
 

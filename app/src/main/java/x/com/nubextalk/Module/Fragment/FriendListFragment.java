@@ -7,14 +7,11 @@ package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,17 +47,13 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.UploadTask;
-import com.google.protobuf.Api;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -71,12 +65,12 @@ import x.com.nubextalk.Manager.AnimManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
+import x.com.nubextalk.Module.Case.FriendlistCase;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.R;
 
@@ -126,7 +120,39 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+
+        getData();
+
+
+//        Log.i(TAG, "OncreateView");
+        return rootview;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         /**
+         * search를 FriendListFragment에서 사용가능하게
+         */
+        setHasOptionsMenu(true);
+        getActivity().invalidateOptionsMenu();
+//        Log.i(TAG, "OnActivityCreated");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        /**
+         * recyclerview 애니매이션
+         */
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.scheduleLayoutAnimation();
+//        Log.i(TAG, "OnStart");
+
+    }
+
+    public void getData() {
+                /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
          */
         apiManager.getEmployeeList(new ApiManager.onApiListener() {
@@ -166,7 +192,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         user.setAppStatus(jsonObject.getString("app_STATUS"));
                         user.setAppName(jsonObject.getString("app_NAME"));
                         user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-
+                        if(!UtilityManager.checkString(user.getAppNickName()))
+                            user.setAppNickName(jsonObject.getString("lastname"));
                         mUserList.add(user);
                     }
                     /**
@@ -225,69 +252,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
+//    makeData();
 
-//        Log.i(TAG, "OncreateView");
-        return rootview;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        /**
-         * search를 FriendListFragment에서 사용가능하게
-         */
-        setHasOptionsMenu(true);
-        getActivity().invalidateOptionsMenu();
-//        Log.i(TAG, "OnActivityCreated");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        /**
-         * recyclerview 애니매이션
-         */
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
-        mRecyclerView.scheduleLayoutAnimation();
-//        Log.i(TAG, "OnStart");
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-//        Log.i(TAG, "OnResume");
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-//        Log.i(TAG, "OnPause");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-//        Log.i(TAG, "OnStop");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-//        Log.i(TAG, "OnDestoryView");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        realm.close();
-//        Log.i(TAG, "OnDetach");
     }
 
     public void makeData() {
@@ -305,7 +271,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(getActivity() ,mUserList, myUid, aq);
+        mAdapter = new FriendListAdapter(getActivity() ,mUserList, aq, FriendlistCase.NON_RADIO);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -400,6 +366,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         ).start(AnimManager.TOGETHER);
     }
 
+    @Override
+    public void onSelected(User address, RadioButton radioButton) {
+
+    }
     @SuppressLint("ClickableViewAccessibility")
     protected void initBottomsheet(User address) {
         // 프로필 이름, 이미지, 상태
@@ -531,7 +501,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              */
             chatList = realm.where(ChatRoomMember.class).equalTo("uid", address.getUserId()).findAll();
             ChatRoom chatRoom = null;
-            if(chatList != null) {
+            if(chatList.size() != 0) {
+
                 Iterator<ChatRoomMember> mChat;
                 /**
                  * 1대1채팅방을 찾았다면 그 값이 chatRoom

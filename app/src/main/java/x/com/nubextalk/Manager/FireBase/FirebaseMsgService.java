@@ -130,7 +130,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("rid", data.get("chatRoomId"));
                 payload.put("content", data.get("content"));
                 payload.put("type", data.get("contentType"));
-                payload.put("sendDate", data.get("sendDate";
+                payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
 

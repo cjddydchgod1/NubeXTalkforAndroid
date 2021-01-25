@@ -15,10 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import x.com.nubextalk.SharePACS;
+import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.R;
 
-public class CalendarFragment extends Fragment {
+public class PACSReferenceFragment extends Fragment {
     private ViewGroup rootview;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,7 +29,7 @@ public class CalendarFragment extends Fragment {
         btnSharePACS.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SharePACS.class);
+                Intent intent = new Intent(getActivity(), ImageViewActivity.class);
                 startActivity(intent);
             }
         });

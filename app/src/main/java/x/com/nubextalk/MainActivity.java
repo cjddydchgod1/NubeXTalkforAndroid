@@ -9,15 +9,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -31,16 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
-
-import java.util.ArrayList;
-
-import io.realm.Realm;
-import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.Config;
-import x.com.nubextalk.Module.Fragment.CalendarFragment;
+import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.ChatListFragment;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
 import x.com.nubextalk.Module.Fragment.SettingFragment;
@@ -58,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MOVE_TO_CHAT_ROOM = 1;
     private FriendListFragment friendListFrag = new FriendListFragment();
     private ChatListFragment chatListFrag = new ChatListFragment();
-    private CalendarFragment calendarFrag = new CalendarFragment();
+    private PACSReferenceFragment calendarFrag = new PACSReferenceFragment();
     private SettingFragment settingFrag = new SettingFragment();
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private FragmentTransaction fragmentTransaction;

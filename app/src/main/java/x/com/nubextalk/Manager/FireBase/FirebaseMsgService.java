@@ -128,7 +128,9 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload = new HashMap<>();
 
                 uid = data.get("senderId");
-                userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+
+                Log.d("USERID",uid);
+                userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
 
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
@@ -138,7 +140,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("uid", "system");
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
-                payload.put("content", data.get(sysContent.toString()));
+                payload.put("content", sysContent.toString());
                 payload.put("type", data.get("contentType"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
@@ -153,14 +155,14 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 rid = data.get("chatRoomId");
                 uid = data.get("senderId");
-                userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+                userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
                 String[] memberId = data.get("newAddedUserId").split(",");
 
                 sysContent = new StringBuilder();
 
-                sysContent.append(userInfo.getAppName()).append("님이");
+                sysContent.append(userInfo.getAppName()).append("님이\n");
                 for (String id : memberId) {
-                    User addUser = realm.where(User.class).equalTo("uid", id).findFirst();
+                    User addUser = realm.where(User.class).equalTo("userId", id).findFirst();
                     if (addUser != null) {
                         sysContent.append(addUser.getAppName()).append("님 ");
                     }
@@ -171,7 +173,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("uid", "system");
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
-                payload.put("content", data.get(sysContent.toString()));
+                payload.put("content", sysContent.toString());
                 payload.put("type", data.get("contentType"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
@@ -187,7 +189,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 rid = data.get("chatRoomId");
                 uid = data.get("senderId");
-                userInfo = realm.where(User.class).equalTo("uid", uid).findFirst();
+                userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
 
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
@@ -196,7 +198,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("uid", "system");
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
-                payload.put("content", data.get(sysContent.toString()));
+                payload.put("content", sysContent.toString());
                 payload.put("type", data.get("contentType"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
@@ -214,7 +216,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 content = data.get("content");
                 type = Integer.parseInt(data.get("contentType"));
 
-                payload.put("uid", "system");
+                payload.put("uid", data.get("senderId"));
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
                 payload.put("content", data.get("content"));

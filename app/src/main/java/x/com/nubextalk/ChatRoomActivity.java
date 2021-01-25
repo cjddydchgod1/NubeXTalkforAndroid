@@ -136,6 +136,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
+        setNavigationView();
 
         View header = mNavigationView.getHeaderView(0);
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
@@ -301,6 +302,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                     }
                     chatRoomData.put("hospital", mHid);
                     chatRoomData.put("chatRoomId", mRoomId);
+                    chatRoomData.put("senderId", mUid);
                     chatRoomData.put("members", chatRoomMemberJsonArray);
                     chatRoomData.put("title", roomInfo.getRoomName());
                     chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
@@ -343,6 +345,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                     }
                     chatRoomData.put("hospital", mHid);
                     chatRoomData.put("chatRoomId", mRoomId);
+                    chatRoomData.put("senderId", mUid);
                     chatRoomData.put("members", chatRoomMemberJsonArray);
                     chatRoomData.put("title", roomInfo.getRoomName());
                     chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
@@ -523,6 +526,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 }
                 chatRoomData.put("hospital", mHid);
                 chatRoomData.put("chatRoomId", mRoomId);
+                chatRoomData.put("senderId", mUid);
                 chatRoomData.put("members", chatRoomMemberJsonArray);
                 chatRoomData.put("title", roomInfo.getRoomName());
                 chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());

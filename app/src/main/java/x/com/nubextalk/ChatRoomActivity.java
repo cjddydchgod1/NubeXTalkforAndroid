@@ -470,8 +470,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         chat.put("cid", cid);
         chat.put("uid", mUid);
         chat.put("rid", mRoomId);
-        chat.put("content", "EMPTY_DESCRIPTION");
         chat.put("ext1", "EMPTY_STUDY_ID");
+        chat.put("content", "EMPTY_DESCRIPTION");
         chat.put("type", "2");
 
         //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가

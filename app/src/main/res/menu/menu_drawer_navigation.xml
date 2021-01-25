@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Created By Jong Ho, Lee on  2020.
   ~ Copyright 테크하임(주). All rights reserved.
   -->
@@ -9,8 +8,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group
-        android:id="@+id/menu_media">
+    <group android:id="@+id/menu_media">
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
@@ -26,31 +24,31 @@
 
     <item android:title="설정">
         <menu>
-            <group
-                android:id="@+id/menu_settings">
+            <group android:id="@+id/menu_settings">
                 <item
                     android:id="@+id/nav_setting_fix_top"
-                    app:actionLayout="@layout/activity_chat_room_draw_switch"
-                    android:title="상단 고정"/>
+                    android:title="상단 고정"
+                    app:actionLayout="@layout/activity_chat_room_draw_switch" />
                 <item
                     android:id="@+id/nav_setting_alarm"
-                    app:actionLayout="@layout/activity_chat_room_draw_switch"
-                    android:title="알람 설정" />
+                    android:title="알람 설정"
+                    app:actionLayout="@layout/activity_chat_room_draw_switch" />
             </group>
         </menu>
     </item>
 
-    <item android:title="채팅방 멤버"
-        android:id="@+id/menu_chat_member">
+    <item
+        android:id="@+id/menu_chat_member"
+        android:title="채팅방 멤버">
         <menu>
-
         </menu>
-
     </item>
 
-     <item
-         android:id="@+id/nav_exit"
-         android:title="나가기" />
+    <item
+        android:id="@+id/nav_add_member"
+        android:title="대화상대 초대" />
 
-
+    <item
+        android:id="@+id/nav_exit"
+        android:title="나가기" />
 </menu>

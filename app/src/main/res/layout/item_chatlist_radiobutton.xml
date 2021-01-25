@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -48,30 +52,14 @@
         app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
         app:layout_constraintTop_toBottomOf="@+id/chat_list_friend_name" />
 
-    <TextView
-        android:id="@+id/chat_list_chat_time"
+    <RadioButton
+        android:id="@+id/select_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="16dp"
-        android:text="15 : 36"
-        android:textSize="14sp"
+        android:layout_marginEnd="@dimen/margin_l"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/chat_list_chat_remain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/rounded_corner"
-        android:clickable="false"
-        android:minWidth="12dp"
-        android:text="6"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_list_chat_time" />
 
     <com.joanzapata.iconify.widget.IconButton
         android:id="@+id/chat_list_notify1"
@@ -80,7 +68,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
         android:background="@color/cTransparent"
-        app:layout_constraintStart_toEndOf="@+id/chat_member_count"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_friend_name"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.joanzapata.iconify.widget.IconButton
@@ -92,15 +80,5 @@
         android:background="@color/cTransparent"
         app:layout_constraintStart_toEndOf="@+id/chat_list_notify1"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/chat_member_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="9dp"
-        android:layout_marginStart="4dp"
-        android:text=""
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/chat_list_friend_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,15 +10,13 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import io.realm.Realm;
-import x.com.nubextalk.LoginActivity3;
+import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
@@ -39,10 +37,10 @@ public class SettingFragment extends Fragment {
             public void onClick(View view) {
                 realm.executeTransaction(realm1 -> {
                     Config config = Config.getMyAccount(realm1);
-                    config.setExt3(null);
+                    config.setExt5(null);
                     realm1.copyToRealmOrUpdate(config);
                 });
-                Intent intent = new Intent(getActivity(), LoginActivity3.class);
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
                 getActivity().finish();
             }

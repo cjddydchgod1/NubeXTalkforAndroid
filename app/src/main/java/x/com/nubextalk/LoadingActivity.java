@@ -24,9 +24,8 @@ public class LoadingActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    // 임시로 로그인하는 화면 만들기
-                    startActivity(new Intent(activity, LoginActivity3.class));
-//                    startActivity(new Intent(activity, MainActivity.class));
+                    // 로그인하는 화면
+                    startActivity(new Intent(activity, LoginActivity.class));
                     finish();
                 } catch (Exception e) {
                     e.printStackTrace();

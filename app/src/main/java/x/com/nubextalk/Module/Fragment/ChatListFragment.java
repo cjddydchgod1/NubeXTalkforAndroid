@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -36,6 +37,7 @@ import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
+import x.com.nubextalk.Module.Case.ChatlistCase;
 import x.com.nubextalk.R;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
@@ -57,7 +59,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
+        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, ChatlistCase.NON_RADIO);
         mAdapter.setItemLongSelectedListener(this);
         mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -136,6 +138,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
         ((MainActivity) getActivity()).startChatRoomActivity(intent);
+    }
+
+    @Override
+    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
     }
 
     @Override

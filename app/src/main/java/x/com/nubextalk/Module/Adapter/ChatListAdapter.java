@@ -337,6 +337,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
 
             radioButton = itemView.findViewById(R.id.select_chat);
+            radioButton.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onItemSelected(mDataset.get(getAdapterPosition()), radioButton);
+                }
+            });
         }
 
 

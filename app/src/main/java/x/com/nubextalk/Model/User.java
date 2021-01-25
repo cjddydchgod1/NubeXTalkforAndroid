@@ -108,10 +108,7 @@ public class User extends RealmObject {
     }
 
     public void setAppName(String appName) {
-        if(UtilityManager.checkString(appName))
-            this.appName = appName;
-        else
-            this.appName = lastName;
+        this.appName = lastName;
     }
 
     public String getAppFcmKey() {

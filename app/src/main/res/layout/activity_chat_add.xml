@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="대화 추가" />
+        app:subtitle="새로운 채팅방 추가" />
 
     <TextView
         android:id="@+id/chat_add_description"
@@ -34,7 +34,7 @@
         android:layout_marginLeft="@dimen/margin_m"
         android:layout_marginTop="@dimen/margin_m"
         android:layout_marginBottom="@dimen/margin_m"
-        android:text="추가된 대화 대상"
+        android:text="추가된 사용자"
         app:layout_constraintBottom_toTopOf="@id/chat_added_member_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_add_toolbar" />
@@ -54,28 +54,37 @@
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:hint="채팅방 이름을 입력하세요."
-        app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
+        app:layout_constraintBottom_toTopOf="@id/chat_add_chat_user_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_added_member_view" />
 
-    <co.moonmonkeylabs.realmsearchview.RealmSearchView
+    <EditText
+        android:id="@+id/chat_add_chat_user_input"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:hint="사용자 검색"
+        app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_room_input" />
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_add_member_search_view"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/chat_add_linear_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_room_input"
-        app:rsvHint="@string/search_hint">
+        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_user_input">
 
-    </co.moonmonkeylabs.realmsearchview.RealmSearchView>
+    </androidx.recyclerview.widget.RecyclerView>
 
 
     <LinearLayout
         android:id="@+id/chat_add_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="2"
         app:layout_constraintBottom_toBottomOf="parent"

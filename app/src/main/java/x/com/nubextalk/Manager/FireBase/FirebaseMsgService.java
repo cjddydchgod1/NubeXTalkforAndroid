@@ -120,7 +120,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
         Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\nCONTENT : " + data.get("content"));
         switch (data.get("CODE")) {
-            case "CHAT_SYSTEM_CREATED": //chat 받았을 때
+            case "CHAT_SYSTEM_CREATED":
                 //Chatting 생성해서 Realm 에 넣기
 
                 payload = new HashMap<>();
@@ -135,7 +135,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("isRead", "true");
 
                 ChatContent.createChat(realm, payload);
-
                 break;
 
             case "CHAT_CONTENT_CREATED":
@@ -204,7 +203,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 }
                 break;
         }
-
     }
 
     public void makeChannel(String id) {

@@ -6,103 +6,129 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.aquery.AQuery;
 
-import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
-import co.moonmonkeylabs.realmsearchview.RealmSearchViewHolder;
+import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-import io.realm.Sort;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
-public class ChatAddSearchAdapter extends RealmSearchAdapter<User, ChatAddSearchAdapter.ViewItemHolder> {
+public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final LayoutInflater mInflater;
-    private Realm realm;
     private Context context;
-    private OnItemSelectedListner clickListener;
+    private OnItemSelectedListener clickListener;
+    public ArrayList<User> userRealmResults;
     private AQuery aq;
 
-    public interface OnItemSelectedListner {
+    public interface OnItemSelectedListener {
         void onItemSelected(User user);
     }
 
-    public void setItemSelectedListener(OnItemSelectedListner listener) {
+    public void setItemSelectedListener(OnItemSelectedListener listener) {
         this.clickListener = listener;
     }
 
-    public ChatAddSearchAdapter(Context context, Realm realm, String fillterColumnName) {
-        super(context, realm, fillterColumnName);
-        this.realm = realm;
+    public ChatAddSearchAdapter(Context context, ArrayList<User> userRealmResults) {
         this.context = context;
+        this.userRealmResults = userRealmResults;
         this.aq = new AQuery(context);
         mInflater = LayoutInflater.from(context);
     }
 
+    @NonNull
     @Override
-    public ViewItemHolder onCreateRealmViewHolder(ViewGroup viewGroup, int viewType) {
-        View vh = mInflater.inflate(R.layout.item_friend, viewGroup, false);
-        return new ViewItemHolder(vh);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View mItemView = mInflater.inflate(R.layout.item_friend, parent, false);
+        return new ViewItemHolder(mItemView);
     }
 
     @Override
-    public void onBindRealmViewHolder(ViewItemHolder viewHolder, int position) {
-        if (viewHolder instanceof ViewItemHolder) {
-            User user = realmResults.get(position);
-            viewHolder.profileName.setText(user.getName());
-            aq.view(viewHolder.profileImage).image(user.getProfileImg());
-            if (user.getStatus() == 0) { // 초록
-                viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-            } else if (user.getStatus() == 1) { // 빨강
-                viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_red_800_24dp);
-            } else { // 노랑
-                viewHolder.profileStatus.setImageResource(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
-            }
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        ViewItemHolder mHolder = (ViewItemHolder) holder;
+        User user = userRealmResults.get(position);
 
-            viewHolder.itemView.setOnClickListener(v -> {
-                if (clickListener != null) {
-                    clickListener.onItemSelected(user);
-                }
-            });
+        //이름 설정
+        if (user.getAppName() != null) {
+            mHolder.profileName.setText(user.getAppName());
+        } else {
+            mHolder.profileName.setText("");
         }
+
+        //사진 설정
+        if (URLUtil.isValidUrl(user.getAppImagePath())) {
+            aq.view(mHolder.profileImage).image(user.getAppImagePath());
+        } else {
+            aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+        }
+
+        //상태 설정
+        switch (user.getAppStatus()) {
+            case "1":
+                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                break;
+            case "2":
+                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                break;
+            default: // 0과 기본으로 되어있는 설정
+                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                break;
+        }
+
+        mHolder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onItemSelected(user);
+            }
+        });
     }
 
-    public class ViewItemHolder extends RealmSearchViewHolder {
-        public TextView profileName;
-        public ImageView profileImage;
-        public ImageView profileStatus;
+    public class ViewItemHolder extends RecyclerView.ViewHolder {
 
-        public ViewItemHolder(View itemView) {
+        public TextView profileName;
+        public ImageView profileStatus;
+        public CircleImageView profileImage;
+        public View userLayout;
+
+        public ViewItemHolder(@NonNull View itemView) {
             super(itemView);
             profileName = itemView.findViewById(R.id.profileName);
-            profileImage = itemView.findViewById(R.id.profileImage);
-            profileImage.setBackground(new ShapeDrawable(new OvalShape()));
-            profileImage.setClipToOutline(true);
             profileStatus = itemView.findViewById(R.id.profileStatus);
+            profileImage = itemView.findViewById(R.id.profileImage);
+            userLayout = itemView.findViewById(R.id.profileConstraintLayout);
         }
     }
 
-    /**
-     * RealmSearchAdapter 에 있는 filter 함수 중 findAllSorted 함수가 현재 Realm 버전에서는
-     * deprecated 된 함수여서 사용할 수 없기 때문에 오버라이딩하여 현재 Realm 버전에 맞게 수정함
-     **/
     @Override
-    public void filter(String input) {
-        RealmQuery<User> where = this.realm.where(User.class);
-        if (!input.isEmpty()) {
-            where = where.contains("name", input);
-        }
-        RealmResults businesses;
-        businesses = where.sort("name", Sort.ASCENDING).findAll();
-        this.updateRealmResults(businesses);
+    public int getItemCount() {
+        return userRealmResults.size();
     }
+
+    public void addItem(@NonNull User user) {
+        if (!userRealmResults.contains(user)) {
+            userRealmResults.add(user);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void deleteAllItem() {
+        userRealmResults.clear();
+        notifyDataSetChanged();
+    }
+
+    public void setItem(ArrayList<User> userList) {
+        this.userRealmResults = userList;
+        notifyDataSetChanged();
+    }
+
 }

@@ -1,99 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created By Jong Ho, Lee on  2020.
+  ~ Created By Jong Ho, Lee on  2021.
   ~ Copyright 테크하임(주). All rights reserved.
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/chat_add_search_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mainBackground"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
-
+    tools:context=".AddChatMemberActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chat_add_toolbar"
+        android:id="@+id/add_chat_member_tool_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:layout_constraintBottom_toTopOf="@id/chat_add_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="새로운 채팅방 추가" />
-
-    <TextView
-        android:id="@+id/chat_add_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_m"
-        android:layout_marginTop="@dimen/margin_m"
-        android:layout_marginBottom="@dimen/margin_m"
-        android:text="추가된 사용자"
-        app:layout_constraintBottom_toTopOf="@id/chat_added_member_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_add_toolbar" />
+        app:subtitle="대화상대 추가" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chat_added_member_view"
+        android:id="@+id/add_chat_member_added_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
-        app:layout_constraintBottom_toTopOf="@id/chat_add_chat_room_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_description" />
+        app:layout_constraintTop_toBottomOf="@+id/add_chat_member_tool_bar" />
 
     <EditText
-        android:id="@+id/chat_add_chat_room_input"
+        android:id="@+id/add_chat_member_input"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:hint="채팅방 이름을 입력하세요."
-        app:layout_constraintBottom_toTopOf="@id/chat_add_chat_user_input"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_added_member_view" />
-
-    <EditText
-        android:id="@+id/chat_add_chat_user_input"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
         android:hint="사용자 검색"
-        app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/add_chat_member_search_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_room_input" />
+        app:layout_constraintTop_toBottomOf="@id/add_chat_member_added_view" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chat_add_member_search_view"
+        android:id="@+id/add_chat_member_search_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/chat_add_linear_layout"
+        app:layout_constraintBottom_toTopOf="@+id/add_chat_linear_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_user_input">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
+        app:layout_constraintTop_toBottomOf="@id/add_chat_member_input" />
 
     <LinearLayout
-        android:id="@+id/chat_add_linear_layout"
+        android:id="@+id/add_chat_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="44dp"
         android:orientation="horizontal"
         android:weightSum="2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_add_member_search_view">
+        app:layout_constraintTop_toBottomOf="@+id/add_chat_member_search_view">
 
         <Button
-            android:id="@+id/chat_add_confirm_btn"
+            android:id="@+id/add_chat_confirm_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="2dp"
@@ -103,7 +75,7 @@
             android:text="확   인" />
 
         <Button
-            android:id="@+id/chat_add_cancel_btn"
+            android:id="@+id/add_chat_cancel_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_s"

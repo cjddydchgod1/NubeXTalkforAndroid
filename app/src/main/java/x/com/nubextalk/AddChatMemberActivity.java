@@ -1,37 +1,46 @@
 /*
- * Created By Jong Ho, Lee on  2020.
+ * Created By Jong Ho, Lee on  2021.
  * Copyright 테크하임(주). All rights reserved.
  */
 
 package x.com.nubextalk;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
 import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
 
-public class ChatAddActivity extends AppCompatActivity implements
+public class AddChatMemberActivity extends AppCompatActivity implements
         ChatAddSearchAdapter.OnItemSelectedListener, View.OnClickListener {
     private ArrayList<User> userList = new ArrayList<User>();
     private ArrayList<User> addedUserList = new ArrayList<User>();
@@ -39,34 +48,39 @@ public class ChatAddActivity extends AppCompatActivity implements
     private Button chatAddCancelButton;
     private ChatAddMemberAdapter selectedMemberAdapter;
     private ChatAddSearchAdapter realmSearchAdapter;
-    private EditText chatRoomNameInput;
     private EditText userNameInput;
     private InputMethodManager imm;
     private RecyclerView realmMemberSearchView;
     private RecyclerView selectedMemberView;
     private Realm realm;
 
+    private String hospitalId;
+    private String chatRoomId;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_add);
+        setContentView(R.layout.activity_add_chat_member);
+
+        Intent intent = getIntent();
+        chatRoomId = intent.getExtras().getString("rid");
+        hospitalId = "w34qjptO0cYSJdAwScFQ";
 
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
-        chatRoomNameInput.setSingleLine(true);
-        userNameInput = findViewById(R.id.chat_add_chat_user_input);
+        userNameInput = findViewById(R.id.add_chat_member_input);
         userNameInput.setSingleLine(true);
         userNameInput.addTextChangedListener(textWatcher);
-        chatAddConfirmButton = findViewById(R.id.chat_add_confirm_btn);
+        chatAddConfirmButton = findViewById(R.id.add_chat_confirm_btn);
+        chatAddCancelButton = findViewById(R.id.add_chat_cancel_btn);
         chatAddConfirmButton.setOnClickListener(this);
-        chatAddCancelButton = findViewById(R.id.chat_add_cancel_btn);
         chatAddCancelButton.setOnClickListener(this);
 
         initUserList(); //리싸이클러뷰에 사용될 사용자 데이터 리스트 초기화
 
         //사용자 검색 및 목록 리싸이클러뷰 설정
-        realmMemberSearchView = findViewById(R.id.chat_add_member_search_view);
+        realmMemberSearchView = findViewById(R.id.add_chat_member_search_view);
         realmSearchAdapter = new ChatAddSearchAdapter(this, userList);
         realmSearchAdapter.setItemSelectedListener(this);
         realmMemberSearchView.
@@ -75,7 +89,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         realmMemberSearchView.setAdapter(realmSearchAdapter);
 
         //선택된 사용자 표시 리싸이클러뷰 설정
-        selectedMemberView = findViewById(R.id.chat_added_member_view);
+        selectedMemberView = findViewById(R.id.add_chat_member_added_view);
         selectedMemberAdapter = new ChatAddMemberAdapter(this, addedUserList);
         selectedMemberView.
                 setLayoutManager(new LinearLayoutManager(
@@ -93,13 +107,23 @@ public class ChatAddActivity extends AppCompatActivity implements
     }
 
     /**
-     * 리싸이클러뷰에 표시될 사용자들 담을 데이터 초기화 함수
+     * 리싸이클러뷰에 표시될 사용자들 담을 데이터 초기화 함수 - 기존 채팅방에 있는 사용자는 보여주지 않는다
      */
     public void initUserList() {
         RealmResults<User> users = User.getUserlist(this.realm);
+        RealmResults<ChatRoomMember> chatRoomMembers = ChatRoom.getChatRoomUsers(this.realm, chatRoomId);
+
         for (User user : users) {
-            if (!userList.contains(user)) {
-                userList.add(user);
+            userList.add(user);
+        }
+
+        //기존 채팅방 사용자들이 있으면 userList 데이터에서 삭제
+        for (ChatRoomMember chatRoomMember : chatRoomMembers) {
+            Iterator<User> userIterator = userList.iterator();
+            while (userIterator.hasNext()) {
+                if (chatRoomMember.getUid().equals(userIterator.next().getUserId())) {
+                    userIterator.remove();
+                }
             }
         }
     }
@@ -116,7 +140,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                     or().contains("appNickName", name).findAll();
             realmSearchAdapter.deleteAllItem();
             for (User user : users) {
-                if (!user.getUserId().contentEquals(Config.getMyAccount(realm).getExt1())) {
+                if(!isExistUser(realm, chatRoomId, user.getUserId())){
                     realmSearchAdapter.addItem(user);
                 }
             }
@@ -128,76 +152,85 @@ public class ChatAddActivity extends AppCompatActivity implements
     }
 
     /**
-     * 리싸이클러뷰에서 아이템 선택 시 수행되는 함수
+     * 해당 채팅방에 사용자가 있는지 확인하는 함수
+     * @param realm
+     * @param roomId
+     * @param uid
+     * @return
+     */
+    private boolean isExistUser(Realm realm, String roomId, String uid) {
+        return !realm.where(ChatRoomMember.class).equalTo("rid", roomId).and()
+                .equalTo("uid", uid).findAll().isEmpty();
+    }
+
+    /**
+     * 사용자 아이템 클릭
      **/
     @Override
     public void onItemSelected(User user) {
         selectedMemberAdapter.addItem(user);
 
-        //사용자 아이템을 클릭한 뒤 사용자 검색창 초기화 및 키보드 숨기기
         userNameInput.setText("");
         imm.hideSoftInputFromWindow(realmMemberSearchView.getWindowToken(), 0);
-        realmSearchAdapter.deleteAllItem();
-        initUserList();
-        realmSearchAdapter.setItem(userList);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.chat_add_confirm_btn:
+            case R.id.add_chat_confirm_btn:
                 ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
-                String roomName = chatRoomNameInput.getText().toString();
-                if (createNewChat(this.realm, selectedUser, roomName)) {
-                    setResult(RESULT_OK); //MainActivity 로 결과 전달
-                    finish();
+                if (addChatUser(realm, hospitalId, chatRoomId, selectedUser)) {
+                    Toast.makeText(this, "대화 상대가 추가되었습니다.", Toast.LENGTH_SHORT)
+                            .show();
                 } else {
-                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "대화 상대 추가가 실패되었습니다.", Toast.LENGTH_SHORT)
+                            .show();
                 }
-                break;
-
-            case R.id.chat_add_cancel_btn:
+                finish();
+            case R.id.add_chat_cancel_btn:
+                Log.d("ADD_CHAT_MEMBER", "back pressed!");
                 onBackPressed();
-                break;
         }
     }
 
     /**
-     * 새로운 realm ChatRoom 생성 함수
-     *
+     * 기존 대화방 ChatRoom 에서 선택된 사용자들 추가
      * @param realm
-     * @param list  사용자 User 리스트
-     * @param name  채팅방 이름
+     * @param hid
+     * @param rid
+     * @param userList
      * @return
      */
-    public static boolean createNewChat(Realm realm, ArrayList<User> list, String name) {
-        String hospital = "w34qjptO0cYSJdAwScFQ";
-        Map<String, Object> data = new HashMap<>();
-        data.put("hospital", hospital);
+    public boolean addChatUser(Realm realm, String hid, String rid, ArrayList<User> userList) {
+        try {
+            FirebaseFirestore fs = FirebaseFirestore.getInstance();
+            for (User user : userList) {
+                //Realm 에 해당 채팅방에 사용자 추가
+                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
 
-        ArrayList<String> userIdList = new ArrayList<>();
-        for (User user : list) {
-            userIdList.add(user.getUserId());
-        }
-
-        if (list.size() == 1) { // 1:1 채팅인 경우
-            if (!name.equals("")) { // 채팅방 이름을 입력했을 때
-                data.put("title", name);
-            } else { // 채팅방 이름 입력 안했을 때 = "" 빈 내용으로 입력
-                data.put("title", list.get(0).getAppName());
+                //FireStore 에 해당 채팅방에 사용자 추가
+                Map<String, Object> data = new HashMap<>();
+                fs.collection("hospital").document(hid)
+                        .collection("chatRoom").document(rid)
+                        .collection("chatRoomMember")
+                        .document(user.getUserId()).set(data);
             }
-            data.put("roomImgUrl", list.get(0).getAppImagePath());
-        } else {
-            if (!name.equals("")) { // 채팅방 이름을 입력했을 때
-                data.put("title", name);
-            } else { // 채팅방 이름 입력 안했을 때, 단톡방에서는 무조건 채팅방 이름 입력 하도록
-                return false;
-            }
-            data.put("roomImgUrl", list.get(0).getAppImagePath());
-        }
 
-        ChatRoom.createChatRoom(realm, data, userIdList);
-        return true;
+            //Functions 통해 기존 사용자 및 초대된 새로운 사용자들에게 시스템 메세지 보냄
+            Map<String, Object> data = new HashMap<>();
+            JSONArray jsonArray = new JSONArray();
+            for (User user : userList) {
+                jsonArray.put(user.getUserId());
+            }
+            data.put("hospitalId", hid);
+            data.put("membersId", jsonArray);
+            data.put("chatRoomId", rid);
+            FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**

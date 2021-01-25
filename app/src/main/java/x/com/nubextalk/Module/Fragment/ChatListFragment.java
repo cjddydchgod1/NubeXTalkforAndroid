@@ -3,7 +3,7 @@
  * Copyright 테크하임(주). All rights reserved.
  */
 
-package x.com.nubextalk;
+package x.com.nubextalk.Module.Fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,22 +18,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import javax.annotation.Nullable;
+
+import io.realm.ObjectChangeSet;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
+import x.com.nubextalk.AddChatMemberActivity;
+import x.com.nubextalk.ChatRoomActivity;
+import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
+import x.com.nubextalk.Module.Case.ChatlistCase;
+import x.com.nubextalk.R;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
         ChatListAdapter.OnItemSelectedListener, View.OnClickListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
-    private RealmResults<ChatContent> chatContentResults;
 
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
@@ -48,22 +58,26 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
-        chatContentResults = ChatContent.getAll(realm);
-        if (chatContentResults.size() == 0) ChatContent.init(getContext(), realm);
-        if (chatRoomResults.size() == 0) ChatRoom.init(getContext(), realm);
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults);
-        mAdapter.setItemLongSelectedListener(this::onItemLongSelected);
-        mAdapter.setItemSelectedListener(this::onItemSelected);
+        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, ChatlistCase.NON_RADIO);
+        mAdapter.setItemLongSelectedListener(this);
+        mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
+            @Override
+            public void onChange(Realm realm) {
+                refreshChatList();
+            }
+        });
 
         fab_main = rootView.findViewById(R.id.chat_fab_main);
         fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
         fab_sub2 = rootView.findViewById(R.id.chat_fab_sub2);
-        fab_main.setOnClickListener(this::onClick);
-        fab_sub1.setOnClickListener(this::onClick);
-        fab_sub2.setOnClickListener(this::onClick);
+        fab_main.setOnClickListener(this);
+        fab_sub1.setOnClickListener(this);
+        fab_sub2.setOnClickListener(this);
 
         return rootView;
     }
@@ -78,26 +92,37 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     }
 
     /**
-     * 채팅 목록에서 채팅 꾹 눌렀을 떄 이벤트
+     * 채팅방 목록 중 아이템 하나 꾹 눌렀을 떄 이벤트
      */
     @Override
     public void onItemLongSelected(ChatRoom chatRoom) {
+        boolean fixTop = chatRoom.getSettingFixTop();
+        boolean alarm = chatRoom.getSettingAlarm();
+
+        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "나가기"};
+        menuArray[0] = alarm ? menuArray[0].concat(" 해제") : menuArray[0].concat(" 켜기");
+        menuArray[2] = fixTop ? menuArray[2].concat(" 해제") : "상단 고정";
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("채팅방 설정")
-                .setItems(R.array.menu_chat_long_click, new DialogInterface.OnClickListener() {
+                .setItems(menuArray, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int pos) {
-                        String[] items = getResources().getStringArray(R.array.menu_chat_long_click);
                         switch (pos) {
-                            case 0: /**채팅방 알림 설정 이벤트 구현**/
+                            case 0: /**채팅방 알림 설정 이벤트**/
+                                updateChatRoomAlarm(chatRoom);
+                                refreshChatList();
                                 break;
-                            case 1: /**대화상대 추가 이벤트 구현**/
+                            case 1: /**대화상대 추가 이벤트**/
+                                startActivity(new Intent(getContext(), AddChatMemberActivity.class)
+                                        .putExtra("rid", chatRoom.getRid()));
                                 break;
-                            case 2: /**채팅방 상단 고정 이벤트 구현**/
+                            case 2: /**채팅방 상단 고정 이벤트**/
+                                updateChatRoomFixTop(chatRoom);
+                                refreshChatList();
                                 break;
-                            case 3: /**채팅방 나가기 이벤트 구현**/
-
-                                exitChatRoom(chatRoom);
+                            case 3: /**채팅방 나가기 이벤트**/
+                                ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
                                 refreshChatList();
                                 break;
                         }
@@ -113,6 +138,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
         ((MainActivity) getActivity()).startChatRoomActivity(intent);
+    }
+
+    @Override
+    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
     }
 
     @Override
@@ -133,42 +162,42 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         }
     }
 
-    public void exitChatRoom(ChatRoom chatRoom) {
-        //1. 눌린 채팅방 rid 통해 uid 받아오기
-        String rid = chatRoom.getRid();
-
-        //2. 채팅방 rid 통해 ChatRoomMember 에 rid 해당하는 row 삭제
-        RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
-        for (ChatRoomMember member : chatRoomMembers) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    member.deleteFromRealm();
-                }
-            });
-        }
-        //3. 채팅방 rid 통해 ChatContent 에 rid 해당하는 row 삭제
-        RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
-        for (ChatContent content : chatContents) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    content.deleteFromRealm();
-                }
-            });
-        }
-        //4. 채팅방 rid 통해 ChatRoom 삭제
+    /**
+     * 채팅방 목록 상단고정 realm 설정 및 해제
+     * @param chatRoom
+     */
+    public void updateChatRoomFixTop(ChatRoom chatRoom) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-                chatRoom.deleteFromRealm();
+                boolean fixTop = chatRoom.getSettingFixTop();
+                chatRoom.setSettingFixTop(!fixTop);
+                realm.copyToRealmOrUpdate(chatRoom);
             }
         });
     }
 
+    /**
+     * 채팅방 목록 알림 realm 설정 및 해제
+     * @param chatRoom
+     */
+    public void updateChatRoomAlarm(ChatRoom chatRoom) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                boolean alarm = chatRoom.getSettingAlarm();
+                chatRoom.setSettingAlarm(!alarm);
+                realm.copyToRealmOrUpdate(chatRoom);
+            }
+        });
+    }
+
+    /**
+     * 채팅목록 리싸이클러뷰 데이터 재설정
+     */
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
+        mAdapter.sortChatRoomByDate();
     }
 
     private void toggleFab() {
@@ -182,7 +211,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
             fab_sub1.show();
             fab_sub2.show();
             isFabOpen = true;
-
         }
     }
 }

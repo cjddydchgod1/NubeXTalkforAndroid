@@ -7,20 +7,14 @@ package x.com.nubextalk.PACS;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import io.realm.Realm;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Model.User2;
 
 public class ApiManager {
 
@@ -64,7 +58,7 @@ public class ApiManager {
     public void login(onLoginApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if (myAccount != null) {
-            login(myAccount.getExt1(), myAccount.getExt2(), listener);
+            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getExt5(), listener);
         }
     }
 
@@ -74,12 +68,11 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, onLoginApiListener listener) {
+    public void login(String id, String pwd, String check, onLoginApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
                 .build();
-
         new Protocol(context)
                 .setFormData(formBody)
                 .setCallback(new Protocol.onCallback() {
@@ -128,6 +121,24 @@ public class ApiManager {
     }
 
     /**
+     * 서버와 연결하지 않고 사용하는 Login
+     * @param id
+     * @param pwd
+     */
+    public void login(String id, String pwd) {
+        realm.executeTransaction(realm1 -> {
+            Config myAccount = Config.getMyAccount(realm);
+            if(myAccount == null) {
+                myAccount = new Config();
+                myAccount.setCODE("MyAccount");
+                myAccount.setCODE("MyAccount");
+            }
+            myAccount.setExt1(id);
+            realm.copyToRealmOrUpdate(myAccount);
+        });
+    }
+
+    /**
      * User 목록 Get
      * @param listener
      */
@@ -140,13 +151,13 @@ public class ApiManager {
      * @param user
      * @param listener
      */
-    public void getEmployeeList(User2 user, onApiListener listener){
+    public void getEmployeeList(User user, onApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if(myAccount == null){
             return;
         }
         if(user == null){
-            user = new User2();
+            user = new User();
         }
 
         RequestBody formBody  = new FormBody.Builder()
@@ -175,7 +186,7 @@ public class ApiManager {
      * @param user
      * @param listener
      */
-    public void setEmployeeAppInfo(User2 user, onApiListener listener){
+    public void setEmployeeAppInfo(User user, onApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if(myAccount == null){
             return;

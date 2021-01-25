@@ -46,6 +46,7 @@
             app:layout_constraintStart_toEndOf="@+id/profileFrameLayout"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="name" />
+        
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

@@ -1,5 +1,5 @@
 /*
- * Created By Jong Ho, Lee on  2020.
+ * Created By Jong Ho, Lee on  2021.
  * Copyright 테크하임(주). All rights reserved.
  */
 
@@ -7,48 +7,73 @@ package x.com.nubextalk;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import io.realm.Realm;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.User2;
-import x.com.nubextalk.PACS.ApiManager;
-import x.com.nubextalk.PACS.Protocol;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 
-import java.util.ArrayList;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
-public class LoginActivity extends AppCompatActivity {
+import io.realm.Realm;
+import okhttp3.Response;
+import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.PACS.ApiManager;
+
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ApiManager apiManager;
     private Realm realm;
+
+    private EditText mEditHospital;
+    private EditText mEditId;
+    private EditText mEditPassword;
+
+    private Button mSignUpBtn;
+    private Button mSignInBtn;
+
+    private Intent intent;
+
+    private CheckBox checkAutoLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
-
         apiManager = new ApiManager(this, realm);
 
-        Button btn = findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mEditHospital = (EditText)findViewById(R.id.login_hospital_edit);
+        mEditId = (EditText)findViewById(R.id.login_id_edit);
+        mEditPassword = (EditText)findViewById(R.id.login_password_edit);
 
-                apiManager.login("han03", "tech1!", new ApiManager.onLoginApiListener() {
+        mSignUpBtn = (Button)findViewById(R.id.login_sign_up);
+        mSignInBtn = (Button)findViewById(R.id.login_sign_in);
+
+        checkAutoLogin = findViewById(R.id.checkAutoLogin);
+
+        mSignUpBtn.setOnClickListener(this);
+        mSignInBtn.setOnClickListener(this);
+        /**
+         * AutoLoginCheck(Ext5) 확인후 자동 로그인
+         * SessionID가 만료가 되지 않게 id, pwd를 박아서 다시 로그인하는 방식으로 하였다.
+         */
+        intent = new Intent(getApplicationContext(), MainActivity.class);
+        Config myAccount = Config.getMyAccount(realm);
+        if(myAccount != null) {
+            if(UtilityManager.checkString(myAccount.getExt5())) {
+                apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", response.toString());
+                        startActivity(intent);
+                        finish();
                     }
 
                     @Override
@@ -57,39 +82,60 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
             }
-        });
+        }
 
-        Button btn2 = findViewById(R.id.btn2);
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                apiManager.getEmployeeList(new ApiManager.onApiListener() {
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        final LoginActivity activity = this;
+
+        switch (view.getId()){
+            case R.id.login_sign_up:
+                startActivity(new Intent(activity, RegisterActivity.class));
+                finish();
+                break;
+            case R.id.login_sign_in:
+                String id = String.valueOf(mEditId.getText());
+                String password = String.valueOf(mEditPassword.getText());
+                String autoLogin = null;
+                if(checkAutoLogin.isChecked())
+                    autoLogin = "checked";
+                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", body.toString());
+                        Log.d("RESUlT", response.toString());
+                        /**
+                         * uid, token을 firestore에 올리는 작업
+                         */
+                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+
+
                     }
-                });
-            }
-        });
 
-        Button btn3 = findViewById(R.id.btn3);
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                User2 user = new User2();
-                user.setCode("220");
-                user.setTypeCode("50");
-                user.setAppImagePath("TEST");
-                user.setAppName("TEST");
-                user.setAppStatus("0");
-
-                apiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
                     @Override
-                    public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", body.toString());
+                    public void onFail() {
+
                     }
                 });
-            }
-        });
+//                apiManager.login(id,password);
+//                /**
+//                 * uid, token을 firestore에 올리는 작업
+//                 */
+//                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+//                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+//                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+//                startActivity(intent);
+//                finish();
+                break;
+        }
     }
 }

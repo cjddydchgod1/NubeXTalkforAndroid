@@ -29,6 +29,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
 
 

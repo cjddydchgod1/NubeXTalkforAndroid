@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
 
-import x.com.nubextalk.Example.Example_Address;
-
 public class LoadingActivity extends Activity {
 
     private TextView mTextView;
@@ -26,7 +24,8 @@ public class LoadingActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    startActivity(new Intent(activity, MainActivity.class));
+                    // 로그인하는 화면
+                    startActivity(new Intent(activity, LoginActivity.class));
                     finish();
                 } catch (Exception e) {
                     e.printStackTrace();

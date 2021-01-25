@@ -22,7 +22,7 @@ import x.com.nubextalk.Manager.UtilityManager;
 public class Config extends RealmObject {
     @NonNull
     @PrimaryKey
-    String oid = UUID.randomUUID().toString();
+    String oid;
     @NonNull
     String CODENAME;
     @NonNull
@@ -114,5 +114,8 @@ public class Config extends RealmObject {
 
     public static Config getServerInfo(Realm realm){
         return realm.where(Config.class).equalTo("CODENAME", "ServerInfo").findFirst();
+    }
+    public static String getMyUID(Realm realm){
+        return getMyAccount(realm).getExt1();
     }
 }

@@ -9,10 +9,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -20,14 +25,25 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+
+import java.util.ArrayList;
+
 import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Module.Fragment.CalendarFragment;
+import x.com.nubextalk.Module.Fragment.ChatListFragment;
+import x.com.nubextalk.Module.Fragment.FriendListFragment;
+import x.com.nubextalk.Module.Fragment.SettingFragment;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
@@ -48,8 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
-
-
+    private String token;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
         initBottomNavigation();
     }
-
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/
@@ -117,15 +131,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == CHAT_ADD) {
             if (resultCode == RESULT_OK) {
-                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                cf.refreshChatList();
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                if(fragment instanceof ChatListFragment) {
+                    ((ChatListFragment) fragment).refreshChatList();
+                }
             }
         }
 
         if (requestCode == MOVE_TO_CHAT_ROOM) {
             if (resultCode == 10) {
-                ChatListFragment cf = (ChatListFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                cf.refreshChatList();
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                if(fragment instanceof ChatListFragment) {
+                    ((ChatListFragment) fragment).refreshChatList();
+                }
             }
         }
     }
@@ -135,29 +153,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /**
-     * 툴바 메뉴 설정
-     **/
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-
-        //검색창 입력 리스
-        MenuItem searchItem = menu.findItem(R.id.toolbar_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override //검색어 완료시
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override //검색어 입력시
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-        return true;
-    }
 
     private void initPermission() {
         PermissionListener pm = new PermissionListener() {

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +19,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
@@ -33,10 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -45,14 +40,8 @@ import com.joanzapata.iconify.widget.IconButton;
 
 import org.json.JSONArray;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import io.realm.Realm;
@@ -178,6 +167,15 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
             }
         });
+
+        String studyId = getIntent().getStringExtra("studyId");
+        String description = getIntent().getStringExtra("description");
+
+        if (UtilityManager.checkString(studyId)) {
+            sendPacs(studyId, description);
+        }
+
+
     }
 
     private void setChatContentRead(RealmResults<ChatContent> mChat) {
@@ -370,7 +368,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         MenuItem item = menu.findItem(R.id.menu_chat_member);
         SubMenu subMenu = item.getSubMenu();
 
-        ChatRoom roomInfo =  realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
+        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
         RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", mRoomId).findAll();
 
         subMenu.clear();
@@ -473,57 +471,9 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void openPacs() {
-        Date date = new Date();
-        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
-
-        Map<String, Object> chat = new HashMap<>();
-        String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
-        chat.put("cid", cid);
-        chat.put("uid", mUid);
-        chat.put("rid", mRoomId);
-        chat.put("ext1", "EMPTY_STUDY_ID");
-        chat.put("content", "EMPTY_DESCRIPTION");
-        chat.put("type", "2");
-
-        //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
-        if (realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll().isEmpty()) {
-            //realm 채팅 생성
-            ChatContent.createChat(realm, chat);
-            Log.d("CHATROOM", "채팅방 서버에 생성한다잉 ");
-            Map<String, Object> chatRoomData = new HashMap<>();
-            RealmResults<ChatRoomMember> chatRoomMember = ChatRoom.getChatRoomUsers(realm, mRoomId);
-            JSONArray chatRoomMemberJsonArray = new JSONArray();
-            for (ChatRoomMember member : chatRoomMember) {
-                chatRoomMemberJsonArray.put(member.getUid());
-            }
-            chatRoomData.put("hospital", mHid);
-            chatRoomData.put("chatRoomId", mRoomId);
-            chatRoomData.put("members", chatRoomMemberJsonArray);
-            chatRoomData.put("title", roomInfo.getRoomName());
-            chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
-            chatRoomData.put("notificationId", roomInfo.getNotificationId());
-            FirebaseFunctionsManager.createChatRoom(chatRoomData)
-                    .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                        @Override
-                        public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                            Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
-                            fs.collection("hospital").document(mHid)
-                                    .collection("chatRoom").document(mRoomId)
-                                    .collection("chatContent").document(cid)
-                                    .set(chat);
-                        }
-                    });
-        } else {
-            //realm 채팅 생성
-            ChatContent.createChat(realm, chat);
-
-            //서버에 채팅 추가
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRoomId)
-                    .collection("chatContent").document(cid)
-                    .set(chat);
-        }
-        mEditChat.setText("");
+        Intent intent = new Intent(getApplicationContext(), ImageViewActivity.class);
+        intent.putExtra("rid", mRoomId);
+        startActivity(intent);
     }
 
     private void addMember() {
@@ -588,6 +538,60 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
             }
             mEditChat.setText("");
         }
+    }
+
+    private void sendPacs(String studyId, String description) {
+        Date date = new Date();
+        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
+
+        Map<String, Object> chat = new HashMap<>();
+        String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
+        chat.put("cid", cid);
+        chat.put("uid", mUid);
+        chat.put("rid", mRoomId);
+        chat.put("ext1", studyId);
+        chat.put("content", description);
+        chat.put("type", "2");
+
+        //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
+        if (realm.where(ChatContent.class).equalTo("rid", mRoomId).findAll().isEmpty()) {
+            //realm 채팅 생성
+            ChatContent.createChat(realm, chat);
+            Log.d("CHATROOM", "채팅방 서버에 생성한다잉 ");
+            Map<String, Object> chatRoomData = new HashMap<>();
+            RealmResults<ChatRoomMember> chatRoomMember = ChatRoom.getChatRoomUsers(realm, mRoomId);
+            JSONArray chatRoomMemberJsonArray = new JSONArray();
+            for (ChatRoomMember member : chatRoomMember) {
+                chatRoomMemberJsonArray.put(member.getUid());
+            }
+            chatRoomData.put("hospital", mHid);
+            chatRoomData.put("chatRoomId", mRoomId);
+            chatRoomData.put("members", chatRoomMemberJsonArray);
+            chatRoomData.put("title", roomInfo.getRoomName());
+            chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
+            chatRoomData.put("notificationId", roomInfo.getNotificationId());
+            FirebaseFunctionsManager.createChatRoom(chatRoomData)
+                    .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                        @Override
+                        public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                            Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
+                            fs.collection("hospital").document(mHid)
+                                    .collection("chatRoom").document(mRoomId)
+                                    .collection("chatContent").document(cid)
+                                    .set(chat);
+                        }
+                    });
+        } else {
+            //realm 채팅 생성
+            ChatContent.createChat(realm, chat);
+
+            //서버에 채팅 추가
+            fs.collection("hospital").document(mHid)
+                    .collection("chatRoom").document(mRoomId)
+                    .collection("chatContent").document(cid)
+                    .set(chat);
+        }
+
     }
 
 

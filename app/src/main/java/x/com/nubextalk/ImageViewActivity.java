@@ -8,6 +8,7 @@ package x.com.nubextalk;
 import androidx.appcompat.app.AppCompatActivity;
 import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.PACS.ApiManager;
 
@@ -87,6 +88,14 @@ public class ImageViewActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(UtilityManager.checkString(studyId)){
+                        String rid = getIntent().getStringExtra("rid");
+
+                        Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                        intent.putExtra("studyId",studyId);
+                        intent.putExtra("description","EMPTY_PACS_DESCRIPTION");
+                        intent.putExtra("rid",rid);
+                        startActivity(intent);
+
                         //Go Share Intent
                         if(UtilityManager.checkString(rid)) {
 

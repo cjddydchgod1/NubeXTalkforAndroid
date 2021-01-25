@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -78,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onFail() {
-
+                        Toast.makeText(LoginActivity.this, "자동 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -123,7 +124,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onFail() {
-
+                        Toast.makeText(activity, "아이디/비밀번호를 확인하세요.", Toast.LENGTH_SHORT).show();
                     }
                 });
 //                apiManager.login(id,password);

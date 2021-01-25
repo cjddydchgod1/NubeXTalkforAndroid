@@ -69,11 +69,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Config myAccount = Config.getMyAccount(realm);
         if(myAccount != null) {
             if(UtilityManager.checkString(myAccount.getExt5())) {
-                apiManager.login(new ApiManager.onApiListener() {
+                apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         startActivity(intent);
                         finish();
+                    }
+
+                    @Override
+                    public void onFail() {
+
                     }
                 });
             }
@@ -89,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()){
             case R.id.login_sign_up:
                 startActivity(new Intent(activity, RegisterActivity.class));
+                finish();
                 break;
             case R.id.login_sign_in:
                 String id = String.valueOf(mEditId.getText());
@@ -96,7 +102,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String autoLogin = null;
                 if(checkAutoLogin.isChecked())
                     autoLogin = "checked";
-                apiManager.login(id, password, autoLogin,new ApiManager.onApiListener() { // lee777 , tech1!
+                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());
@@ -112,6 +118,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             }
                         });
 
+
+                    }
+
+                    @Override
+                    public void onFail() {
 
                     }
                 });

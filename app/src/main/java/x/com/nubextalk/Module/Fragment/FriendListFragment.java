@@ -192,7 +192,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         user.setAppStatus(jsonObject.getString("app_STATUS"));
                         user.setAppName(jsonObject.getString("app_NAME"));
                         user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-
+                        if(!UtilityManager.checkString(user.getAppNickName()))
+                            user.setAppNickName(jsonObject.getString("lastname"));
                         mUserList.add(user);
                     }
                     /**
@@ -252,6 +253,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 //                    e.printStackTrace();
 //                }
 //    makeData();
+
     }
 
     public void makeData() {

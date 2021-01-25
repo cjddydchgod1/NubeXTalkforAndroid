@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -187,19 +188,21 @@ public class ChatRoom extends RealmObject {
                 chatRoom.setNotificationId(notificationId);
                 chatRoom.setMemeberCount(memberCount);
                 realm.copyToRealmOrUpdate(chatRoom);
+
+                //ChatRoomMember 모델에 채팅유저 생성
+                for (String userId : userList) {
+                    //채팅방 목록에 없는 유저일 경우 ChatRoomMember 모델 생성
+                    if(!realm.where(User.class).equalTo("userId", userId).findAll().isEmpty()
+                    && realm.where(ChatRoomMember.class).equalTo("rid", rid).and().equalTo("uid", userId).findAll().isEmpty()){
+                        User user = realm.where(User.class).equalTo("userId", userId).findFirst();
+                        ChatRoomMember chatRoomMember = new ChatRoomMember();
+                        chatRoomMember.setRid(rid);
+                        chatRoomMember.setUid(user.getUserId());
+                        realm.copyToRealm(chatRoomMember);
+                    }
+                }
             }
         });
-
-        //ChatRoomMember 모델에 채팅유저 생성
-        for (String userId : userList) {
-            User user = realm.where(User.class).equalTo("userId", userId).findFirst();
-            realm.beginTransaction();
-            ChatRoomMember chatRoomMember = new ChatRoomMember();
-            chatRoomMember.setRid(rid);
-            chatRoomMember.setUid(user.getUserId());
-            realm.copyToRealm(chatRoomMember);
-            realm.commitTransaction();
-        }
     }
 
     /**

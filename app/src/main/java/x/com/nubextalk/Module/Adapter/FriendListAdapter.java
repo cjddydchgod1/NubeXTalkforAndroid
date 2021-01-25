@@ -139,6 +139,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             profileImage    = itemView.findViewById(R.id.profileImage);
             profileStatus   = itemView.findViewById(R.id.profileStatus);
             radioButton     = itemView.findViewById(R.id.select_user);
+            radioButton.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onSelected(mDataSet.get(getAdapterPosition()), radioButton);
+                }
+            });
         }
         public void bintTo(User user) {
             profileName.setText(user.getAppName());

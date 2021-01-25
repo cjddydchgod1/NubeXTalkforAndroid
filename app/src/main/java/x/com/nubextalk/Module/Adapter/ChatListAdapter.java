@@ -135,6 +135,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //채팅방 목록 상태 설정 (1:1 채팅인 경우 상대방 상태 설정)
             mHolder.setStatusImg(mCurrent);
 
+            //채팅방 멤버수 설정
+            mHolder.memberCount.setText(String.valueOf(mDataset.get(position).getMemeberCount()));
+
             //채팅방 목록 알림 및 상단고정 아이콘 설정
             mHolder.setNotify(mCurrent);
 
@@ -203,6 +206,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView chatRoomName;
         public TextView time;
         public TextView remain;
+        public TextView memberCount;
         public CircleImageView chatRoomImg;
         public ImageView statusImg;
         public IconButton notifyImg1;
@@ -217,6 +221,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             remain = itemView.findViewById(R.id.chat_list_chat_remain);
             chatRoomImg = itemView.findViewById(R.id.chat_list_chat_picture);
             statusImg = itemView.findViewById(R.id.chat_list_friend_status);
+            memberCount = itemView.findViewById(R.id.chat_member_count);
             notifyImg1 = itemView.findViewById(R.id.chat_list_notify1);
             notifyImg2 = itemView.findViewById(R.id.chat_list_notify2);
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
@@ -332,6 +337,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
 
             radioButton = itemView.findViewById(R.id.select_chat);
+            radioButton.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onItemSelected(mDataset.get(getAdapterPosition()), radioButton);
+                }
+            });
         }
 
 

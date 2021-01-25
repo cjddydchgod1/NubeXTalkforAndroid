@@ -120,9 +120,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
         Log.d("TOKEN", "RECEIVE_TOKEN\nCODE : " + data.get("CODE") + "\nDATE : " + data.get("date") + "\nCONTENT : " + data.get("content"));
         switch (data.get("CODE")) {
-            //todo case 코드 명 바꾸는거 어떰. CHAT_SYSTEM_CREATED -> SYSTEM_MESSAGE_RECEIVED
-            // CHAT_CONTENT_CREATED -> CONTENT_MESSAGE_RECEIVED
-            case "CHAT_SYSTEM_CREATED": //chat 받았을 때
+            case "CHAT_SYSTEM_CREATED":
                 //Chatting 생성해서 Realm 에 넣기
 
                 payload = new HashMap<>();
@@ -132,42 +130,11 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("rid", data.get("chatRoomId"));
                 payload.put("content", data.get("content"));
                 payload.put("type", data.get("contentType"));
-                payload.put("sendDate", data.get("sendDate"));
+                payload.put("sendDate", data.get("sendDate";
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
 
-                rid = data.get("chatRoomId");
-
-                //todo 기존의 채팅방에서 새로운 사용자를 초대하면 기존에 채팅방에 있던 사용자들의 ChatRoomMember 모델도 동기화가 되어야 하므로
-                // FirebaseFunctionsManager.getChatRoom 함수를 CHAT_SYSTEM_CREATED 에서도 써야할 듯??
-                FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
-                        .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                            @Override
-                            public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                                Gson gson = new Gson();
-                                Map<String, Object> value = new HashMap<>();
-                                try {
-                                    // realm ChatRoom 데이터 초기화
-                                    Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
-                                    JSONObject result = new JSONObject(gson.toJson(httpsCallableResult.getData()));
-                                    value.put("rid", rid);
-                                    value.put("title", result.getJSONObject("chatRoom").getString("roomName"));
-                                    value.put("roomImgUrl", result.getJSONObject("chatRoom").getString("roomImg"));
-                                    value.put("updatedDate", result.getJSONObject("chatRoom").getString("updatedDate"));
-                                    value.put("notificationId", result.getJSONObject("chatRoom").getString("notificationId"));
-                                    ArrayList<String> userIdList = new ArrayList<>();
-                                    for (int i = 0; i < result.getJSONArray("chatRoomMember").length(); i++) {
-                                        userIdList.add(result.getJSONArray("chatRoomMember").getString(i));
-                                    }
-                                    // realm ChatRoom, ChatContent 생성
-                                    ChatRoom.createChatRoom(realm1, value, userIdList);
-                                    ChatContent.createChat(realm1, payload);
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                ChatContent.createChat(realm, payload);
                 break;
 
             case "CHAT_CONTENT_CREATED":
@@ -187,8 +154,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 uid = data.get("senderId");
                 content = data.get("content");
                 type = Integer.parseInt(data.get("contentType"));
-                String notificationId = data.get("notificationId");
-
 
                 if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
                     //Firebase Functions 함수의 getChatRoom 함수 호출을 통해 FireStore 에 있는 채팅방 데이터 불러옴
@@ -215,13 +180,12 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                         ChatRoom.createChatRoom(realm1, value, userIdList);
                                         ChatContent.createChat(realm1, payload);
 
-                                        //todo 이 부분을 아예 밖으로 빼서 통합시켜보기.
-//                                        if (!Config.getMyUID(realm1).equals(uid)) {
-//                                            ChatRoom roomInfo = realm1.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-//                                            int channelId = Integer.parseInt(roomInfo.getNotificationId());
-//                                            makeChannel(CHANNEL_ID);
-//                                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-//                                        }
+                                        if (!Config.getMyUID(realm1).equals(uid)) {
+                                            ChatRoom roomInfo = realm1.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                                            int channelId = Integer.parseInt(roomInfo.getNotificationId());
+                                            makeChannel(CHANNEL_ID);
+                                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
+                                        }
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -230,26 +194,15 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                             });
                 } else { // 기존 realm 에 채팅방이 있는 경우에는 ChatContent 만 생성
                     ChatContent.createChat(realm, payload);
-//                    if (!Config.getMyUID(realm).equals(uid)) {
-//                        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-//                        int channelId = Integer.parseInt(roomInfo.getNotificationId());
-//                        makeChannel(CHANNEL_ID);
-//                        notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-//                    }
-                }
-
-                if (!Config.getMyUID(realm).equals(uid)) {
-//                    Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
-//                    ChatRoom roomInfo = realm1.where(ChatRoom.class).equalTo("rid", rid).findFirstAsync();
-//                    int channelId = Integer.parseInt(roomInfo.getNotificationId());
-                    int channelId = Integer.parseInt(notificationId); //todo notificationId 를 data 에서 받아온 걸로 바로 쓰면 될듯?
-                    makeChannel(CHANNEL_ID);
-                    notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-
+                    if (!Config.getMyUID(realm).equals(uid)) {
+                        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                        int channelId = Integer.parseInt(roomInfo.getNotificationId());
+                        makeChannel(CHANNEL_ID);
+                        notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
+                    }
                 }
                 break;
         }
-
     }
 
     public void makeChannel(String id) {

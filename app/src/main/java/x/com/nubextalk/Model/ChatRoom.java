@@ -43,6 +43,8 @@ public class ChatRoom extends RealmObject {
     private Date updatedDate;
     private String notificationId;
     private int memberCount;
+    private Boolean isGroupChat = false;
+
     @NonNull
     public String getRid() {
         return rid;
@@ -103,6 +105,11 @@ public class ChatRoom extends RealmObject {
         this.updatedDate = updatedDate;
     }
 
+    @NonNull
+    public Boolean getIsGroupChat() { return isGroupChat; }
+
+    public void setIsGroupChat(Boolean isGroupChat) { this.isGroupChat = isGroupChat; }
+
     /**
      * Data 초기화 함수
      *
@@ -157,6 +164,7 @@ public class ChatRoom extends RealmObject {
                 ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
         String notificationId = data.get("notificationId") == null
                 ? String.valueOf(newDate.hashCode()) : data.get("notificationId").toString();
+        Boolean isGroupChat = data.get("isGroupChat") == null ? false : (Boolean) data.get("isGroupChat");
 
         int memberCount = userList.size();
         if (memberCount == 2) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
@@ -187,6 +195,7 @@ public class ChatRoom extends RealmObject {
                 chatRoom.setUpdatedDate(updatedDate);
                 chatRoom.setNotificationId(notificationId);
                 chatRoom.setMemeberCount(memberCount);
+                chatRoom.setIsGroupChat(isGroupChat);
                 realm.copyToRealmOrUpdate(chatRoom);
 
                 //ChatRoomMember 모델에 채팅유저 생성

@@ -85,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()){
             case R.id.login_sign_up:
                 startActivity(new Intent(activity, RegisterActivity.class));
+                finish();
                 break;
             case R.id.login_sign_in:
                 String id = String.valueOf(mEditId.getText());

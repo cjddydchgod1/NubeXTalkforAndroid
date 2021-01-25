@@ -6,6 +6,8 @@
 package x.com.nubextalk.Model;
 
 import androidx.annotation.NonNull;
+
+import io.realm.Realm;
 import io.realm.RealmObject;
 
 public class ChatRoomMember extends RealmObject {
@@ -27,4 +29,19 @@ public class ChatRoomMember extends RealmObject {
     }
 
     public void setUid(String uid) { this.uid = uid; }
+
+    public static void addChatRoomMember(Realm realm, String rid, String uid){
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ChatRoomMember chatRoomMember = new ChatRoomMember();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                chatRoomMember.setRid(rid);
+                chatRoomMember.setUid(uid);
+                chatRoom.setMemeberCount(chatRoom.getMemeberCount() + 1);
+                realm.copyToRealmOrUpdate(chatRoom);
+                realm.copyToRealm(chatRoomMember);
+            }
+        });
+    }
 }

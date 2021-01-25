@@ -226,7 +226,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 //                    e.printStackTrace();
 //                }
 
-
 //        Log.i(TAG, "OncreateView");
         return rootview;
     }

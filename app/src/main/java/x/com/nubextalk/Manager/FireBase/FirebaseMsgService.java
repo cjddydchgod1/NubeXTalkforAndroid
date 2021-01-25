@@ -133,7 +133,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("isRead", "true");
 
                 ChatContent.createChat(realm, payload);
-
                 break;
 
             case "CHAT_CONTENT_CREATED":
@@ -267,7 +266,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 //                }
 //                break;
         }
-
     }
 
     public void makeChannel(String id) {

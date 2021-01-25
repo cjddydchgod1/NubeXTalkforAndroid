@@ -46,7 +46,6 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
 
-
     //lib
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'gun0912.ted:tedpermission:2.1.1'

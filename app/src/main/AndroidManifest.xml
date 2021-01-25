@@ -15,14 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".ImageViewActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <!-- FireBase -->
+            </intent-filter></activity>
+        <activity android:name=".LoginActivity">
+        </activity> <!-- FireBase -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@android:drawable/ic_menu_mylocation" />
@@ -54,8 +54,7 @@
         </activity>
         <activity
             android:name=".LoadingActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
-        </activity>
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"></activity>
         <activity
             android:name=".ChatAddActivity"
             android:theme="@style/AppTheme" />

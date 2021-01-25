@@ -33,22 +33,35 @@ public class ApiManager {
         //void onFail();
     }
 
+    public interface onLoginApiListener{
+        void onSuccess(Response response, String body);
+        void onFail();
+    }
+
     public ApiManager(Context context, Realm realm) {
         this.context = context;
         this.realm = realm;
+        this.CONTEXT_PATH = getServerPath(realm);
+    }
 
+    /**
+     * getServerPath
+     * @param realm
+     * @return
+     */
+    public String getServerPath(Realm realm){
         Config serverInfo = Config.getServerInfo(realm);
         String ssl = serverInfo == null ? "http://" : serverInfo.getExt1();
         String host = serverInfo == null ? "192.168.3.156" : serverInfo.getExt2();
         String port = serverInfo == null ? "" : serverInfo.getExt3();
-        this.CONTEXT_PATH = ssl + host + port;
+        return ssl + host + port;
     }
 
     /**
      * Login
      * @param listener
      */
-    public void login(onApiListener listener){
+    public void login(onLoginApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if (myAccount != null) {
             login(myAccount.getExt1(), myAccount.getExt2(), listener);
@@ -61,7 +74,7 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, onApiListener listener) {
+    public void login(String id, String pwd, onLoginApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
@@ -73,28 +86,40 @@ public class ApiManager {
                     @Override
                     public void onCallback(Response response, String body) {
                         if (response != null) {
-                            String cookie = response
-                                    .request().url().toString().split(";")[1];
-                            if (cookie != null) {
-                                realm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        Config myAccount = Config.getMyAccount(realm);
-                                        if(myAccount == null){
-                                            myAccount = new Config();
-                                            myAccount.setCODENAME("MyAccount");
-                                            myAccount.setCODE("MyAccount");
-                                        }
-                                        myAccount.setExt1(id);
-                                        myAccount.setExt2(pwd);
-                                        myAccount.setExt3(cookie.toUpperCase());
-                                        realm.copyToRealmOrUpdate(myAccount);
-
-                                        if (listener != null) {
-                                            listener.onSuccess(response, body);
-                                        }
+                            try {
+                                String cookie = response
+                                        .request().url().toString().split(";")[1];
+                                if(cookie == null){
+                                    if(listener != null){
+                                        listener.onFail();
+                                        return;
                                     }
-                                });
+                                }
+                                if (cookie != null) {
+                                    realm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            Config myAccount = Config.getMyAccount(realm);
+                                            if(myAccount == null){
+                                                myAccount = new Config();
+                                                myAccount.setCODENAME("MyAccount");
+                                                myAccount.setCODE("MyAccount");
+                                            }
+                                            myAccount.setExt1(id);
+                                            myAccount.setExt2(pwd);
+                                            myAccount.setExt3(cookie.toUpperCase());
+                                            realm.copyToRealmOrUpdate(myAccount);
+
+                                            if (listener != null) {
+                                                listener.onSuccess(response, body);
+                                            }
+                                        }
+                                    });
+                                }
+                            } catch (Exception e){
+                                if(listener != null){
+                                    listener.onFail();
+                                }
                             }
                         }
                     }

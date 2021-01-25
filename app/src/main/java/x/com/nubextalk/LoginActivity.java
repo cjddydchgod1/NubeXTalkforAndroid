@@ -45,10 +45,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                apiManager.login("han03", "tech1!", new ApiManager.onApiListener() {
+                apiManager.login("han03", "tech1!", new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());
+                    }
+
+                    @Override
+                    public void onFail() {
+
                     }
                 });
             }

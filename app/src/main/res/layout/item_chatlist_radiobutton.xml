@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chat_list_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp"
+    android:layout_marginTop="15dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/chat_list_chat_picture"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/baseline_account_circle_black_24dp" />
+
+    <ImageView
+        android:id="@+id/chat_list_friend_status"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/chat_list_chat_picture"
+        app:layout_constraintEnd_toEndOf="@id/chat_list_chat_picture" />
+
+
+    <TextView
+        android:id="@+id/chat_list_friend_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="Person Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chat_list_last_message"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:maxWidth="250dp"
+        android:text="Chat content..."
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
+        app:layout_constraintTop_toBottomOf="@+id/chat_list_friend_name" />
+
+    <RadioButton
+        android:id="@+id/select_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_l"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.joanzapata.iconify.widget.IconButton
+        android:id="@+id/chat_list_notify1"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/cTransparent"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_friend_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.joanzapata.iconify.widget.IconButton
+        android:id="@+id/chat_list_notify2"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/cTransparent"
+        app:layout_constraintStart_toEndOf="@+id/chat_list_notify1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -66,15 +66,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          * SessionID가 만료가 되지 않게 id, pwd를 박아서 다시 로그인하는 방식으로 하였다.
          */
         intent = new Intent(getApplicationContext(), MainActivity.class);
-        if(UtilityManager.checkString(Config.getMyAccount(realm).getExt5())) {
-            apiManager.login(new ApiManager.onApiListener() {
-                @Override
-                public void onSuccess(Response response, String body) {
-                    startActivity(intent);
-                    finish();
-                }
-            });
+        Config myAccount = Config.getMyAccount(realm);
+        if(myAccount != null) {
+            if(UtilityManager.checkString(myAccount.getExt5())) {
+                apiManager.login(new ApiManager.onLoginApiListener() {
+                    @Override
+                    public void onSuccess(Response response, String body) {
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFail() {
+
+                    }
+                });
+            }
         }
+
     }
 
 
@@ -85,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()){
             case R.id.login_sign_up:
                 startActivity(new Intent(activity, RegisterActivity.class));
+                finish();
                 break;
             case R.id.login_sign_in:
                 String id = String.valueOf(mEditId.getText());
@@ -92,7 +102,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String autoLogin = null;
                 if(checkAutoLogin.isChecked())
                     autoLogin = "checked";
-                apiManager.login(id, password, autoLogin,new ApiManager.onApiListener() { // lee777 , tech1!
+                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());
@@ -108,6 +118,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             }
                         });
 
+
+                    }
+
+                    @Override
+                    public void onFail() {
 
                     }
                 });

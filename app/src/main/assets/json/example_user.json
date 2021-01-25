@@ -270,7 +270,7 @@
     "app_FCM_KEY": null,
     "app_NAME": "한양대01",
     "app_STATUS": "0",
-    "app_IMG_PATH": "https://firebasestorage.googleapis.com/v0/b/nubextalkforandroid.appspot.com/o/hosptial%2Fw34qjptO0cYSJdAwScFQprofileshan01?alt=media&token=bbdbe3dc-5b5f-4701-afdd-10f306bc07b3"
+    "app_IMG_PATH": null
   },
   {
     "code": "219",
@@ -309,7 +309,7 @@
     "app_FCM_KEY": null,
     "app_NAME": "한양대02",
     "app_STATUS": "0",
-    "app_IMG_PATH": "https://firebasestorage.googleapis.com/v0/b/nubextalkforandroid.appspot.com/o/hosptial%2Fw34qjptO0cYSJdAwScFQprofileshan02?alt=media&token=d661150a-485d-424d-a2b0-9be669266778"
+    "app_IMG_PATH": null
   },
   {
     "code": "220",
@@ -348,6 +348,6 @@
     "app_FCM_KEY": null,
     "app_NAME": "TEST",
     "app_STATUS": "2",
-    "app_IMG_PATH": "https://firebasestorage.googleapis.com/v0/b/nubextalkforandroid.appspot.com/o/hosptial%2Fw34qjptO0cYSJdAwScFQprofileshan03?alt=media&token=1e075ab1-6a14-4505-8271-63ad52daa1f3"
+    "app_IMG_PATH": null
   }
 ]

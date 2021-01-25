@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 
 public class ChatRoomMember extends RealmObject {
     @NonNull
@@ -21,16 +22,20 @@ public class ChatRoomMember extends RealmObject {
         return rid;
     }
 
-    public void setRid(String rid) { this.rid = rid; }
+    public void setRid(String rid) {
+        this.rid = rid;
+    }
 
     @NonNull
     public String getUid() {
         return uid;
     }
 
-    public void setUid(String uid) { this.uid = uid; }
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
-    public static void addChatRoomMember(Realm realm, String rid, String uid){
+    public static void addChatRoomMember(Realm realm, String rid, String uid) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -41,6 +46,33 @@ public class ChatRoomMember extends RealmObject {
                 chatRoom.setMemeberCount(chatRoom.getMemeberCount() + 1);
                 realm.copyToRealmOrUpdate(chatRoom);
                 realm.copyToRealm(chatRoomMember);
+            }
+        });
+    }
+
+    public static void addChatRoomMember(Realm realm, String rid, String[] uid) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ChatRoomMember chatRoomMember = new ChatRoomMember();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                for (String id : uid) {
+                    chatRoomMember.setRid(rid);
+                    chatRoomMember.setUid(id);
+                    chatRoom.setMemeberCount(chatRoom.getMemeberCount() + 1);
+                }
+                realm.copyToRealmOrUpdate(chatRoom);
+                realm.copyToRealm(chatRoomMember);
+            }
+        });
+    }
+
+    public static void deleteChatRoomMember(Realm realm, String rid, String uid) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ChatRoomMember chatRoomMember = realm.where(ChatRoomMember.class).equalTo("rid", rid).equalTo("uid",uid).findFirst();
+                chatRoomMember.deleteFromRealm();
             }
         });
     }

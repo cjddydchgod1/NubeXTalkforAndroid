@@ -68,6 +68,7 @@ public class FirebaseFunctionsManager {
 
     /**
      * Firebase Functions 통해 FireStore에 채팅방 생성
+     *
      * @param data 채팅방 생성 데이터 Map
      * @return
      */
@@ -79,6 +80,7 @@ public class FirebaseFunctionsManager {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
         params.put("hospital", data.get("hospital"));
+        params.put("senderId", data.get("senderId"));
         params.put("chatRoomId", data.get("chatRoomId"));
         params.put("members", data.get("members"));
         params.put("title", data.get("title"));
@@ -93,6 +95,7 @@ public class FirebaseFunctionsManager {
 
     /**
      * Firbase Functions 통해 FireStore 에서 채팅방 가져오기
+     *
      * @param hospitalId 병원 id
      * @param chatRoomId 채팅방 id
      * @return FireStore 채팅방 데이
@@ -114,6 +117,7 @@ public class FirebaseFunctionsManager {
 
     /**
      * 기존 채팅방에서 새로운 유저들이 추가되면 해당 유저들에게 fcm 메세지 보내는 함수
+     *
      * @param data 병원 id, 유저들 userId, 채팅방 id 가 담긴 데이터 Map
      * @return
      */
@@ -127,6 +131,8 @@ public class FirebaseFunctionsManager {
         params.put("hospitalId", data.get("hospitalId"));
         params.put("membersId", data.get("membersId"));
         params.put("chatRoomId", data.get("chatRoomId"));
+        params.put("senderId", data.get("senderId"));
+
         return functions
                 .getHttpsCallable("notifyToChatRoomAddedUser")
                 .call(params);

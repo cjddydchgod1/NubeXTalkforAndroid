@@ -16,8 +16,13 @@ import android.widget.EditText;
 import android.widget.Switch;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Model.User;
 
 public class RegisterActivity extends AppCompatActivity {
     @SuppressLint("UseSwitchCompatOrMaterialCode")
@@ -48,26 +53,51 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void execute(Realm realm) {
                         Config serverInfo = Config.getServerInfo(realm);
-                        if (serverInfo == null) {
-                            serverInfo = new Config();
-                            serverInfo.setCODENAME("ServerInfo");
-                            serverInfo.setCODE("ServerInfo");
-                        }
                         String ssl = sslInput.isChecked() ? "https://" : "http://";
                         String host = hostInput.getText().toString().equals("") ? "192.168.3.156" : hostInput.getText().toString();
                         String port = portInput.getText().toString().equals("") ? "" : ":".concat(portInput.getText().toString());
                         String name = nameInput.getText().toString().equals("") ? "" : nameInput.getText().toString();
-                        serverInfo.setOid(name);
+                        if (serverInfo == null) {
+                            serverInfo = new Config();
+                            serverInfo.setOid("[null]");
+                            serverInfo.setCODENAME("ServerInfo");
+                            serverInfo.setCODE("ServerInfo");
+                        }
                         serverInfo.setExt1(ssl);
                         serverInfo.setExt2(host);
                         serverInfo.setExt3(port);
                         serverInfo.setExt4(name);
                         realm.copyToRealmOrUpdate(serverInfo);
-                        startActivity(new Intent(activity, LoginActivity.class));
-                        finish();
+
                     }
                 });
+                clearModels(realm);
+                startActivity(new Intent(activity, LoginActivity.class));
+                finish();
             }
         });
     }
+
+    /**
+     * 서버 최초 등록 및 재등록 시에 Config 모델을 제외한 나머지 모델들 데이터 초기화 함수
+     * @param realm
+     */
+    private void clearModels(Realm realm) {
+        final RealmResults<User> userRealmResults = realm.where(User.class).findAll();
+        final RealmResults<ChatRoom> chatRoomRealmResults = realm.where(ChatRoom.class).findAll();
+        final RealmResults<ChatRoomMember> chatRoomMemberRealmResults = realm.where(ChatRoomMember.class).findAll();
+        final RealmResults<ChatContent> chatContentRealmResults = realm.where(ChatContent.class).findAll();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                userRealmResults.deleteAllFromRealm();
+                chatRoomRealmResults.deleteAllFromRealm();
+                chatRoomMemberRealmResults.deleteAllFromRealm();
+                chatContentRealmResults.deleteAllFromRealm();
+            }
+        });
+
+    }
+
 }

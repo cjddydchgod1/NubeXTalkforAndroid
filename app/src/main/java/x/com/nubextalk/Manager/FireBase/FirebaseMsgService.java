@@ -85,6 +85,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 realm.copyToRealmOrUpdate(userMe);
             }
         });
+        realm.close();
 
 
         /**
@@ -131,7 +132,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 Log.d("USERID",uid);
                 userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
-
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
                 sysContent.append("님이 채팅방을 개설 하였습니다.");

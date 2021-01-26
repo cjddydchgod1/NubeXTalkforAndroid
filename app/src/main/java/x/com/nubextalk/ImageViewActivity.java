@@ -7,25 +7,19 @@ package x.com.nubextalk;
 
 import androidx.appcompat.app.AppCompatActivity;
 import io.realm.Realm;
-import okhttp3.Cookie;
-import okhttp3.Response;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.PACS.ApiManager;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import java.util.List;
 
 public class ImageViewActivity extends AppCompatActivity {
 
@@ -35,6 +29,8 @@ public class ImageViewActivity extends AppCompatActivity {
     private WebView mWebView;
     private WebSettings mWebSettings;
     private String CONTEXT_PATH;
+
+    private String rid;
 
     @Override
     protected void onDestroy() {
@@ -60,6 +56,7 @@ public class ImageViewActivity extends AppCompatActivity {
         cookieManager.setCookie(CONTEXT_PATH, myAccount.getExt3());
 
         String studyId = getIntent().getStringExtra("studyId");
+        rid = getIntent().getStringExtra("rid");
         if(UtilityManager.checkString(studyId)){
             mWebView.loadUrl(CONTEXT_PATH + "/mobile/app/?studyId="+studyId);
         }
@@ -91,15 +88,26 @@ public class ImageViewActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(UtilityManager.checkString(studyId)){
-                        String rid = getIntent().getStringExtra("rid");
-
-                        Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                        intent.putExtra("studyId",studyId);
-                        intent.putExtra("description","EMPTY_PACS_DESCRIPTION");
-                        intent.putExtra("rid",rid);
-                        startActivity(intent);
-
                         //Go Share Intent
+                        /**
+                         * rid값이 존재한다면 ChatRoom에서 바로 PACS를 접근한 것.
+                         * rid값이 존재하지 않는다면 PACSReference에서 접근한 것.
+                         */
+                        if(UtilityManager.checkString(rid)) {
+                            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                            intent.putExtra("studyId",studyId);
+                            intent.putExtra("description","EMPTY_PACS_DESCRIPTION");
+                            intent.putExtra("rid",rid);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(ImageViewActivity.this, SharePACSActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", studyId);
+                            bundle.putString("description", "EMPTY PACS DESCRIPTION");
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
+                        finish();
                     }
                 }
             });

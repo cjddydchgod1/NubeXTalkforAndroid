@@ -86,7 +86,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private FriendListAdapter mAdapter;
     private RealmResults<User> mResults;
     private ArrayList<User> mUserList; // mResults를 복사
-    private RealmResults<ChatRoomMember> chatList;
     private AQuery aq;
     private ApiManager apiManager;
     private String myUid; // Uid
@@ -499,22 +498,9 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              * 2. rid중에서 memberCount값이 2인것을 찾는다.
              * 3. 해당 rid값으로 intent로 넘겨준다.
              */
-            chatList = realm.where(ChatRoomMember.class).equalTo("uid", address.getUserId()).findAll();
-            ChatRoom chatRoom = null;
-            if(chatList.size() != 0) {
 
-                Iterator<ChatRoomMember> mChat;
-                /**
-                 * 1대1채팅방을 찾았다면 그 값이 chatRoom
-                 * 찾지 못했다면 chatRoom은 null값
-                 */
-                for(mChat = chatList.iterator(); chatRoom == null ;mChat.hasNext()) {
-                    chatRoom = realm.where(ChatRoom.class)
-                            .equalTo("rid", mChat.next().getRid())
-                            .and()
-                            .equalTo("memberCount", 2).findFirst();
-                }
-            }
+            ChatRoom chatRoom = User.getChatroom(realm, address);
+
             if(chatRoom==null){
                 // 새로만든 채팅이 없다면 새로 만든다.
                 ArrayList<User> list = new ArrayList<>();

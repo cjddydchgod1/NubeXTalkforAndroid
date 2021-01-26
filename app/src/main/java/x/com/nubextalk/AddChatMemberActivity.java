@@ -207,7 +207,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
             FirebaseFirestore fs = FirebaseFirestore.getInstance();
             for (User user : userList) {
                 //Realm 에 해당 채팅방에 사용자 추가
-                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
+//                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
 
                 //FireStore 에 해당 채팅방에 사용자 추가
                 Map<String, Object> data = new HashMap<>();

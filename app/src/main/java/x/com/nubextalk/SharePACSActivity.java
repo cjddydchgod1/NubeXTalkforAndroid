@@ -56,14 +56,15 @@ public class SharePACSActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View view) {
+        fragmentTransaction = fragmentManager.beginTransaction();
         switch (view.getId()) {
             case R.id.btn_friend_list :
+                fragmentTransaction.replace(R.id.main_PACS_frame_layout, friendListFragPACS).commit();
                 friendListFragPACS.setArguments(bundle);
-                fragmentTransaction.replace(R.id.main_PACS_frame_layout, friendListFragPACS).commitAllowingStateLoss();
                 break;
             case R.id.btn_chat_list :
+                fragmentTransaction.replace(R.id.main_PACS_frame_layout, chatListFragPACS).commit();
                 chatListFragPACS.setArguments(bundle);
-                fragmentTransaction.replace(R.id.main_PACS_frame_layout, chatListFragPACS).commitAllowingStateLoss();
                 break;
 
         }

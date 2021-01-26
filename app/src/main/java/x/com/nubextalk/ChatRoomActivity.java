@@ -194,7 +194,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onBackPressed() {
-        setResult(10);
+        setResult(RESULT_OK);
         finish();
     }
 

@@ -206,12 +206,6 @@ public class ChatAddActivity extends AppCompatActivity implements
         ChatRoom.createChatRoom(realm, data, userIdList, new ChatRoom.onChatRoomCreatedListener() {
             @Override
             public void onCreate(ChatRoom chatRoom) {
-//                startActivity(new Intent(context, ChatRoomActivity.class)
-//                            .putExtra("rid", chatRoom.getRid()));
-//                context.startActivity(new Intent(context, ChatRoomActivity.class)
-//                        .putExtra("rid", chatRoom.getRid()));
-                Log.d("CHAT", "채팅방 생성됨");
-                Log.d("CHAT", chatRoom.getRid());
                 rid[0] = chatRoom.getRid();
             }
         });

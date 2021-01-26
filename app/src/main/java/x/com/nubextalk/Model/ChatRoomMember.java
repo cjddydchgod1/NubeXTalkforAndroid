@@ -60,15 +60,16 @@ public class ChatRoomMember extends RealmObject {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                ChatRoomMember chatRoomMember = new ChatRoomMember();
-                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                 for (String id : uid) {
+                    ChatRoomMember chatRoomMember = new ChatRoomMember();
+                    ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                     chatRoomMember.setRid(rid);
                     chatRoomMember.setUid(id);
                     chatRoom.setMemeberCount(chatRoom.getMemeberCount() + 1);
+                    realm.copyToRealmOrUpdate(chatRoom);
+                    realm.copyToRealm(chatRoomMember);
                 }
-                realm.copyToRealmOrUpdate(chatRoom);
-                realm.copyToRealm(chatRoomMember);
+
             }
         });
     }

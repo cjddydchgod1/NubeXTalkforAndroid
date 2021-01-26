@@ -90,6 +90,7 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
                  * Finish Activity (ImageViewActivity, SharePACSActivity)
                  * 작성
                  */
+                getActivity().finish();
             } else {
                 Toast.makeText(getActivity(), "선택된 채팅 목록이 없습니다.", Toast.LENGTH_SHORT).show();
             }

@@ -8,6 +8,8 @@ package x.com.nubextalk.Module.Adapter;
 // 채팅방 액티비티와 Chat class 어댑터
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
@@ -174,6 +177,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chat.getUid().equals(mUid)) {
                 cpvHolder.myTime.setText(sendTime);
                 cpvHolder.myPacsDescription.setText(chat.getContent());
+                cpvHolder.myPacsButton.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(mContext, ImageViewActivity.class);
+                        intent.putExtra("studyId",chat.getExt1());
+                        Log.d("PACS",chat.getExt1());
+                        mContext.startActivity(intent);
+                    }
+                });
 
                 cpvHolder.myChatPacs.setVisibility(View.VISIBLE);
                 cpvHolder.myTime.setVisibility(View.VISIBLE);
@@ -189,6 +201,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.profileName.setText(mUserData.getAppName());
                 cpvHolder.otherTime.setText(sendTime);
                 cpvHolder.otherPacsDescription.setText(chat.getContent());
+                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(mContext, ImageViewActivity.class);
+                        intent.putExtra("studyId",chat.getExt1());
+                        Log.d("PACS",chat.getExt1());
+                        mContext.startActivity(intent);
+                    }
+                });
 
 
                 cpvHolder.profileImage.setVisibility(View.VISIBLE);

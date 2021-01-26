@@ -14,6 +14,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/friend_list_PACS_recycleview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+    <Button
+        android:id="@+id/btn_confirm_PACS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="공유하기"/>
 </LinearLayout>

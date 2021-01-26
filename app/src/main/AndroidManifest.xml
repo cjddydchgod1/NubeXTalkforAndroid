@@ -21,7 +21,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".ImageViewActivity"/>
-        <activity android:name=".SharePACS"></activity>
+        <activity android:name=".SharePACSActivity"></activity>
         <activity android:name=".AddChatMemberActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" /> <!-- FireBase -->

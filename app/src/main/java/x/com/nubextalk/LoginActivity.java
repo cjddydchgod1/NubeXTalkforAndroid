@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -78,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onFail() {
-
+                        Toast.makeText(LoginActivity.this, "자동 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -102,39 +103,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String autoLogin = null;
                 if(checkAutoLogin.isChecked())
                     autoLogin = "checked";
-                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
-                    @Override
-                    public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", response.toString());
-                        /**
-                         * uid, token을 firestore에 올리는 작업
-                         */
-                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-
-
-                    }
-
-                    @Override
-                    public void onFail() {
-
-                    }
-                });
-//                apiManager.login(id,password);
-//                /**
-//                 * uid, token을 firestore에 올리는 작업
-//                 */
-//                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-//                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
-//                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-//                startActivity(intent);
-//                finish();
+//                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
+//                    @Override
+//                    public void onSuccess(Response response, String body) {
+//                        Log.d("RESUlT", response.toString());
+//                        /**
+//                         * uid, token을 firestore에 올리는 작업
+//                         */
+//                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+//                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                startActivity(intent);
+//                                finish();
+//                            }
+//                        });
+//
+//
+//                    }
+//
+//                    @Override
+//                    public void onFail() {
+//                        Toast.makeText(activity, "아이디/비밀번호를 확인하세요.", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+                apiManager.login(id,password);
+                /**
+                 * uid, token을 firestore에 올리는 작업
+                 */
+                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
     }

@@ -155,8 +155,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
             case R.id.chat_fab_sub1:
                 toggleFab();
-//                ((MainActivity) getActivity()).startChatAddActivity();
-                startActivity(new Intent(getContext(), ChatAddActivity.class));
+                ((MainActivity) getActivity()).startChatAddActivity(new Intent(getContext(), ChatAddActivity.class));
+//                startActivity();
                 break;
 
             case R.id.chat_fab_sub2:

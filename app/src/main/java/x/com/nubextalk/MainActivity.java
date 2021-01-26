@@ -9,6 +9,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -96,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void startChatAddActivity(Intent intent) {
+        startActivityForResult(intent, CHAT_ADD);
+    }
     public void startChatRoomActivity(Intent intent) {
         startActivityForResult(intent, MOVE_TO_CHAT_ROOM);
     }
@@ -107,21 +111,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CHAT_ADD) {
-            if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHAT_ADD) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
                 if(fragment instanceof ChatListFragment) {
 //                    startActivity(data);
+                    Log.e("asdfasdf","asdfasdfasdf");
                     startChatRoomActivity(data);
-                }
-            }
-        }
-
-        if (requestCode == MOVE_TO_CHAT_ROOM) {
-            if (resultCode == 10) {
-                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                if(fragment instanceof ChatListFragment) {
-                    ((ChatListFragment) fragment).refreshChatList();
                 }
             }
         }
@@ -158,4 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 }

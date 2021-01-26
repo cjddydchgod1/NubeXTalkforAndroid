@@ -30,6 +30,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
+import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
@@ -86,8 +87,13 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
                     // 새로만든 채팅이 없다면 새로 만든다.
                     ArrayList<User> list = new ArrayList<>();
                     list.add(lastChecked);
-//                    ChatAddActivity.createNewChat(realm, list, "");
-                    new ChatAddActivity().createNewChat(realm, getContext(), list, "");
+
+                    String rid = new ChatAddActivity().createNewChat(realm, getContext(), list, "");
+                    Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                    intent.putExtra("rid", rid);
+                    intent.putExtra("studyId", studyId);
+                    intent.putExtra("description", description);
+                    startActivity(intent);
                 } else {
                     Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                     intent.putExtra("rid", chatRoom.getRid());
@@ -99,6 +105,7 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
                      * 작성
                      */
                 }
+                getActivity().finish();
             } else {
                 Toast.makeText(getActivity(), "선택된 친구 목록이 없습니다.", Toast.LENGTH_SHORT).show();
             }

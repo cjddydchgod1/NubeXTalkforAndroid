@@ -180,7 +180,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         String hospital = "w34qjptO0cYSJdAwScFQ";
         Map<String, Object> data = new HashMap<>();
         data.put("hospital", hospital);
-        final String[] rid = {null};
+        String[] rid = {null};
 
         ArrayList<String> userIdList = new ArrayList<>();
         for (User user : list) {

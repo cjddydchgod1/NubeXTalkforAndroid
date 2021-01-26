@@ -30,6 +30,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
 import x.com.nubextalk.AddChatMemberActivity;
+import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -137,7 +138,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void onItemSelected(@NonNull ChatRoom chatRoom) {
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
-        ((MainActivity) getActivity()).startChatRoomActivity(intent);
+//        ((MainActivity) getActivity()).startChatRoomActivity(intent);
+        startActivity(intent);
     }
 
     @Override
@@ -153,7 +155,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
             case R.id.chat_fab_sub1:
                 toggleFab();
-                ((MainActivity) getActivity()).startChatAddActivity();
+//                ((MainActivity) getActivity()).startChatAddActivity();
+                startActivity(new Intent(getContext(), ChatAddActivity.class));
                 break;
 
             case R.id.chat_fab_sub2:

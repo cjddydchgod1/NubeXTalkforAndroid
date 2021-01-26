@@ -86,7 +86,8 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
                     // 새로만든 채팅이 없다면 새로 만든다.
                     ArrayList<User> list = new ArrayList<>();
                     list.add(lastChecked);
-                    ChatAddActivity.createNewChat(realm, list, "");
+//                    ChatAddActivity.createNewChat(realm, list, "");
+                    new ChatAddActivity().createNewChat(realm, getContext(), list, "");
                 } else {
                     Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                     intent.putExtra("rid", chatRoom.getRid());

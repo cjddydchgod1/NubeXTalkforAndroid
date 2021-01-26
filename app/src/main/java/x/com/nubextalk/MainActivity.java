@@ -96,13 +96,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * ChatListFragment 에서 MainActivity -> ChatAddActivity 를 실행하는 하도록 호출해주는 함수
-     **/
-    public void startChatAddActivity() {
-        startActivityForResult(new Intent(MainActivity.this, ChatAddActivity.class), CHAT_ADD);
-    }
-
     public void startChatRoomActivity(Intent intent) {
         startActivityForResult(intent, MOVE_TO_CHAT_ROOM);
     }
@@ -118,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
                 if(fragment instanceof ChatListFragment) {
-                    ((ChatListFragment) fragment).refreshChatList();
+//                    startActivity(data);
+                    startChatRoomActivity(data);
                 }
             }
         }

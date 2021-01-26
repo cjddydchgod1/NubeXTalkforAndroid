@@ -9,6 +9,7 @@ package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,6 +182,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     public void onClick(View view) {
                         Intent intent = new Intent(mContext, ImageViewActivity.class);
                         intent.putExtra("studyId",chat.getExt1());
+                        Log.d("PACS",chat.getExt1());
                         mContext.startActivity(intent);
                     }
                 });
@@ -199,6 +201,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.profileName.setText(mUserData.getAppName());
                 cpvHolder.otherTime.setText(sendTime);
                 cpvHolder.otherPacsDescription.setText(chat.getContent());
+                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(mContext, ImageViewActivity.class);
+                        intent.putExtra("studyId",chat.getExt1());
+                        Log.d("PACS",chat.getExt1());
+                        mContext.startActivity(intent);
+                    }
+                });
 
 
                 cpvHolder.profileImage.setVisibility(View.VISIBLE);

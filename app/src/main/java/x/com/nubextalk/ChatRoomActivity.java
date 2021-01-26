@@ -136,7 +136,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
-        setNavigationView();
 
         View header = mNavigationView.getHeaderView(0);
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
@@ -219,6 +218,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
+                setNavigationView();
                 imm.hideSoftInputFromWindow(mEditChat.getWindowToken(), 0);
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
@@ -373,20 +373,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRoomId).findFirst();
         RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", mRoomId).findAll();
 
-        chatRoomMembers.addChangeListener(new RealmChangeListener<RealmResults<ChatRoomMember>>() {
-            @Override
-            public void onChange(RealmResults<ChatRoomMember> chatRoomMembers) {
-                Menu menu = mNavigationView.getMenu();
-                MenuItem item = menu.findItem(R.id.menu_chat_member);
-                SubMenu subMenu = item.getSubMenu();
-                subMenu.clear();
-                int menuId = 0;
-                for (ChatRoomMember member : chatRoomMembers) {
-                    String userName = realm.where(User.class).equalTo("userId", member.getUid()).findFirst().getAppName();
-                    subMenu.add(0, menuId++, 0, userName);
-                }
-            }
-        });
         subMenu.clear();
         int menuId = 0;
         for (ChatRoomMember member : chatRoomMembers) {

@@ -101,6 +101,7 @@ public class ApiManager {
                                             myAccount.setExt1(id);
                                             myAccount.setExt2(pwd);
                                             myAccount.setExt3(cookie.toUpperCase());
+                                            myAccount.setExt5(check);
                                             realm.copyToRealmOrUpdate(myAccount);
 
                                             if (listener != null) {

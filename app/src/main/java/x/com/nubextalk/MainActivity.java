@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MOVE_TO_CHAT_ROOM = 1;
     private FriendListFragment friendListFrag = new FriendListFragment();
     private ChatListFragment chatListFrag = new ChatListFragment();
-    private PACSReferenceFragment calendarFrag = new PACSReferenceFragment();
+    private PACSReferenceFragment pacsReferenceFrag = new PACSReferenceFragment();
     private SettingFragment settingFrag = new SettingFragment();
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private FragmentTransaction fragmentTransaction;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                         fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
                         return true;
                     case R.id.nav_calendar:
-                        fragmentTransaction.replace(R.id.main_frame_layout, calendarFrag).commitAllowingStateLoss();
+                        fragmentTransaction.replace(R.id.main_frame_layout, pacsReferenceFrag).commitAllowingStateLoss();
                         return true;
                     case R.id.nav_setting:
                         fragmentTransaction.replace(R.id.main_frame_layout, settingFrag).commitAllowingStateLoss();

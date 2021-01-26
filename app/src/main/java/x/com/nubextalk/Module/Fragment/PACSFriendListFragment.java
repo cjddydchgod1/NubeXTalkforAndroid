@@ -64,7 +64,9 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        /**
+         * User data를 받아온다
+         */
         getData();
 
         mAdapter = new FriendListAdapter(getActivity() ,mUserList, aq, FriendlistCase.RADIO);
@@ -77,7 +79,6 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
         Bundle bundle = getArguments();
         studyId = bundle.getString("studyId");
         description = bundle.getString("description");
-
         confirmBtn.setOnClickListener(view -> {
             if(lastChecked != null) {
                 ChatRoom chatRoom = User.getChatroom(realm, lastChecked);
@@ -124,8 +125,7 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
 
     public void getData() {
         try {
-            RealmResults<User> mResults = realm.where(User.class).notEqualTo("userId", Config.getMyUID(realm)).findAll();
-            mUserList.addAll(realm.copyFromRealm(mResults));
+            mUserList.addAll(realm.copyFromRealm(User.getUserlist(realm)));
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {

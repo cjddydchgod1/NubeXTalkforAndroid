@@ -88,21 +88,23 @@ public class ImageViewActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(UtilityManager.checkString(studyId)){
-                        String rid = getIntent().getStringExtra("rid");
-
-                        Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                        intent.putExtra("studyId",studyId);
-                        intent.putExtra("description","EMPTY_PACS_DESCRIPTION");
-                        intent.putExtra("rid",rid);
-                        startActivity(intent);
-
                         //Go Share Intent
+                        /**
+                         * rid값이 존재한다면 ChatRoom에서 바로 PACS를 접근한 것.
+                         * rid값이 존재하지 않는다면 PACSReference에서 접근한 것.
+                         */
                         if(UtilityManager.checkString(rid)) {
-
+                            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                            intent.putExtra("studyId",studyId);
+                            intent.putExtra("description","EMPTY_PACS_DESCRIPTION");
+                            intent.putExtra("rid",rid);
+                            startActivity(intent);
                         } else {
                             Intent intent = new Intent(ImageViewActivity.this, SharePACSActivity.class);
-                            intent.putExtra("studyId", studyId);
-                            intent.putExtra("description", "EMPTY PACS DESCRIPTION");
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", studyId);
+                            bundle.putString("description", "EMPTY PACS DESCRIPTION");
+                            intent.putExtras(bundle);
                             startActivity(intent);
                         }
                         finish();

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,11 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView   = rootview.findViewById(R.id.chat_list_PACS_recyclerview);
         confirmBtn      = rootview.findViewById(R.id.btn_confirm_PACS);
-        chatRoomResults = ChatRoom.getAll(realm);
+
+        /**
+         * Chatlist data를 받아온다.
+         */
+        getData();
 
         mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, ChatlistCase.RADIO);
         mAdapter.setItemSelectedListener(this);
@@ -104,5 +109,16 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
         radioButton.setChecked(true);
         lastRadioButton = radioButton;
         lastChecked = chatRoom;
+    }
+
+    public void getData() {
+        try {
+            chatRoomResults = ChatRoom.getAll(realm);
+        } catch (Exception e) {
+            Log.e("e", e.toString());
+        } finally {
+            if(realm != null)
+                realm.close();
+        }
     }
 }

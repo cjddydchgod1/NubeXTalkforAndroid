@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -28,8 +29,7 @@ public class SharePACSActivity extends AppCompatActivity implements View.OnClick
     private Button mFriendListBtn;
     private Button mChatListBtn;
 
-    private String studyId;
-    private String description;
+    private Bundle bundle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,37 +38,32 @@ public class SharePACSActivity extends AppCompatActivity implements View.OnClick
         mFriendListBtn  = findViewById(R.id.btn_friend_list);
         mChatListBtn    = findViewById(R.id.btn_chat_list);
 
+        /**
+         * Fragment 처음은 FriendListFrag
+         */
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_PACS_frame_layout, friendListFragPACS).commitAllowingStateLoss();
+        fragmentTransaction.replace(R.id.main_PACS_frame_layout, friendListFragPACS).commit();
+        /**
+         * ImageView에서 받아온 intent값을 bundle로 저장하여 Fragment에게 뿌려준다
+         */
+        Intent intent = getIntent();
+        bundle = intent.getExtras();
+        friendListFragPACS.setArguments(bundle);
 
         mFriendListBtn.setOnClickListener(this);
         mChatListBtn.setOnClickListener(this);
-
-        Intent intent = getIntent();
-        studyId     = intent.getExtras().getString("studyId");
-        description = intent.getExtras().getString("description");
-
     }
 
     @Override
     public void onClick(View view) {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        Bundle bundle = new Bundle();
-        Fragment fragment;
         switch (view.getId()) {
             case R.id.btn_friend_list :
+                friendListFragPACS.setArguments(bundle);
                 fragmentTransaction.replace(R.id.main_PACS_frame_layout, friendListFragPACS).commitAllowingStateLoss();
-                fragment = new PACSFriendListFragment();
-                bundle.putString("studyId", studyId);
-                bundle.putString("description", description);
-                fragment.setArguments(bundle);
                 break;
             case R.id.btn_chat_list :
+                chatListFragPACS.setArguments(bundle);
                 fragmentTransaction.replace(R.id.main_PACS_frame_layout, chatListFragPACS).commitAllowingStateLoss();
-                fragment = new PACSChatListFragment();
-                bundle.putString("studyId", studyId);
-                bundle.putString("description", description);
-                fragment.setArguments(bundle);
                 break;
 
         }

@@ -17,6 +17,7 @@ import android.widget.Button;
 
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.R;
+import x.com.nubextalk.SharePACSActivity;
 
 public class PACSReferenceFragment extends Fragment {
     private ViewGroup rootview;
@@ -29,7 +30,17 @@ public class PACSReferenceFragment extends Fragment {
         btnSharePACS.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ImageViewActivity.class);
+//                Intent intent = new Intent(getActivity(), ImageViewActivity.class);
+//                startActivity(intent);
+                /**
+                 * bundle을 intent로 보내는 방법
+                 * 현재 Test 하기 위한 코드 추후에 위에 있는 코드로 변경
+                 */
+                Intent intent = new Intent(getActivity(), SharePACSActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("studyId", "33");
+                bundle.putString("description", "EMPTY PACS DESCRIPTION");
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });

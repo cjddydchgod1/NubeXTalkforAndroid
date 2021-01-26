@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.ChatListFragment;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
@@ -51,10 +52,23 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
     private String token;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bottomNavigationView = findViewById(R.id.bottom_nav);
+
+
+        String requestChatList = getIntent().getStringExtra("requestChatList");
+        if (UtilityManager.checkString(requestChatList)) {
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        } else {
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+        }
 
         //툴바 설정
         toolbar = findViewById(R.id.toolbar);
@@ -62,17 +76,11 @@ public class MainActivity extends AppCompatActivity {
 
         initBottomNavigation();
     }
+
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/
     private void initBottomNavigation() {
-        //네비게이션 설정
-        bottomNavigationView = findViewById(R.id.bottom_nav);
-
-        //프래그먼트 전환 관리 설정 - 처음 실행시에는 친구목록 프래그먼트
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
-
         //네비게이션 버튼 해당 프래그먼트로 전환
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override

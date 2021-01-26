@@ -72,6 +72,8 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     private String mUid;
 
     private ChatAdapter mAdapter;
+    private RealmResults<ChatContent> mChat;
+    private int mChatIndex;
 
     private RecyclerView mRecyclerView;
     private DrawerLayout mDrawerLayout;
@@ -115,9 +117,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         title.setText(roomTitle);
 
         // rid 참조하여 채팅내용 불러옴
-        RealmResults<ChatContent> mChat = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
+        mChat = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
         mChat = mChat.sort("sendDate", Sort.ASCENDING);
-        setChatContentRead(mChat);
+        mChatIndex = setChatContentRead(mChat, 0);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
         mEditChat = (EditText) findViewById(R.id.edit_chat);
@@ -181,15 +183,20 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
     @Override // Back pressed
     public void onBackPressed() {
-        super.onBackPressed();
-        setResult(10);
+        setChatContentRead(mChat, mChatIndex);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.putExtra("requestChatList", "OK");
+        startActivity(intent);
         realm.close();
+        finish();
+
     }
 
     @Override // Destroy
     protected void onDestroy() {
-        super.onDestroy();
+        setChatContentRead(mChat, mChatIndex);
         realm.close();
+        super.onDestroy();
     }
 
     @Override // Option Item Selected Listener
@@ -592,17 +599,20 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     }
 
     // Read Chat
-    private void setChatContentRead(RealmResults<ChatContent> mChat) {
+    private int setChatContentRead(RealmResults<ChatContent> Chats, int start) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                for (ChatContent chatContent : mChat) {
+                for (int i = start; i < Chats.size(); i++) {
+                    ChatContent chatContent = Chats.get(i);
                     if (!chatContent.getIsRead()) {
                         chatContent.setIsRead(true);
+                        realm.copyToRealmOrUpdate(chatContent);
                     }
                 }
-                ;
             }
         });
+
+        return Chats.size();
     }
 }

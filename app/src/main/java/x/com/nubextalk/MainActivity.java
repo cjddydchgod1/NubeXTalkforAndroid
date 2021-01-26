@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     public void startChatAddActivity(Intent intent) {
         startActivityForResult(intent, CHAT_ADD);
     }
+
     public void startChatRoomActivity(Intent intent) {
         startActivityForResult(intent, MOVE_TO_CHAT_ROOM);
     }
@@ -122,11 +123,17 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == CHAT_ADD) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                if(fragment instanceof ChatListFragment) {
-//                    startActivity(data);
-                    Log.e("asdfasdf","asdfasdfasdf");
+                if (fragment instanceof ChatListFragment) {
                     startChatRoomActivity(data);
                 }
+            }
+        }
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == MOVE_TO_CHAT_ROOM) {
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+                bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
             }
         }
     }

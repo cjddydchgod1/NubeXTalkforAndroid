@@ -36,6 +36,7 @@ import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
 import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
@@ -206,7 +207,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
             FirebaseFirestore fs = FirebaseFirestore.getInstance();
             for (User user : userList) {
                 //Realm 에 해당 채팅방에 사용자 추가
-                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
+//                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
 
                 //FireStore 에 해당 채팅방에 사용자 추가
                 Map<String, Object> data = new HashMap<>();
@@ -223,6 +224,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
                 jsonArray.put(user.getUserId());
             }
             data.put("hospitalId", hid);
+            data.put("senderId", Config.getMyAccount(realm).getExt1());
             data.put("membersId", jsonArray);
             data.put("chatRoomId", rid);
             FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);

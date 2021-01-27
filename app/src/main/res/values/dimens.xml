@@ -77,4 +77,7 @@
 
     <dimen name="actrionbar_height">44dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="nav_item_height">44dp</dimen>
+    <dimen name="toolbar_height">80dp</dimen>
+    <dimen name="toolbar_height_l">160dp</dimen>
 </resources>

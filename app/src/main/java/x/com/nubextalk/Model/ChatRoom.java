@@ -176,16 +176,19 @@ public class ChatRoom extends RealmObject {
                     User user = realm.where(User.class).equalTo("userId", userId).findFirst();
                     roomName = user.getAppName();
                     roomImg = user.getAppImagePath();
+                    isGroupChat = false;
                 }
             }
         }
 
         if (memberCount > 2) { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
             roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
+            isGroupChat = true;
         }
 
         String finalRoomName = roomName;
         String finalRoomImg = roomImg;
+        Boolean finalIsGroupChat = isGroupChat;
 
         //realm 로컬 채팅방 생성
         realm.executeTransaction(new Realm.Transaction() {
@@ -198,7 +201,7 @@ public class ChatRoom extends RealmObject {
                 chatRoom.setUpdatedDate(updatedDate);
                 chatRoom.setNotificationId(notificationId);
                 chatRoom.setMemeberCount(memberCount);
-                chatRoom.setIsGroupChat(isGroupChat);
+                chatRoom.setIsGroupChat(finalIsGroupChat);
                 realm.copyToRealmOrUpdate(chatRoom);
 
                 if(onChatRoomCreatedListener != null) {

@@ -118,13 +118,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
 
         getData();
-        makeProfile();
-//        /**
-//         * Adapter 설정
-//         */
-//        mAdapter = new FriendListAdapter(getActivity() ,mUserList, aq, FriendlistCase.NON_RADIO);
-//        mAdapter.setOnItemSelectedListener(this);
-//        mRecyclerView.setAdapter(mAdapter);
+
         /**
          * recyclerview 애니매이션
          */
@@ -266,6 +260,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mAdapter = new FriendListAdapter(getActivity() ,mUserList, aq, FriendlistCase.NON_RADIO);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
+
+        makeProfile();
     }
 
     public void makeProfile() {

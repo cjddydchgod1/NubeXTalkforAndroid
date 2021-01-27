@@ -11,6 +11,7 @@ import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.PACS.ApiManager;
+import x.com.nubextalk.PACS.PacsWebView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,13 +22,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class ImageViewActivity extends AppCompatActivity {
+public class ImageViewActivity extends AppCompatActivity implements PacsWebView.onJavaScriptListener {
 
     private Realm realm;
     private ApiManager mApiManager;
 
-    private WebView mWebView;
-    private WebSettings mWebSettings;
+    private PacsWebView mPacsWebView;
     private String CONTEXT_PATH;
 
     private String rid;
@@ -47,70 +47,40 @@ public class ImageViewActivity extends AppCompatActivity {
         mApiManager = new ApiManager(this, realm);
         CONTEXT_PATH = mApiManager.getServerPath(realm);
 
-        mWebView = findViewById(R.id.webView);
-
-        setWebViewSettings();
-
-        Config myAccount = Config.getMyAccount(realm);
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setCookie(CONTEXT_PATH, myAccount.getExt3());
+        mPacsWebView = findViewById(R.id.webView);
+        mPacsWebView.init(realm);
+        mPacsWebView.setJavaScriptListener(this);
 
         String studyId = getIntent().getStringExtra("studyId");
         rid = getIntent().getStringExtra("rid");
         if(UtilityManager.checkString(studyId)){
-            mWebView.loadUrl(CONTEXT_PATH + "/mobile/app/?studyId="+studyId);
+            mPacsWebView.loadUrl("/mobile/app/?studyId="+studyId);
         }
         else{
-            mWebView.loadUrl(CONTEXT_PATH + "/mobile/app/");
+            mPacsWebView.loadUrl("/mobile/app/");
         }
     }
 
-    private void setWebViewSettings() {
-        mWebView.setWebViewClient(new WebViewClient());
-        mWebView.addJavascriptInterface(new JavaScriptBridge(), "NubeXApp");
-        mWebSettings = mWebView.getSettings();
-        mWebSettings.setJavaScriptEnabled(true);
-        mWebSettings.setUseWideViewPort(true);
-        mWebSettings.setLoadWithOverviewMode(true);
-        mWebSettings.setDomStorageEnabled(true);
-
-        mWebSettings.setBuiltInZoomControls(false);
-        mWebSettings.setSupportZoom(false);
-
-        mWebSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-    }
-
-    private class JavaScriptBridge{
-
-        @JavascriptInterface
-        public void shareApp(final String studyId){
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    if(UtilityManager.checkString(studyId)){
-                        //Go Share Intent
-                        /**
-                         * rid값이 존재한다면 ChatRoom에서 바로 PACS를 접근한 것.
-                         * rid값이 존재하지 않는다면 PACSReference에서 접근한 것.
-                         */
-                        if(UtilityManager.checkString(rid)) {
-                            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                            intent.putExtra("studyId",studyId);
-                            intent.putExtra("description","EMPTY_PACS_DESCRIPTION");
-                            intent.putExtra("rid",rid);
-                            startActivity(intent);
-                        } else {
-                            Intent intent = new Intent(ImageViewActivity.this, SharePACSActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("studyId", studyId);
-                            bundle.putString("description", "EMPTY PACS DESCRIPTION");
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        }
-                        finish();
-                    }
+    @Override
+    public void onCall(String func, String... arg) {
+        switch (func){
+            case "shareApp":
+                if(UtilityManager.checkString(rid)) {
+                    Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                    intent.putExtra("studyId",arg[0]);
+                    intent.putExtra("description",arg[1]);
+                    intent.putExtra("rid",rid);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(ImageViewActivity.this, SharePACSActivity.class);
+                    Bundle bundle = new Bundle();
+                    intent.putExtra("studyId",arg[0]);
+                    intent.putExtra("description",arg[1]);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
                 }
-            });
+                finish();
+                break;
         }
     }
 }

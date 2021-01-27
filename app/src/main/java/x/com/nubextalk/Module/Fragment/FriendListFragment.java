@@ -78,7 +78,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm realm;
-    FirebaseStoreManager firebaseStoreManager;
 
     private ViewGroup rootview;
     private LinearLayout mBottomWrapper;
@@ -98,9 +97,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         super.onCreate(savedInstanceState);
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-        firebaseStoreManager = new FirebaseStoreManager();
         apiManager = new ApiManager(getActivity(), realm);
-//        Log.i(TAG, "OnCreate");
     }
 
     @Override
@@ -113,7 +110,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         aq              = new AQuery(getActivity());
 
         /**
-         * recyclerview 디자인 및 애니매이션
+         * recyclerview 디자인
          */
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -122,8 +119,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         getData();
 
-
-//        Log.i(TAG, "OncreateView");
+        /**
+         * recyclerview 애니매이션
+         */
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.scheduleLayoutAnimation();
         return rootview;
     }
 
@@ -135,84 +135,22 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         setHasOptionsMenu(true);
         getActivity().invalidateOptionsMenu();
-//        Log.i(TAG, "OnActivityCreated");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        /**
-         * recyclerview 애니매이션
-         */
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
-        mRecyclerView.scheduleLayoutAnimation();
-//        Log.i(TAG, "OnStart");
-
     }
 
     public void getData() {
                 /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
          */
-//        apiManager.getEmployeeList(new ApiManager.onApiListener() {
-//            @Override
-//            public void onSuccess(Response response, String body) {
-//                /**
-//                 * userlist -> realm 저장
-//                 */
-//                try{
-//                    /**
-//                     * String(body) -> JSONArray
-//                     */
-//                    JSONArray jsonArray = new JSONArray(body);
-//                    /**
-//                     * JSONArray -> JSONObject
-//                     * JSONObject -> User
-//                     * User -> ArrayList
-//                     */
-//                    int len = jsonArray.length();
-//
-//                    for(int i=0; i<len; i++) {
-//                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-//
-//                        User user = realm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
-//                        if(user == null) {
-//                            user = new User();
-//                            user.setCode(jsonObject.getString("code"));
-//                        } else {
-//                            user = realm.copyFromRealm(user);
-//                        }
-//                        user.setUserId(jsonObject.getString("userid"));
-//                        user.setLastName(jsonObject.getString("lastname"));
-//                        user.setTypeCode(jsonObject.getString("typecode"));
-//                        user.setTypeCodeName(jsonObject.getString("typecodename"));
-//                        user.setRemoved(jsonObject.getString("removed"));
-//                        user.setAppImagePath(jsonObject.getString("app_IMG_PATH"));
-//                        user.setAppStatus(jsonObject.getString("app_STATUS"));
-//                        user.setAppName(jsonObject.getString("app_NAME"));
-//                        user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-//                        if(!UtilityManager.checkString(user.getAppNickName()))
-//                            user.setAppNickName(jsonObject.getString("lastname"));
-//                        mUserList.add(user);
-//                    }
-//                    /**
-//                     * ArrayList -> Realm
-//                     */
-//                    realm.executeTransaction(realm1 -> {
-//                        realm1.copyToRealmOrUpdate(mUserList);
-//                    });
-//                    makeData();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-
-        try{
+        apiManager.getEmployeeList(new ApiManager.onApiListener() {
+            @Override
+            public void onSuccess(Response response, String body) {
+                /**
+                 * userlist -> realm 저장
+                 */
+                try{
                     /**
                      * String(body) -> JSONArray
                      */
-                    String body = UtilityManager.loadJson(getActivity(), "example_user.json");
                     JSONArray jsonArray = new JSONArray(body);
                     /**
                      * JSONArray -> JSONObject
@@ -221,12 +159,16 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      */
                     int len = jsonArray.length();
 
-                    ArrayList<User> users = new ArrayList<>();
                     for(int i=0; i<len; i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                        User user = new User();
-                        user.setCode(jsonObject.getString("code"));
+                        User user = realm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
+                        if(user == null) {
+                            user = new User();
+                            user.setCode(jsonObject.getString("code"));
+                        } else {
+                            user = realm.copyFromRealm(user);
+                        }
                         user.setUserId(jsonObject.getString("userid"));
                         user.setLastName(jsonObject.getString("lastname"));
                         user.setTypeCode(jsonObject.getString("typecode"));
@@ -236,22 +178,67 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         user.setAppStatus(jsonObject.getString("app_STATUS"));
                         user.setAppName(jsonObject.getString("app_NAME"));
                         user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-
-                        user.setAppNickName(jsonObject.getString("lastname"));
-                        Log.d(TAG, user.getLastName());
+                        if(!UtilityManager.checkString(user.getAppNickName()))
+                            user.setAppNickName(jsonObject.getString("lastname"));
                         mUserList.add(user);
                     }
                     /**
                      * ArrayList -> Realm
                      */
                     realm.executeTransaction(realm1 -> {
-                        realm1.where(User.class).findAll().deleteAllFromRealm();
                         realm1.copyToRealmOrUpdate(mUserList);
                     });
+                    makeData();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-    makeData();
+            }
+        });
+
+//        try{
+//                    /**
+//                     * String(body) -> JSONArray
+//                     */
+//                    String body = UtilityManager.loadJson(getActivity(), "example_user.json");
+//                    JSONArray jsonArray = new JSONArray(body);
+//                    /**
+//                     * JSONArray -> JSONObject
+//                     * JSONObject -> User
+//                     * User -> ArrayList
+//                     */
+//                    int len = jsonArray.length();
+//
+//                    ArrayList<User> users = new ArrayList<>();
+//                    for(int i=0; i<len; i++) {
+//                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+//
+//                        User user = new User();
+//                        user.setCode(jsonObject.getString("code"));
+//                        user.setUserId(jsonObject.getString("userid"));
+//                        user.setLastName(jsonObject.getString("lastname"));
+//                        user.setTypeCode(jsonObject.getString("typecode"));
+//                        user.setTypeCodeName(jsonObject.getString("typecodename"));
+//                        user.setRemoved(jsonObject.getString("removed"));
+//                        user.setAppImagePath(jsonObject.getString("app_IMG_PATH"));
+//                        user.setAppStatus(jsonObject.getString("app_STATUS"));
+//                        user.setAppName(jsonObject.getString("app_NAME"));
+//                        user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
+//
+//                        user.setAppNickName(jsonObject.getString("lastname"));
+//                        Log.d(TAG, user.getLastName());
+//                        mUserList.add(user);
+//                    }
+//                    /**
+//                     * ArrayList -> Realm
+//                     */
+//                    realm.executeTransaction(realm1 -> {
+//                        realm1.where(User.class).findAll().deleteAllFromRealm();
+//                        realm1.copyToRealmOrUpdate(mUserList);
+//                    });
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//    makeData();
 
     }
 
@@ -355,8 +342,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mAdapter.notifyDataSetChanged();
     }
 
-
-
     @Override
     public void onSelected(User address) {
         initBottomsheet(address);
@@ -369,6 +354,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onSelected(User address, RadioButton radioButton) {
 
     }
+
     @SuppressLint("ClickableViewAccessibility")
     protected void initBottomsheet(User address) {
         // 프로필 이름, 이미지, 상태
@@ -577,7 +563,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         if(requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 try {
-                    // 선택된 이미지의 Uri값을 가져온다.
                     Uri imgUri = data.getData();
                     /* Uri값의 이미지값을 불러온다.
                      * 이미지값을 저장한다.

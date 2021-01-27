@@ -137,4 +137,27 @@ public class FirebaseFunctionsManager {
                 .getHttpsCallable("notifyToChatRoomAddedUser")
                 .call(params);
     }
+
+    /**
+     * 채팅방을 나가면 FireStore 의 ChatRoom > ChatRoomMember 해당 유저 삭제 함수
+     *
+     * @param hospitalId 병원 id
+     * @param userId     유저 id
+     * @param chatRoomId 채팅방 id
+     * @return
+     */
+    public static Task<HttpsCallableResult> exitChatRoom(@NonNull String hospitalId, @NonNull String userId, @NonNull String chatRoomId) {
+        return exitChatRoom(hospitalId, userId, chatRoomId, null);
+    }
+
+    public static Task<HttpsCallableResult> exitChatRoom(@NonNull String hospitalId, @NonNull String userId, @NonNull String chatRoomId, OnCompleteListsner onCompleteListsner) {
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        Map<String, Object> params = new HashMap<>();
+        params.put("hospitalId", hospitalId);
+        params.put("roomMemberId", userId);
+        params.put("chatRoomId", chatRoomId);
+        return functions
+                .getHttpsCallable("exitChatRoom")
+                .call(params);
+    }
 }

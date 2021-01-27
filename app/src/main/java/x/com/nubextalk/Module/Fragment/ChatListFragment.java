@@ -33,10 +33,12 @@ import x.com.nubextalk.AddChatMemberActivity;
 import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 import x.com.nubextalk.Module.Case.ChatlistCase;
 import x.com.nubextalk.R;
@@ -45,6 +47,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         ChatListAdapter.OnItemSelectedListener, View.OnClickListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
+
+    private String hospitalId;
 
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
@@ -56,6 +60,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
+        hospitalId = "w34qjptO0cYSJdAwScFQ";
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
@@ -112,7 +117,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                         switch (pos) {
                             case 0: /**채팅방 알림 설정 이벤트**/
                                 updateChatRoomAlarm(chatRoom);
-                                refreshChatList();
                                 break;
                             case 1: /**대화상대 추가 이벤트**/
                                 startActivity(new Intent(getContext(), AddChatMemberActivity.class)
@@ -120,11 +124,9 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트**/
                                 updateChatRoomFixTop(chatRoom);
-                                refreshChatList();
                                 break;
                             case 3: /**채팅방 나가기 이벤트**/
-                                ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
-                                refreshChatList();
+                                exitChatRoom(chatRoom);
                                 break;
                         }
                     }
@@ -162,6 +164,16 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
             case R.id.chat_fab_sub2:
                 toggleFab();
                 break;
+        }
+    }
+
+    public void exitChatRoom(ChatRoom chatRoom) {
+        if(chatRoom.getIsGroupChat()) {
+            User me = (User) User.getMyAccountInfo(realm);
+            ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
+            FirebaseFunctionsManager.exitChatRoom(hospitalId, me.getUserId(), chatRoom.getRid());
+        } else {
+            ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
         }
     }
 

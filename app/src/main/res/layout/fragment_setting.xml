@@ -3,20 +3,73 @@
   ~ Created By Jong Ho, Lee on  2020.
   ~ Copyright 테크하임(주). All rights reserved.
   -->
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Module.Fragment.SettingFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <Button
-        android:id="@+id/logoutButton"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/actrionbar_height"
+            android:background="?android:attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/mRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Logout"
-        android:textSize="@dimen/txt_GGGl"
-        android:gravity="center"/>
+        android:layout_below="@+id/appbar"
+        android:background="@color/cContent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-</FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/toolbar_height_l"
+            android:orientation="vertical">
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="계정 설정"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+            <!-- -->
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="앱 설정"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperApp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

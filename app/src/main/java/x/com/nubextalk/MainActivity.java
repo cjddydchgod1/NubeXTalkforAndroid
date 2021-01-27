@@ -105,11 +105,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * ChatListFragment 에서 MainActivity -> ChatAddActivity 를 실행하는 하도록 호출해주는 함수
-     **/
-    public void startChatAddActivity() {
-        startActivityForResult(new Intent(MainActivity.this, ChatAddActivity.class), CHAT_ADD);
+    public void startChatAddActivity(Intent intent) {
+        startActivityForResult(intent, CHAT_ADD);
     }
 
     public void startChatRoomActivity(Intent intent) {
@@ -123,12 +120,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CHAT_ADD) {
-            if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHAT_ADD) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
                 if (fragment instanceof ChatListFragment) {
-                    ((ChatListFragment) fragment).refreshChatList();
+                    startChatRoomActivity(data);
                 }
+            }
+        }
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == MOVE_TO_CHAT_ROOM) {
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+                bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
             }
         }
     }
@@ -164,4 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 }

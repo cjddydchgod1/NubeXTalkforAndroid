@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -140,6 +139,10 @@ public class ChatRoom extends RealmObject {
         return realm.where(ChatRoom.class).findAll();
     }
 
+    public interface onChatRoomCreatedListener {
+        void onCreate(ChatRoom chatRoom);
+    }
+
     /**
      * realm ChatRoom 과 ChatRoomMember 생성
      *
@@ -147,7 +150,7 @@ public class ChatRoom extends RealmObject {
      * @param data 채팅방 생성을 위한 데이터 Map
      * @param userList 채팅방 참여 사용자 (userId) 가 담긴 ArrayList
      */
-    public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList) {
+    public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList, onChatRoomCreatedListener onChatRoomCreatedListener) {
         User myAccount = (User) User.getMyAccountInfo(realm);
 
         // userList 에 자신의 아이디 추가
@@ -173,16 +176,19 @@ public class ChatRoom extends RealmObject {
                     User user = realm.where(User.class).equalTo("userId", userId).findFirst();
                     roomName = user.getAppName();
                     roomImg = user.getAppImagePath();
+                    isGroupChat = false;
                 }
             }
         }
 
         if (memberCount > 2) { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
             roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
+            isGroupChat = true;
         }
 
         String finalRoomName = roomName;
         String finalRoomImg = roomImg;
+        Boolean finalIsGroupChat = isGroupChat;
 
         //realm 로컬 채팅방 생성
         realm.executeTransaction(new Realm.Transaction() {
@@ -195,8 +201,12 @@ public class ChatRoom extends RealmObject {
                 chatRoom.setUpdatedDate(updatedDate);
                 chatRoom.setNotificationId(notificationId);
                 chatRoom.setMemeberCount(memberCount);
-                chatRoom.setIsGroupChat(isGroupChat);
+                chatRoom.setIsGroupChat(finalIsGroupChat);
                 realm.copyToRealmOrUpdate(chatRoom);
+
+                if(onChatRoomCreatedListener != null) {
+                    onChatRoomCreatedListener.onCreate(chatRoom);
+                }
 
                 //ChatRoomMember 모델에 채팅유저 생성
                 for (String userId : userList) {

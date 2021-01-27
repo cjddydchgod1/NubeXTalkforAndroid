@@ -5,9 +5,12 @@
 
 package x.com.nubextalk;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -148,11 +151,36 @@ public class ChatAddActivity extends AppCompatActivity implements
             case R.id.chat_add_confirm_btn:
                 ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
                 String roomName = chatRoomNameInput.getText().toString();
-                if (createNewChat(this.realm, selectedUser, roomName)) {
-                    setResult(RESULT_OK); //MainActivity 로 결과 전달
-                    finish();
-                } else {
-                    Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+
+                //선택된 유저가 한명일 때
+                if (selectedUser.size() == 1) {
+                    ChatRoom chatRoom = User.getChatroom(realm, selectedUser.get(0));
+                    //선택된 유저와의 채팅방이 없으면 새로운 채팅방 생성
+                    if (chatRoom == null) {
+                        String rid = createNewChat(this.realm, this, selectedUser, roomName);
+                        if (rid != null) {
+                            Intent intent = new Intent(this, ChatRoomActivity.class);
+                            intent.putExtra("rid", rid);
+                            setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
+                            finish();
+                        }
+                    } else { //기존에 선택된 유저와 채팅방이 있으면 그 채팅방으로 이동
+                        Intent intent = new Intent(this, ChatRoomActivity.class);
+                        intent.putExtra("rid", chatRoom.getRid());
+                        setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
+                        finish();
+                    }
+
+                } else { //선택된 유저가 여러명일 때, 단톡방
+                    String rid = createNewChat(this.realm, this, selectedUser, roomName);
+                    if (rid != null) {
+                        Intent intent = new Intent(this, ChatRoomActivity.class);
+                        intent.putExtra("rid", rid);
+                        setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
+                        finish();
+                    } else { // 단톡방 이름을 입력안한 경우
+                        Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
 
@@ -170,10 +198,11 @@ public class ChatAddActivity extends AppCompatActivity implements
      * @param name  채팅방 이름
      * @return
      */
-    public static boolean createNewChat(Realm realm, ArrayList<User> list, String name) {
+    public static String createNewChat(Realm realm, Context context, ArrayList<User> list, String name) {
         String hospital = "w34qjptO0cYSJdAwScFQ";
         Map<String, Object> data = new HashMap<>();
         data.put("hospital", hospital);
+        String[] rid = {null};
 
         ArrayList<String> userIdList = new ArrayList<>();
         for (User user : list) {
@@ -191,13 +220,19 @@ public class ChatAddActivity extends AppCompatActivity implements
             if (!name.equals("")) { // 채팅방 이름을 입력했을 때
                 data.put("title", name);
             } else { // 채팅방 이름 입력 안했을 때, 단톡방에서는 무조건 채팅방 이름 입력 하도록
-                return false;
+                return null;
             }
             data.put("roomImgUrl", list.get(0).getAppImagePath());
         }
 
-        ChatRoom.createChatRoom(realm, data, userIdList);
-        return true;
+        ChatRoom.createChatRoom(realm, data, userIdList, new ChatRoom.onChatRoomCreatedListener() {
+            @Override
+            public void onCreate(ChatRoom chatRoom) {
+                rid[0] = chatRoom.getRid();
+            }
+        });
+
+        return rid[0];
     }
 
     /**

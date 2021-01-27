@@ -139,19 +139,19 @@ public class User extends RealmObject {
     public static ChatRoom getChatroom(Realm realm, User user) {
         RealmResults<ChatRoomMember> chatList = realm.where(ChatRoomMember.class).equalTo("uid", user.getUserId()).findAll();
         ChatRoom chatRoom = null;
+
         if(chatList.size() != 0) {
 
-                Iterator<ChatRoomMember> mChat;
-                /**
+            /**
                  * 1대1채팅방을 찾았다면 그 값이 chatRoom
                  * 찾지 못했다면 chatRoom은 null값
                  */
-                for(mChat = chatList.iterator(); chatRoom == null ;mChat.hasNext()) {
-                    chatRoom = realm.where(ChatRoom.class)
-                            .equalTo("rid", mChat.next().getRid())
-                            .and()
-                            .equalTo("isGroupChat", false).findFirst();
-                }
+            for (ChatRoomMember chatRoomMember : chatList) {
+                chatRoom = realm.where(ChatRoom.class)
+                        .equalTo("rid", chatRoomMember.getRid())
+                        .and()
+                        .equalTo("isGroupChat", false).findFirst();
+            }
             }
         return chatRoom;
     }

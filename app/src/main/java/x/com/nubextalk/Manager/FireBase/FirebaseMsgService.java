@@ -274,69 +274,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                     }
                 }
                 break;
-//            case "CHAT_PACS_CREATED" :
-//                payload = new HashMap<>();
-//
-//                payload.put("uid", data.get("senderId"));
-//                payload.put("cid", data.get("chatContentId"));
-//                payload.put("rid", data.get("chatRoomId"));
-//                payload.put("content", data.get("content"));
-//                payload.put("type", data.get("contentType"));
-//                payload.put("sendDate", data.get("sendDate"));
-//                payload.put("isFirst", data.get("isFirst"));
-//
-//                rid = data.get("chatRoomId");
-//                uid = data.get("senderId");
-//                content = data.get("content");
-//                type = Integer.parseInt(data.get("contentType"));
-//
-//                if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
-//                    FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
-//                            .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-//                                @Override
-//                                public void onSuccess(HttpsCallableResult httpsCallableResult) {
-//                                    Gson gson = new Gson();
-//                                    Map<String, Object> value = new HashMap<>();
-//                                    try {
-//                                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
-//                                        JSONObject result = new JSONObject(gson.toJson(httpsCallableResult.getData()));
-//                                        value.put("rid", rid);
-//                                        value.put("title", result.getJSONObject("chatRoom").getString("roomName"));
-//                                        value.put("roomImgUrl", result.getJSONObject("chatRoom").getString("roomImg"));
-//                                        value.put("updatedDate", result.getJSONObject("chatRoom").getString("updatedDate"));
-//                                        value.put("notificationId", result.getJSONObject("chatRoom").getString("notificationId"));
-//                                        ArrayList<String> userIdList = new ArrayList<>();
-//                                        for (int i = 0; i < result.getJSONArray("chatRoomMember").length(); i++) {
-//                                            userIdList.add(result.getJSONArray("chatRoomMember").getString(i));
-//                                        }
-//                                        ChatRoom.createChatRoom(realm1, value, userIdList);
-//                                        ChatContent.createChat(realm1, payload);
-//
-//                                        if (!Config.getMyUID(realm1).equals(uid)) {
-//                                            ChatRoom roomInfo = realm1.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-//                                            int channelId = Integer.parseInt(roomInfo.getNotificationId());
-//                                            makeChannel(CHANNEL_ID);
-//                                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-//                                        }
-//
-//                                    } catch (JSONException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                            });
-//                } else {
-//                    ChatContent.createChat(realm, payload);
-//                    if (!Config.getMyUID(realm).equals(uid)) {
-//                        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-//                        int channelId = 0;
-//                        if (roomInfo != null) {
-//                            channelId = Integer.parseInt(roomInfo.getNotificationId());
-//                        }
-//                        makeChannel(CHANNEL_ID);
-//                        notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-//                    }
-//                }
-//                break;
         }
     }
 

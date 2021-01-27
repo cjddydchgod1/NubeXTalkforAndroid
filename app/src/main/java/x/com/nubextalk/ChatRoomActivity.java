@@ -185,25 +185,50 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d("NEWINTENT", "ChatRoomActivity new intent");
+
+        mRid = intent.getExtras().getString("rid");
+
+        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        String roomTitle = roomInfo.getRoomName();
+        Toolbar toolbar = findViewById(R.id.toolbar_chat_room);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
+        TextView title = (TextView) findViewById(R.id.toolbar_chat_room_title);
+        title.setText(roomTitle);
+        mChat = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
+        mChat = mChat.sort("sendDate", Sort.ASCENDING);
+        mChatIndex = setChatContentRead(mChat, 0);
+        mAdapter = new ChatAdapter(this, mChat);
+
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+        View header = mNavigationView.getHeaderView(0);
+        TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
+        drawerTitle.setText(roomTitle);
     }
 
     @Override // Back pressed
     public void onBackPressed() {
+        super.onBackPressed();
         setChatContentRead(mChat, mChatIndex);
         realm.close();
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.putExtra("requestChatList", "OK");
 
-        finish();
         startActivity(intent);
     }
 
     @Override // Destroy
     protected void onDestroy() {
-        setChatContentRead(mChat, mChatIndex);
-        realm.close();
         super.onDestroy();
+        realm.close();
     }
 
     @Override // Option Item Selected Listener

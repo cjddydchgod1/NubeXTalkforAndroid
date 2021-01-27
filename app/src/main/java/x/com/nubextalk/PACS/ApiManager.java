@@ -46,7 +46,7 @@ public class ApiManager {
     public String getServerPath(Realm realm){
         Config serverInfo = Config.getServerInfo(realm);
         String ssl = serverInfo == null ? "http://" : serverInfo.getExt1();
-        String host = serverInfo == null ? "192.168.3.156" : serverInfo.getExt2();
+        String host = serverInfo == null ? "121.166.85.235" : serverInfo.getExt2();
         String port = serverInfo == null ? "" : serverInfo.getExt3();
         return ssl + host + port;
     }

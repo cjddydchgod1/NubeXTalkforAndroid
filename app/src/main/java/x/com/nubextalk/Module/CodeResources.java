@@ -7,4 +7,8 @@ package x.com.nubextalk.Module;
 
 public class CodeResources {
     public static final String TAG = "NubeX Talk";
+
+    /** SettingsActivity Resourece */
+    public static final int EXE_LOGOUT  = 0;
+    public static final int EXE_SWITCH  = 1;
 }

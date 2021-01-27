@@ -92,6 +92,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void onDestroyView() {
         super.onDestroyView();
         if (realm != null) {
+            realm.removeAllChangeListeners();
             realm.close();
             realm = null;
         }
@@ -120,6 +121,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 break;
                             case 1: /**대화상대 추가 이벤트**/
                                 startActivity(new Intent(getContext(), AddChatMemberActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
                                         .putExtra("rid", chatRoom.getRid()));
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트**/
@@ -140,7 +142,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void onItemSelected(@NonNull ChatRoom chatRoom) {
         Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
-//        ((MainActivity) getActivity()).startChatRoomActivity(intent);
         startActivity(intent);
     }
 
@@ -157,8 +158,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
             case R.id.chat_fab_sub1:
                 toggleFab();
-                ((MainActivity) getActivity()).startChatAddActivity(new Intent(getContext(), ChatAddActivity.class));
-//                startActivity();
+                startActivity(new Intent(getContext(), ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
                 break;
 
             case R.id.chat_fab_sub2:
@@ -168,7 +168,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     }
 
     public void exitChatRoom(ChatRoom chatRoom) {
-        if(chatRoom.getIsGroupChat()) {
+        if (chatRoom.getIsGroupChat()) {
             User me = (User) User.getMyAccountInfo(realm);
             ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
             FirebaseFunctionsManager.exitChatRoom(hospitalId, me.getUserId(), chatRoom.getRid());
@@ -179,6 +179,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
     /**
      * 채팅방 목록 상단고정 realm 설정 및 해제
+     *
      * @param chatRoom
      */
     public void updateChatRoomFixTop(ChatRoom chatRoom) {
@@ -194,6 +195,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
     /**
      * 채팅방 목록 알림 realm 설정 및 해제
+     *
      * @param chatRoom
      */
     public void updateChatRoomAlarm(ChatRoom chatRoom) {

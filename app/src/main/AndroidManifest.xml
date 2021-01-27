@@ -20,8 +20,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ImageViewActivity"/>
-        <activity android:name=".SharePACSActivity"></activity>
+        <activity android:name=".ImageViewActivity" />
+        <activity android:name=".SharePACSActivity" />
         <activity android:name=".AddChatMemberActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" /> <!-- FireBase -->
@@ -45,7 +45,9 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

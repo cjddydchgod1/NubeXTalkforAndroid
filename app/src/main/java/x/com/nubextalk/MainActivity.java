@@ -77,6 +77,22 @@ public class MainActivity extends AppCompatActivity {
         initBottomNavigation();
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("NEWINTENT","main activity new intent");
+
+        String requestChatList = getIntent().getStringExtra("requestChatList");
+        if (UtilityManager.checkString(requestChatList)) {
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        } else {
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+        }
+    }
+
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/

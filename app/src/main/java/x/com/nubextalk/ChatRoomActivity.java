@@ -181,15 +181,22 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         });
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("NEWINTENT", "ChatRoomActivity new intent");
+    }
+
     @Override // Back pressed
     public void onBackPressed() {
         setChatContentRead(mChat, mChatIndex);
+        realm.close();
+
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.putExtra("requestChatList", "OK");
-        startActivity(intent);
-        realm.close();
-        finish();
 
+        finish();
+        startActivity(intent);
     }
 
     @Override // Destroy

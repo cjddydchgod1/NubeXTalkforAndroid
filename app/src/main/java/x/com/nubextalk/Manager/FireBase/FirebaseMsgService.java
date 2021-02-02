@@ -15,15 +15,9 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -34,19 +28,14 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
@@ -130,7 +119,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 uid = data.get("senderId");
 
-                Log.d("USERID",uid);
+                Log.d("USERID", uid);
                 userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());

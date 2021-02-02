@@ -12,12 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
-
-import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,10 +20,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+
+import java.util.ArrayList;
+
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.ChatListFragment;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
+import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.SettingFragment;
 
 /**
@@ -57,39 +57,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bottomNavigationView = findViewById(R.id.bottom_nav);
 
-
-        String requestChatList = getIntent().getStringExtra("requestChatList");
-        if (UtilityManager.checkString(requestChatList)) {
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
-            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
-        } else {
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
-        }
-
-        //툴바 설정
+        //Setting toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Setting bottom navigation
+        bottomNavigationView = findViewById(R.id.bottom_nav);
         initBottomNavigation();
+
+        // Begin fragment transaction
+        String requestChatList = getIntent().getStringExtra("requestChatList");
+        fragmentTransaction = fragmentManager.beginTransaction();
+        if (UtilityManager.checkString(requestChatList)) {
+            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        } else {
+            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d("NEWINTENT","main activity new intent");
+        Log.d("NEWINTENT", "main activity new intent");
 
-        String requestChatList = getIntent().getStringExtra("requestChatList");
+        String requestChatList = intent.getStringExtra("requestChatList");
+        fragmentTransaction = fragmentManager.beginTransaction();
         if (UtilityManager.checkString(requestChatList)) {
-            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
             bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
-            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
     }
 

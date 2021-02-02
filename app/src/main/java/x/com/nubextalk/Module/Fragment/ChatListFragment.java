@@ -145,10 +145,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     }
 
     @Override
-    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
-    }
-
-    @Override
     public void onClick(@NonNull View v) {
         switch (v.getId()) {
             case R.id.chat_fab_main:

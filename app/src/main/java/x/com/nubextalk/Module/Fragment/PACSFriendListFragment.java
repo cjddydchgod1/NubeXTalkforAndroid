@@ -116,19 +116,8 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
     }
 
     @Override
-    public void onSelected(User address, RadioButton radioButton) {
-        if(!address.equals(lastChecked) && lastRadioButton != null) {
-            lastRadioButton.setChecked(false);
-        }
-        radioButton.setChecked(true);
-        lastRadioButton = radioButton;
-        lastChecked = address;
-
-    }
-
-    @Override
     public void onSelected(User address) {
-
+        lastChecked = address;
     }
 
     public void getData() {

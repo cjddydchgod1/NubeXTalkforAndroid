@@ -346,14 +346,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onSelected(User address) {
         initBottomsheet(address);
         new AnimManager(
-                AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(3000).translationY(0).setInterpolator(new DecelerateInterpolator())
+                AnimManager.make(mBottomWrapper, AnimManager.SHORT, 0).translationY(3000).translationY(0).setInterpolator(new DecelerateInterpolator())
         ).start(AnimManager.TOGETHER);
     }
 
-    @Override
-    public void onSelected(User address, RadioButton radioButton) {
-
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     protected void initBottomsheet(User address) {
@@ -491,7 +487,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 // 새로만든 채팅이 없다면 새로 만든다.
                 ArrayList<User> list = new ArrayList<>();
                 list.add(address);
-//                ChatAddActivity.createNewChat(realm, this, list, "");
                 String rid = new ChatAddActivity().createNewChat(realm, getContext(), list, "");
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                 intent.putExtra("rid", rid);

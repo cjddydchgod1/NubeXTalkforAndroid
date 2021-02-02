@@ -151,7 +151,7 @@ public class ChatRoom extends RealmObject {
      * @param userList 채팅방 참여 사용자 (userId) 가 담긴 ArrayList
      */
     public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList, onChatRoomCreatedListener onChatRoomCreatedListener) {
-        User myAccount = (User) User.getMyAccountInfo(realm);
+        User myAccount = User.getMyAccountInfo(realm);
 
         // userList 에 자신의 아이디 추가
         if(!userList.contains(myAccount.getUserId())){

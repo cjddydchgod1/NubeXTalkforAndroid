@@ -48,7 +48,6 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
     private ChatListAdapter mAdapter;
 
     private ChatRoom lastChecked;
-    private RadioButton lastRadioButton;
 
     private String studyId;
     private String description;
@@ -100,17 +99,9 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
 
     @Override
     public void onItemSelected(ChatRoom chatRoom) {
-    }
-
-    @Override
-    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
-        if(!chatRoom.getRid().equals(lastChecked) && lastRadioButton != null) {
-            lastRadioButton.setChecked(false);
-        }
-        radioButton.setChecked(true);
-        lastRadioButton = radioButton;
         lastChecked = chatRoom;
     }
+
 
     public void getData() {
         try {

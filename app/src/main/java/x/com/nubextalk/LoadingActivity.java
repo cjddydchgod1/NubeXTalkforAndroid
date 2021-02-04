@@ -31,6 +31,6 @@ public class LoadingActivity extends Activity {
                     e.printStackTrace();
                 }
             }
-        }, 2000);
+        }, 1000);
     }
 }

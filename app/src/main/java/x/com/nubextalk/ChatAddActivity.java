@@ -161,14 +161,15 @@ public class ChatAddActivity extends AppCompatActivity implements
                         if (rid != null) {
                             Intent intent = new Intent(this, ChatRoomActivity.class);
                             intent.putExtra("rid", rid);
-                            setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
-                            finish();
+//                            setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
+                            startActivity(intent);
                         }
+
                     } else { //기존에 선택된 유저와 채팅방이 있으면 그 채팅방으로 이동
                         Intent intent = new Intent(this, ChatRoomActivity.class);
                         intent.putExtra("rid", chatRoom.getRid());
-                        setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
-                        finish();
+//                        setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
+                        startActivity(intent);
                     }
 
                 } else { //선택된 유저가 여러명일 때, 단톡방
@@ -176,8 +177,8 @@ public class ChatAddActivity extends AppCompatActivity implements
                     if (rid != null) {
                         Intent intent = new Intent(this, ChatRoomActivity.class);
                         intent.putExtra("rid", rid);
-                        setResult(RESULT_OK, intent); //MainActivity 로 결과 전달
-                        finish();
+                        startActivity(intent);
+
                     } else { // 단톡방 이름을 입력안한 경우
                         Toast.makeText(this, "채팅방 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
                     }

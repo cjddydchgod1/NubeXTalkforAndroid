@@ -187,7 +187,6 @@ public class AddChatMemberActivity extends AppCompatActivity implements
                     Toast.makeText(this, "대화 상대 추가가 실패되었습니다.", Toast.LENGTH_SHORT)
                             .show();
                 }
-                finish();
             case R.id.add_chat_cancel_btn:
                 Log.d("ADD_CHAT_MEMBER", "back pressed!");
                 onBackPressed();

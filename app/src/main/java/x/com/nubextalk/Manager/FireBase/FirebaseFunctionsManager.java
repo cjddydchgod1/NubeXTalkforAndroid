@@ -128,6 +128,7 @@ public class FirebaseFunctionsManager {
     public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(@NonNull Map data, OnCompleteListsner onCompleteListsner) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
+        params.put("chatContentId", data.get("chatContentId"));
         params.put("hospitalId", data.get("hospitalId"));
         params.put("membersId", data.get("membersId"));
         params.put("chatRoomId", data.get("chatRoomId"));

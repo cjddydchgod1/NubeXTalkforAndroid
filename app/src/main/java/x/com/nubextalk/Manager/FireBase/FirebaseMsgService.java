@@ -235,6 +235,8 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                             userIdList.add(result.getJSONArray("chatRoomMember").getString(i));
                                         }
                                         // realm ChatRoom, ChatContent 생성
+                                        payload.put("isFirst", true);
+
                                         ChatRoom.createChatRoom(realm1, value, userIdList, null);
                                         ChatContent.createChat(realm1, payload);
 

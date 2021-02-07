@@ -33,7 +33,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ApiManager apiManager;
     private Realm realm;
 
-    private EditText mEditHospital;
     private EditText mEditId;
     private EditText mEditPassword;
 
@@ -51,7 +50,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         apiManager = new ApiManager(this, realm);
 
-        mEditHospital = (EditText) findViewById(R.id.login_hospital_edit);
         mEditId = (EditText) findViewById(R.id.login_id_edit);
         mEditPassword = (EditText) findViewById(R.id.login_password_edit);
 

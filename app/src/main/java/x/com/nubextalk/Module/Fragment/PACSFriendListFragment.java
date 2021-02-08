@@ -88,12 +88,16 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
                     ArrayList<User> list = new ArrayList<>();
                     list.add(lastChecked);
 
-                    String rid = new ChatAddActivity().createNewChat(realm, getContext(), list, "");
                     Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
-                    intent.putExtra("rid", rid);
-                    intent.putExtra("studyId", studyId);
-                    intent.putExtra("description", description);
-                    startActivity(intent);
+                    new ChatAddActivity().createNewChat(realm, getContext(), list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                        @Override
+                        public void onCreate(String rid) {
+                            intent.putExtra("rid", rid);
+                            intent.putExtra("studyId", studyId);
+                            intent.putExtra("description", description);
+                            startActivity(intent);
+                        }
+                    });
                 } else {
                     Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                     intent.putExtra("rid", chatRoom.getRid());

@@ -236,16 +236,19 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                         }
                                         // realm ChatRoom, ChatContent 생성
                                         payload.put("isFirst", true);
-
-                                        ChatRoom.createChatRoom(realm1, value, userIdList, null);
+                                        ChatRoom.createChatRoom(realm1, value, userIdList, new ChatRoom.onChatRoomCreatedListener() {
+                                            @Override
+                                            public void onCreate(ChatRoom chatRoom) {
+                                                if (!Config.getMyUID(realm1).equals(uid)) {
+                                                    ChatRoom roomInfo = realm1.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                                                    int channelId = Integer.parseInt(roomInfo.getNotificationId());
+                                                    makeChannel(CHANNEL_ID);
+                                                    notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
+                                                }
+                                            }
+                                        });
                                         ChatContent.createChat(realm1, payload);
 
-                                        if (!Config.getMyUID(realm1).equals(uid)) {
-                                            ChatRoom roomInfo = realm1.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-                                            int channelId = Integer.parseInt(roomInfo.getNotificationId());
-                                            makeChannel(CHANNEL_ID);
-                                            notificationManager.notify(channelId, makeBuilder(rid, uid, type, content).build());
-                                        }
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();

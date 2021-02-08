@@ -41,4 +41,9 @@
 
 
     <string name="title_activity_chat_add">ChatAddActivity</string>
+    <string name="hint_password">PASSWORD</string>
+    <string name="login">로그인</string>
+    <string name="sign_hospital">병원 등록</string>
+    <string name="auto_login">자동 로그인</string>
+    <string name="hint_user_id">USER ID</string>
 </resources>

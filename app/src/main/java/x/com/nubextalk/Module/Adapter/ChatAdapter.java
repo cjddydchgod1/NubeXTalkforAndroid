@@ -36,9 +36,14 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
-public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    String FINAL_DATE = "9999-12-31 23:59:59";
+import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_1;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_2;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_3;
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.SENDING;
 
+public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Realm realm;
 
     private LayoutInflater mInflater;
@@ -77,22 +82,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatContent chat = mChatData.get(position);
-        if (chat.getContent() == null) {
+        String preSenderId = (position > 0) ? mChatData.get(position - 1).getUid() : mUid;
+        if (chat == null) {
             return;
         }
         String uid = chat.getUid();
         mUserData = realm.where(User.class).equalTo("userId", uid).findFirst();
 
         // 시간 형식 나누기
-        SimpleDateFormat formatChatTime = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat formatChatDate = new SimpleDateFormat("yyyy.MM.dd (E)");
+        SimpleDateFormat formatChatTime = new SimpleDateFormat(DATE_FORMAT_1);
+        SimpleDateFormat formatChatDate = new SimpleDateFormat(DATE_FORMAT_2);
 
         String sendDate;
         String sendTime;
 
-        if (DateManager.convertDate(chat.getSendDate(), "yyyy-MM-dd HH:mm:ss").equals(FINAL_DATE)) {
-            sendTime = "전송중";
-            sendDate = "";
+        if (DateManager.convertDate(chat.getSendDate(), DATE_FORMAT_3).equals(DATE_FINAL)) {
+            sendTime = SENDING;
+            sendDate = EMPTY;
         } else {
             sendTime = formatChatTime.format(chat.getSendDate());
             sendDate = formatChatDate.format(chat.getSendDate());
@@ -108,7 +114,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
-            if (chat.getUid().equals(this.mUid)) {
+            if (chat.getUid().equals(mUid)) {
                 cvHolder.my_chat_text.setText(chat.getContent());
                 cvHolder.myTime.setText(sendTime);
 
@@ -127,8 +133,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cvHolder.other_chat_text.setText(chat.getContent());
                 cvHolder.otherTime.setText(sendTime);
 
-                cvHolder.profileImage.setVisibility(View.VISIBLE);
-                cvHolder.profileName.setVisibility(View.VISIBLE);
+                if (chat.getUid().equals(preSenderId)) {
+                    cvHolder.profileImage.setVisibility(View.GONE);
+                    cvHolder.profileName.setVisibility(View.GONE);
+                } else {
+                    cvHolder.profileImage.setVisibility(View.VISIBLE);
+                    cvHolder.profileName.setVisibility(View.VISIBLE);
+                }
                 cvHolder.other_chat_text.setVisibility(View.VISIBLE);
                 cvHolder.otherTime.setVisibility(View.VISIBLE);
 
@@ -143,6 +154,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             } else {
                 cmvHolder.date.setVisibility(View.GONE);
             }
+
             if (chat.getUid().equals(mUid)) {
                 cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
                 cmvHolder.myTime.setText(sendTime);
@@ -159,8 +171,17 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cmvHolder.profileName.setText(mUserData.getAppName());
                 cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
                 cmvHolder.otherTime.setText(sendTime);
-                cmvHolder.profileImage.setVisibility(View.VISIBLE);
-                cmvHolder.profileName.setVisibility(View.VISIBLE);
+
+
+                if (chat.getUid().equals(preSenderId)) {
+                    cmvHolder.profileImage.setVisibility(View.GONE);
+                    cmvHolder.profileName.setVisibility(View.GONE);
+
+                } else {
+                    cmvHolder.profileImage.setVisibility(View.VISIBLE);
+                    cmvHolder.profileName.setVisibility(View.VISIBLE);
+                }
+
                 cmvHolder.otherTime.setVisibility(View.VISIBLE);
                 cmvHolder.otherChatImg.setVisibility(View.VISIBLE);
                 cmvHolder.myChatImg.setVisibility(View.GONE);
@@ -177,12 +198,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chat.getUid().equals(mUid)) {
                 cpvHolder.myTime.setText(sendTime);
                 cpvHolder.myPacsDescription.setText(chat.getContent());
-                cpvHolder.myPacsButton.setOnClickListener(new View.OnClickListener(){
+                cpvHolder.myPacsButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(mContext, ImageViewActivity.class);
-                        intent.putExtra("studyId",chat.getExt1());
-                        Log.d("PACS",chat.getExt1());
+                        intent.putExtra("studyId", chat.getExt1());
+                        Log.d("PACS", chat.getExt1());
                         mContext.startActivity(intent);
                     }
                 });
@@ -201,22 +222,26 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.profileName.setText(mUserData.getAppName());
                 cpvHolder.otherTime.setText(sendTime);
                 cpvHolder.otherPacsDescription.setText(chat.getContent());
-                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener(){
+                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(mContext, ImageViewActivity.class);
-                        intent.putExtra("studyId",chat.getExt1());
-                        Log.d("PACS",chat.getExt1());
+                        intent.putExtra("studyId", chat.getExt1());
+                        Log.d("PACS", chat.getExt1());
                         mContext.startActivity(intent);
                     }
                 });
 
 
-                cpvHolder.profileImage.setVisibility(View.VISIBLE);
-                cpvHolder.profileName.setVisibility(View.VISIBLE);
+                if (chat.getUid().equals(preSenderId)) {
+                    cpvHolder.profileImage.setVisibility(View.GONE);
+                    cpvHolder.profileName.setVisibility(View.GONE);
+                } else {
+                    cpvHolder.profileImage.setVisibility(View.VISIBLE);
+                    cpvHolder.profileName.setVisibility(View.VISIBLE);
+                }
                 cpvHolder.otherTime.setVisibility(View.VISIBLE);
                 cpvHolder.otherChatPacs.setVisibility(View.VISIBLE);
-
 
 
                 cpvHolder.myChatPacs.setVisibility(View.GONE);

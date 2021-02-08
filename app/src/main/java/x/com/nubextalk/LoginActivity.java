@@ -33,7 +33,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ApiManager apiManager;
     private Realm realm;
 
-    private EditText mEditHospital;
     private EditText mEditId;
     private EditText mEditPassword;
 
@@ -51,12 +50,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         apiManager = new ApiManager(this, realm);
 
-        mEditHospital = (EditText)findViewById(R.id.login_hospital_edit);
-        mEditId = (EditText)findViewById(R.id.login_id_edit);
-        mEditPassword = (EditText)findViewById(R.id.login_password_edit);
+        mEditId = (EditText) findViewById(R.id.login_id_edit);
+        mEditPassword = (EditText) findViewById(R.id.login_password_edit);
 
-        mSignUpBtn = (Button)findViewById(R.id.login_sign_up);
-        mSignInBtn = (Button)findViewById(R.id.login_sign_in);
+        mSignUpBtn = (Button) findViewById(R.id.login_sign_up);
+        mSignInBtn = (Button) findViewById(R.id.login_sign_in);
 
         checkAutoLogin = findViewById(R.id.checkAutoLogin);
 
@@ -68,13 +66,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          */
         intent = new Intent(getApplicationContext(), MainActivity.class);
         Config myAccount = Config.getMyAccount(realm);
-        if(myAccount != null) {
-            if(UtilityManager.checkString(myAccount.getExt5())) {
+        if (myAccount != null) {
+            if (UtilityManager.checkString(myAccount.getExt5())) {
                 apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         startActivity(intent);
-                        finish();
                     }
 
                     @Override
@@ -92,18 +89,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         final LoginActivity activity = this;
 
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.login_sign_up:
-                startActivity(new Intent(activity, RegisterActivity.class));
-                finish();
+                startActivity(new Intent(activity, RegisterActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.login_sign_in:
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
                 String autoLogin = null;
-                if(checkAutoLogin.isChecked())
+                if (checkAutoLogin.isChecked())
                     autoLogin = "checked";
-                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
+                apiManager.login(id, password, autoLogin, new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());

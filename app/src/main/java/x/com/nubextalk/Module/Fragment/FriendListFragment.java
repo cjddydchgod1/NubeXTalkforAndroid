@@ -492,10 +492,15 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 ArrayList<User> list = new ArrayList<>();
                 list.add(address);
 //                ChatAddActivity.createNewChat(realm, this, list, "");
-                String rid = new ChatAddActivity().createNewChat(realm, getContext(), list, "");
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
-                intent.putExtra("rid", rid);
-                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                new ChatAddActivity().createNewChat(realm, getContext(), list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                    @Override
+                    public void onCreate(String rid) {
+                        intent.putExtra("rid", rid);
+                        ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                    }
+                });
+
             } else {
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                 intent.putExtra("rid", chatRoom.getRid());

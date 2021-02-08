@@ -186,8 +186,7 @@ public class ChatRoom extends RealmObject {
                     isGroupChat = false;
                 }
             }
-        }
-        else { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
+        } else { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
             roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
             isGroupChat = true;
         }
@@ -208,22 +207,18 @@ public class ChatRoom extends RealmObject {
                                 rid[0] = chatRoomId;
                                 Log.d("CHATROOM", "rid: " + rid[0]);
                             }
-                            realm.executeTransaction(new Realm.Transaction() {
+                            ChatRoom chatRoom = new ChatRoom();
+                            chatRoom.setRid(rid[0]);
+                            chatRoom.setRoomName(finalRoomName);
+                            chatRoom.setRoomImg(finalRoomImg);
+                            chatRoom.setUpdatedDate(updatedDate);
+                            chatRoom.setNotificationId(notificationId);
+                            chatRoom.setMemeberCount(memberCount);
+                            chatRoom.setIsGroupChat(finalIsGroupChat);
+                            realm.executeTransactionAsync(new Realm.Transaction() {
                                 @Override
                                 public void execute(@NonNull Realm realm) {
-                                    ChatRoom chatRoom = new ChatRoom();
-                                    chatRoom.setRid(rid[0]);
-                                    chatRoom.setRoomName(finalRoomName);
-                                    chatRoom.setRoomImg(finalRoomImg);
-                                    chatRoom.setUpdatedDate(updatedDate);
-                                    chatRoom.setNotificationId(notificationId);
-                                    chatRoom.setMemeberCount(memberCount);
-                                    chatRoom.setIsGroupChat(finalIsGroupChat);
                                     realm.copyToRealmOrUpdate(chatRoom);
-
-                                    if (onChatRoomCreatedListener != null) {
-                                        onChatRoomCreatedListener.onCreate(chatRoom);
-                                    }
 
                                     //ChatRoomMember 모델에 채팅유저 생성
                                     for (String userId : userList) {
@@ -238,26 +233,29 @@ public class ChatRoom extends RealmObject {
                                         }
                                     }
                                 }
+                            }, new Realm.Transaction.OnSuccess() {
+                                @Override
+                                public void onSuccess() {
+                                    if (onChatRoomCreatedListener != null) {
+                                        onChatRoomCreatedListener.onCreate(chatRoom);
+                                    }
+                                }
                             });
                         }
                     });
         } else { // 단체 채팅방 생성
-            realm.executeTransaction(new Realm.Transaction() {
+            ChatRoom chatRoom = new ChatRoom();
+            chatRoom.setRid(rid[0]);
+            chatRoom.setRoomName(finalRoomName);
+            chatRoom.setRoomImg(finalRoomImg);
+            chatRoom.setUpdatedDate(updatedDate);
+            chatRoom.setNotificationId(notificationId);
+            chatRoom.setMemeberCount(memberCount);
+            chatRoom.setIsGroupChat(finalIsGroupChat);
+            realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(@NonNull Realm realm) {
-                    ChatRoom chatRoom = new ChatRoom();
-                    chatRoom.setRid(rid[0]);
-                    chatRoom.setRoomName(finalRoomName);
-                    chatRoom.setRoomImg(finalRoomImg);
-                    chatRoom.setUpdatedDate(updatedDate);
-                    chatRoom.setNotificationId(notificationId);
-                    chatRoom.setMemeberCount(memberCount);
-                    chatRoom.setIsGroupChat(finalIsGroupChat);
                     realm.copyToRealmOrUpdate(chatRoom);
-
-                    if (onChatRoomCreatedListener != null) {
-                        onChatRoomCreatedListener.onCreate(chatRoom);
-                    }
 
                     //ChatRoomMember 모델에 채팅유저 생성
                     for (String userId : userList) {
@@ -271,6 +269,14 @@ public class ChatRoom extends RealmObject {
                             realm.copyToRealm(chatRoomMember);
                         }
                     }
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    if (onChatRoomCreatedListener != null) {
+                        onChatRoomCreatedListener.onCreate(chatRoom);
+                    }
+
                 }
             });
         }

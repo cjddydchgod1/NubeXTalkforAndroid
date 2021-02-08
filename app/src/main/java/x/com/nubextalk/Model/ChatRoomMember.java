@@ -80,6 +80,11 @@ public class ChatRoomMember extends RealmObject {
             public void execute(Realm realm) {
                 ChatRoomMember chatRoomMember = realm.where(ChatRoomMember.class).equalTo("rid", rid).equalTo("uid", uid).findFirst();
                 chatRoomMember.deleteFromRealm();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                if(chatRoom != null){
+                    int orgMemberCount = chatRoom.getMemeberCount();
+                    chatRoom.setMemeberCount(orgMemberCount - 1);
+                }
             }
         });
     }

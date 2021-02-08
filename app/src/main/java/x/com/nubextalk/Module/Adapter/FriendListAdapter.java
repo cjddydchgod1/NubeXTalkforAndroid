@@ -24,7 +24,8 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Module.Case.FriendlistCase;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
 import x.com.nubextalk.R;
 
 public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -33,7 +34,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private Context mContext;
     private onItemSelectedListener listener;
     private AQuery aq;
-    private FriendlistCase sel_type;
+    private int sel_type;
     private int mLastCheckedPosition = -1;
 
     public interface onItemSelectedListener{
@@ -44,7 +45,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data, AQuery aq, FriendlistCase sel_type) {
+    public FriendListAdapter(Context context, ArrayList<User> data, AQuery aq, int sel_type) {
         this.mDataSet = data;
         this.mContext = context;
         this.aq = aq;
@@ -66,7 +67,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if(holder instanceof FriendViewHolder) {
             FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
             friendViewHolder.bintTo(mCurrent);
-            if(sel_type == FriendlistCase.RADIO)
+            if(sel_type == RADIO)
                 friendViewHolder.radioButton.setChecked(mLastCheckedPosition == position);
         }
     }
@@ -95,7 +96,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     if(listener != null) {
                         int copyLastCheckedPosition = mLastCheckedPosition;
                         mLastCheckedPosition = getAdapterPosition();
-                        if(sel_type == FriendlistCase.RADIO) {
+                        if(sel_type == RADIO) {
                             notifyItemChanged(copyLastCheckedPosition);
                             notifyItemChanged(mLastCheckedPosition);
                         }
@@ -107,8 +108,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             radioButton.setOnClickListener(clickListener);
         }
         public void bintTo(User user) {
-            if(sel_type == FriendlistCase.NON_RADIO)
-                radioButton.setVisibility(View.GONE);
+            if(sel_type == RADIO)
+                radioButton.setVisibility(View.VISIBLE);
             profileName.setText(user.getAppName());
             if(URLUtil.isValidUrl(user.getAppImagePath())){
                 aq.view(profileImage).image(user.getAppImagePath());

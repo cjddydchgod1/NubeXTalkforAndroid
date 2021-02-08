@@ -11,4 +11,8 @@ public class CodeResources {
     /** SettingsActivity Resourece */
     public static final int EXE_LOGOUT  = 0;
     public static final int EXE_SWITCH  = 1;
+    /** SharePACSActivity Resource */
+    public static final int NON_RADIO   = 0;
+    public static final int RADIO       = 1;
 }
+

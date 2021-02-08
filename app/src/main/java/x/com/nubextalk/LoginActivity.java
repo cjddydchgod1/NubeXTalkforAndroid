@@ -74,7 +74,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onSuccess(Response response, String body) {
                         startActivity(intent);
-                        finish();
                     }
 
                     @Override
@@ -115,7 +114,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             @Override
                             public void onSuccess(Void aVoid) {
                                 startActivity(intent);
-                                finish();
                             }
                         });
 

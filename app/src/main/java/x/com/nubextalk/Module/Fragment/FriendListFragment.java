@@ -7,6 +7,7 @@ package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -63,14 +64,12 @@ import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
-import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
-import x.com.nubextalk.Module.Case.FriendlistCase;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.R;
 
@@ -78,6 +77,9 @@ import static android.app.Activity.RESULT_OK;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm realm;
+
+    private Context mContext;
+    private Activity mActivity;
 
     private ViewGroup rootview;
     private LinearLayout mBottomWrapper;
@@ -92,12 +94,36 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private String TAG = "FriendListFragment";
     private User myProfile;
 
+    /* bottomSheet */
+    // 프로필 이름, 이미지, 상태
+    private TextView profileName;
+    private ImageView profileImage;
+    private ImageView profileStatus;
+    // 수정 버튼
+    private EditText modifyName;
+    private TextView modifyNameButton;
+    private TextView modifyImageButton;
+    // 상태레이아웃
+    private LinearLayout statusLayout;
+    // 채팅 버튼
+    private Button chatButton;
+    //
+    private LinearLayout exitWrapper;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if(context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-        apiManager = new ApiManager(getActivity(), realm);
+        apiManager = new ApiManager(mActivity, realm);
     }
 
     @Override
@@ -107,22 +133,38 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
         mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
         mUserList       = new ArrayList<>();
-        aq              = new AQuery(getActivity());
+        aq              = new AQuery(mActivity);
 
+        /**
+         * bottomSheet
+         */
+        // 프로필 이름, 이미지, 상태
+        profileName = mBottomWrapper.findViewById(R.id.profileName);
+        profileImage = mBottomWrapper.findViewById(R.id.profileImage);
+        profileStatus = mBottomWrapper.findViewById(R.id.profileStatus);
+        // 수정 버튼
+        modifyName = mBottomWrapper.findViewById(R.id.modifyName);
+        modifyNameButton = mBottomWrapper.findViewById(R.id.modifyButton);
+        modifyImageButton = mBottomWrapper.findViewById(R.id.modifyImage);
+        // 상태레이아웃
+        statusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
+        // 채팅 버튼
+        chatButton = mBottomWrapper.findViewById(R.id.chatButton);
+        exitWrapper = rootview.findViewById(R.id.wrapper);
         /**
          * recyclerview 디자인
          */
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-        getData();
+        getDataFromPACS();
 
         /**
          * recyclerview 애니매이션
          */
-        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down));
+        mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(mActivity, R.anim.layout_animation_fall_down));
         mRecyclerView.scheduleLayoutAnimation();
         return rootview;
     }
@@ -134,11 +176,22 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          * search를 FriendListFragment에서 사용가능하게
          */
         setHasOptionsMenu(true);
-        getActivity().invalidateOptionsMenu();
+        mActivity.invalidateOptionsMenu();
     }
 
-    public void getData() {
-                /**
+    @Override
+    public void onDetach() {
+        if(realm != null) {
+            realm.close();
+            realm = null;
+        }
+        mContext = null;
+        mActivity = null;
+        super.onDetach();
+    }
+
+    public void getDataFromPACS() {
+        /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
          */
         apiManager.getEmployeeList(new ApiManager.onApiListener() {
@@ -188,64 +241,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     realm.executeTransaction(realm1 -> {
                         realm1.copyToRealmOrUpdate(mUserList);
                     });
-                    makeData();
+                    processData();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
-
-//        try{
-//                    /**
-//                     * String(body) -> JSONArray
-//                     */
-//                    String body = UtilityManager.loadJson(getActivity(), "example_user.json");
-//                    JSONArray jsonArray = new JSONArray(body);
-//                    /**
-//                     * JSONArray -> JSONObject
-//                     * JSONObject -> User
-//                     * User -> ArrayList
-//                     */
-//                    int len = jsonArray.length();
-//
-//                    ArrayList<User> users = new ArrayList<>();
-//                    for(int i=0; i<len; i++) {
-//                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-//
-//                        User user = new User();
-//                        user.setCode(jsonObject.getString("code"));
-//                        user.setUserId(jsonObject.getString("userid"));
-//                        user.setLastName(jsonObject.getString("lastname"));
-//                        user.setTypeCode(jsonObject.getString("typecode"));
-//                        user.setTypeCodeName(jsonObject.getString("typecodename"));
-//                        user.setRemoved(jsonObject.getString("removed"));
-//                        user.setAppImagePath(jsonObject.getString("app_IMG_PATH"));
-//                        user.setAppStatus(jsonObject.getString("app_STATUS"));
-//                        user.setAppName(jsonObject.getString("app_NAME"));
-//                        user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-//
-//                        user.setAppNickName(jsonObject.getString("lastname"));
-//                        Log.d(TAG, user.getLastName());
-//                        mUserList.add(user);
-//                    }
-//                    /**
-//                     * ArrayList -> Realm
-//                     */
-//                    realm.executeTransaction(realm1 -> {
-//                        realm1.where(User.class).findAll().deleteAllFromRealm();
-//                        realm1.copyToRealmOrUpdate(mUserList);
-//                    });
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//    makeData();
-
     }
 
-    public void makeData() {
-        /**
-         * mUserList에서 나의 정보만 뺀다.
-         */
+    /**
+     * 나의 유저정보는 뺀다.
+     */
+    public void processData() {
         for(User user : mUserList) {
             if(user.getUserId().equals(Config.getMyUID(realm))) {
                 myProfile = user;
@@ -257,14 +264,14 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(getActivity() ,mUserList, aq, FriendlistCase.NON_RADIO);
+        mAdapter = new FriendListAdapter(mActivity ,mUserList, aq, NON_RADIO);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        makeProfile();
+        setMyProfile();
     }
 
-    public void makeProfile() {
+    public void setMyProfile() {
         myUid = myProfile.getUserId();
         TextView myProfileName = rootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
@@ -306,7 +313,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * keyboard
          */
-        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -343,8 +350,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     @Override
-    public void onSelected(User address) {
-        initBottomsheet(address);
+    public void onSelected(User user) {
+        initBottomsheet(user);
         new AnimManager(
                 AnimManager.make(mBottomWrapper, AnimManager.SHORT, 0).translationY(3000).translationY(0).setInterpolator(new DecelerateInterpolator())
         ).start(AnimManager.TOGETHER);
@@ -352,25 +359,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
 
     @SuppressLint("ClickableViewAccessibility")
-    protected void initBottomsheet(User address) {
-        // 프로필 이름, 이미지, 상태
-        TextView profileName = mBottomWrapper.findViewById(R.id.profileName);
-        ImageView profileImage = mBottomWrapper.findViewById(R.id.profileImage);
-        ImageView profileStatus = mBottomWrapper.findViewById(R.id.profileStatus);
-        // 이름 수정 및 수정 버튼
-        EditText modifyName = mBottomWrapper.findViewById(R.id.modifyName);
-        TextView modifyNameButton = mBottomWrapper.findViewById(R.id.modifyButton);
-        // 프로필 사진 수정 버튼
-        TextView modifyImageButton = mBottomWrapper.findViewById(R.id.modifyImage);
-        // 상태레이아웃
-        LinearLayout statusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
-        // 채팅 버튼
-        Button chatButton = mBottomWrapper.findViewById(R.id.chatButton);
-        // 프로필 이름 설정
-        profileName.setText(address.getAppName());
-
-        // profilestatus
-        switch(address.getAppStatus()) {
+    protected void initBottomsheet(User user) {
+        /**
+         * 데이터 초기화
+         */
+        profileName.setText(user.getAppName());
+        switch(user.getAppStatus()) {
             case "1" :
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
                 break;
@@ -381,21 +375,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
                 break;
         }
-        // 프로필 사진
-        if(URLUtil.isValidUrl(address.getAppImagePath())){
-            aq.view(profileImage).image(address.getAppImagePath());
+
+        if(URLUtil.isValidUrl(user.getAppImagePath())){
+            aq.view(profileImage).image(user.getAppImagePath());
         } else {
             aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
         }
-
         /**
-         * 데이터 초기화
+         * 임시로 userId로 primaryKey를 사용하고 있지만, 추후에 code로 변경해야 한다.
+         * if(user.getCode().equals(myUid))
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        /**
-         * if(address.getCode().equals(myUid))
-         */
-        if(address.getUserId().equals(myUid)){
+        if(user.getUserId().equals(myUid)){
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
             profileStatus.setClickable(true);
@@ -409,23 +400,17 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         profileName.setVisibility(View.VISIBLE);
         modifyNameButton.setText("수정");
 
+        // 해당 exitWrapper클릭시 onBackPressed() 수행
+        exitWrapper.setVisibility(View.VISIBLE);
+
         // Nickname 변경
         modifyNameButton.setOnClickListener(v -> {
-            String buttonName = modifyNameButton.getText().toString();
-            if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
-                modifyNameButton.setText("완료");
-                profileName.setVisibility(View.GONE);
-                modifyName.setVisibility(View.VISIBLE);
-                modifyName.setText(profileName.getText().toString());
-            } else { // 완료버튼을 눌렀을 경우
-                updateNickname(address, modifyName.getText().toString());
-                refreshFragment();
-            }
+            changeOpponentNickName(user);
         });
 
         // 프로필 사진 변경 (myProfile만 가능)
         modifyImageButton.setOnClickListener(v -> {
-            if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if(ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             } else {
                 startGallery();
@@ -434,43 +419,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // 프로필 Status 변경
         profileStatus.setOnClickListener(v -> {
-            // chatButton은 숨기고, status를 선택하는 Layout등장
-            chatButton.setVisibility(View.INVISIBLE);
-            statusLayout.setVisibility(View.VISIBLE);
-            // status를 클릭
-            LinearLayout working = statusLayout.findViewById(R.id.working_status);
-            LinearLayout leaving = statusLayout.findViewById(R.id.leaving_status);
-            LinearLayout vacation = statusLayout.findViewById(R.id.vacation_status);
-            LinearLayout.OnClickListener onClickListener = new LinearLayout.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    chatButton.setVisibility(View.VISIBLE);
-                    statusLayout.setVisibility(View.INVISIBLE);
-                    realm.executeTransaction(realm1 -> {
-                        switch (v.getId()) {
-                            case R.id.working_status :
-                                address.setAppStatus("0");
-                                break;
-                            case R.id.leaving_status :
-                                address.setAppStatus("1");
-                                break;
-                            case R.id.vacation_status :
-                                address.setAppStatus("2");
-                                break;
-                        }
-                    });
-                    apiManager.setEmployeeAppInfo(address, new ApiManager.onApiListener() {
-                        @Override
-                        public void onSuccess(Response response, String body) {
-                            refreshFragment();
-                            Log.d("setEmplyee", body);
-                        }
-                    });
-                }
-            };
-            working.setOnClickListener(onClickListener);
-            leaving.setOnClickListener(onClickListener);
-            vacation.setOnClickListener(onClickListener);
+            changeMyStatus(user);
         });
 
         // 1대1채팅 버튼
@@ -481,43 +430,38 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              * 3. 해당 rid값으로 intent로 넘겨준다.
              */
 
-            ChatRoom chatRoom = User.getChatroom(realm, address);
+            ChatRoom chatRoom = User.getChatroom(realm, user);
 
             if(chatRoom==null){
                 // 새로만든 채팅이 없다면 새로 만든다.
                 ArrayList<User> list = new ArrayList<>();
-                list.add(address);
-                String rid = new ChatAddActivity().createNewChat(realm, getContext(), list, "");
-                Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                list.add(user);
+                String rid = new ChatAddActivity().createNewChat(realm, mContext, list, "");
+                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
                 intent.putExtra("rid", rid);
-                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+
+                ((MainActivity) mActivity).startChatRoomActivity(intent);
             } else {
-                Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
                 intent.putExtra("rid", chatRoom.getRid());
-                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                ((MainActivity) mActivity).startChatRoomActivity(intent);
             }
         });
 
 
-        // 닫기 버튼
+        // 닫기
         mBottomWrapper.findViewById(R.id.mClose).setOnClickListener(v -> {
             onBackPressed();
         });
-        // RecyclerView위를 감싸는 view
-        LinearLayout wrapper = rootview.findViewById(R.id.wrapper);
-        wrapper.setVisibility(View.VISIBLE);
-        // 해당 뷰를 클릭했을 시 나가기.
-        wrapper.setOnTouchListener(new View.OnTouchListener() {
+        exitWrapper.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if(motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
-                    wrapper.setVisibility(View.GONE);
                     onBackPressed();
                 }
                 return true;
             }
         });
-
         // 하위 레이아웃(wrapper)에게 touch event 전달하지 않게 막기
         mBottomWrapper.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -525,8 +469,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 return true;
             }
         });
-
-
     }
 
     // bottomsheet 닫기버튼
@@ -535,10 +477,63 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             new AnimManager(
                     AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
             ).start(AnimManager.TOGETHER);
+            exitWrapper.setVisibility(View.GONE);
             return true;
         } else {
             return false;
         }
+    }
+    public void changeOpponentNickName(User user) {
+        String buttonName = modifyNameButton.getText().toString();
+        if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
+            modifyNameButton.setText("완료");
+            profileName.setVisibility(View.GONE);
+            modifyName.setVisibility(View.VISIBLE);
+            modifyName.setText(profileName.getText().toString());
+        } else { // 완료버튼을 눌렀을 경우
+            updateNickname(user, modifyName.getText().toString());
+            refreshFragment();
+        }
+    }
+
+    public void changeMyStatus(User user) {
+        // chatButton은 숨기고, status를 선택하는 Layout등장
+        chatButton.setVisibility(View.INVISIBLE);
+        statusLayout.setVisibility(View.VISIBLE);
+        // status를 클릭
+        LinearLayout working = statusLayout.findViewById(R.id.working_status);
+        LinearLayout leaving = statusLayout.findViewById(R.id.leaving_status);
+        LinearLayout vacation = statusLayout.findViewById(R.id.vacation_status);
+        LinearLayout.OnClickListener onClickListener = new LinearLayout.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chatButton.setVisibility(View.VISIBLE);
+                statusLayout.setVisibility(View.INVISIBLE);
+                realm.executeTransaction(realm1 -> {
+                    switch (v.getId()) {
+                        case R.id.working_status :
+                            user.setAppStatus("0");
+                            break;
+                        case R.id.leaving_status :
+                            user.setAppStatus("1");
+                            break;
+                        case R.id.vacation_status :
+                            user.setAppStatus("2");
+                            break;
+                    }
+                });
+                apiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
+                    @Override
+                    public void onSuccess(Response response, String body) {
+                        refreshFragment();
+                        Log.d("setEmplyee", body);
+                    }
+                });
+            }
+        };
+        working.setOnClickListener(onClickListener);
+        leaving.setOnClickListener(onClickListener);
+        vacation.setOnClickListener(onClickListener);
     }
 
     // Gallery start
@@ -546,7 +541,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 갤러리를 들어가기 위한 intent
         Intent cameraIntent = new Intent(Intent.ACTION_PICK);
         cameraIntent.setType("image/*");
-        if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+        if (cameraIntent.resolveActivity(mActivity.getPackageManager()) != null) {
             // 갤러리 실행
             startActivityForResult(cameraIntent, 1);
         }

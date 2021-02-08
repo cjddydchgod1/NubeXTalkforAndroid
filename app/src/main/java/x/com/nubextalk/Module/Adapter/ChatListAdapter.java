@@ -30,7 +30,8 @@ import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Module.Case.ChatlistCase;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
 import x.com.nubextalk.R;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -41,7 +42,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private OnItemLongSelectedListener mLongClickListener;
     private OnItemSelectedListener mClickListener;
     private AQuery aq;
-    private ChatlistCase sel_type;
+    private int sel_type;
     private int mLastCheckedPosition = -1;
     public interface OnItemSelectedListener {
         void onItemSelected(ChatRoom chatRoom);
@@ -59,7 +60,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mLongClickListener = listener;
     }
 
-    public ChatListAdapter(Context context, RealmResults<ChatRoom> mChatList, ChatlistCase sel_type) {
+    public ChatListAdapter(Context context, RealmResults<ChatRoom> mChatList, int sel_type) {
         mInflater = LayoutInflater.from(context);
         this.context = context;
         this.mDataset = mChatList;
@@ -85,7 +86,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ViewItemHolder viewItemHolder = (ViewItemHolder) holder;
             viewItemHolder.bindTo(mCurrent);
 
-            if(sel_type == ChatlistCase.RADIO)
+            if(sel_type == RADIO)
                 viewItemHolder.setVisible();
             viewItemHolder.radioButton.setChecked(mLastCheckedPosition == position);
         }
@@ -125,7 +126,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     if(mClickListener != null) {
                         int copyLastCheckedPosition = mLastCheckedPosition;
                         mLastCheckedPosition = getAdapterPosition();
-                        if(sel_type == ChatlistCase.RADIO) {
+                        if(sel_type == RADIO) {
                             notifyItemChanged(copyLastCheckedPosition);
                             notifyItemChanged(mLastCheckedPosition);
                         }

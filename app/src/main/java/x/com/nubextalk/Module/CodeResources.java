@@ -6,9 +6,19 @@
 package x.com.nubextalk.Module;
 
 public class CodeResources {
-    public static final String TAG = "NubeX Talk";
+    public static final String TAG   = "NubeX Talk";
+    public static final String EMPTY = "";
 
     /** SettingsActivity Resourece */
     public static final int EXE_LOGOUT  = 0;
     public static final int EXE_SWITCH  = 1;
+
+    /** Chat Adapter Resource */
+    public static final String SENDING        = "전송중";
+    public static final String DATE_FINAL     = "2100-12-31 23:59:59";
+    public static final String DATE_FORMAT_1  = "HH:mm";
+    public static final String DATE_FORMAT_2  = "yyyy.MM.dd (E)";
+    public static final String DATE_FORMAT_3  = "yyyy-MM-dd HH:mm:ss";
+
+
 }

@@ -45,24 +45,75 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/nav_item_height"
                 style="@style/SettingTextHeaderStyle"
-                android:text="계정 설정"/>
+                android:text="앱 설정"/>
 
             <LinearLayout
-                android:id="@+id/wrapperUser"
+                android:id="@+id/wrapperScreenLock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="@dimen/elevation_m"
                 android:orientation="vertical"/>
 
-            <!-- -->
             <com.joanzapata.iconify.widget.IconTextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/nav_item_height"
                 style="@style/SettingTextHeaderStyle"
-                android:text="앱 설정"/>
+                android:text="알람 설정"/>
 
             <LinearLayout
-                android:id="@+id/wrapperApp"
+                android:id="@+id/wrapperSetAlarm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="테마 설정"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperSetTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="계정 설정"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="도움말"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperHowToUse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="버전 정보"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperVesionInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="@dimen/elevation_m"

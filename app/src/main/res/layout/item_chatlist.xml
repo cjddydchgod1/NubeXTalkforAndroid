@@ -28,6 +28,8 @@
         android:id="@+id/chat_list_friend_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxWidth="164dp"
+        android:maxHeight="22dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="Person Name"

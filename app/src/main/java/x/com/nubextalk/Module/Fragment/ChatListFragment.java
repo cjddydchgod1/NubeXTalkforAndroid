@@ -44,7 +44,7 @@ import x.com.nubextalk.Module.Case.ChatlistCase;
 import x.com.nubextalk.R;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
-        ChatListAdapter.OnItemSelectedListener, View.OnClickListener {
+        ChatListAdapter.OnItemSelectedListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
 
@@ -78,12 +78,13 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
             }
         });
 
-        fab_main = rootView.findViewById(R.id.chat_fab_main);
         fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
-        fab_sub2 = rootView.findViewById(R.id.chat_fab_sub2);
-        fab_main.setOnClickListener(this);
-        fab_sub1.setOnClickListener(this);
-        fab_sub2.setOnClickListener(this);
+        fab_sub1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+            }
+        });
 
         return rootView;
     }
@@ -149,24 +150,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
     }
 
-    @Override
-    public void onClick(@NonNull View v) {
-        switch (v.getId()) {
-            case R.id.chat_fab_main:
-                toggleFab();
-                break;
-
-            case R.id.chat_fab_sub1:
-                toggleFab();
-                startActivity(new Intent(getContext(), ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
-                break;
-
-            case R.id.chat_fab_sub2:
-                toggleFab();
-                break;
-        }
-    }
-
     public void exitChatRoom(ChatRoom chatRoom) {
         if (chatRoom.getIsGroupChat()) {
             User me = (User) User.getMyAccountInfo(realm);
@@ -215,19 +198,5 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
         mAdapter.sortChatRoomByDate();
-    }
-
-    private void toggleFab() {
-        if (isFabOpen) {
-            fab_main.setImageResource(R.drawable.ic_floating_btn_24);
-            fab_sub1.hide();
-            fab_sub2.hide();
-            isFabOpen = false;
-        } else {
-            fab_main.setImageResource(R.drawable.ic_baseline_close_24);
-            fab_sub1.show();
-            fab_sub2.show();
-            isFabOpen = true;
-        }
     }
 }

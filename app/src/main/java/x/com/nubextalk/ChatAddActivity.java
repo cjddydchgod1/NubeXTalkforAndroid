@@ -120,10 +120,9 @@ public class ChatAddActivity extends AppCompatActivity implements
      * @param name 사용자 이름
      */
     private void searchUser(String name) {
-        if (!this.realm.where(User.class).contains("appName", name).
-                or().contains("appNickName", name).findAll().isEmpty()) {
-            RealmResults<User> users = this.realm.where(User.class).contains("appName", name).
-                    or().contains("appNickName", name).findAll();
+        RealmResults<User> users = this.realm.where(User.class).contains("appName", name).
+                or().contains("appNickName", name).findAll();
+        if (!users.isEmpty()) {
             realmSearchAdapter.deleteAllItem();
             for (User user : users) {
                 if (!user.getUserId().contentEquals(Config.getMyAccount(realm).getExt1())) {
@@ -158,7 +157,7 @@ public class ChatAddActivity extends AppCompatActivity implements
             case R.id.chat_add_confirm_btn:
                 ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
                 String roomName = chatRoomNameInput.getText().toString();
-                Log.d("CHATROOM", "roomName: " + roomName );
+                Log.d("CHATROOM", "roomName: " + roomName);
 
                 //선택된 유저가 한명일 때
                 if (selectedUser.size() == 1) {
@@ -183,19 +182,18 @@ public class ChatAddActivity extends AppCompatActivity implements
                         startActivity(intent);
                     }
 
-                } else { //선택된 유저가 여러명일 때, 단톡방
+                } else if (selectedUser.size() > 1) { //선택된 유저가 여러명일 때, 단톡방
                     if (roomName.isEmpty()) {
-                        Toast.makeText(this, "단체 채팅방 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Intent intent = new Intent(this, ChatRoomActivity.class);
-                        createNewChat(this.realm, this, selectedUser, roomName, new onNewChatCreatedListener() {
-                            @Override
-                            public void onCreate(String rid) {
-                                intent.putExtra("rid", rid);
-                                startActivity(intent);
-                            }
-                        });
+                        roomName = getUserName(selectedUser);
                     }
+                    Intent intent = new Intent(this, ChatRoomActivity.class);
+                    createNewChat(this.realm, this, selectedUser, roomName, new onNewChatCreatedListener() {
+                        @Override
+                        public void onCreate(String rid) {
+                            intent.putExtra("rid", rid);
+                            startActivity(intent);
+                        }
+                    });
                 }
                 break;
 
@@ -209,8 +207,9 @@ public class ChatAddActivity extends AppCompatActivity implements
      * 새로운 realm ChatRoom 생성 함수
      *
      * @param realm
-     * @param list  사용자 User 리스트
-     * @param name  채팅방 이름
+     * @param context
+     * @param list    사용자 User 리스트
+     * @param name    채팅방 이름
      */
     public static void createNewChat(Realm realm, Context context, ArrayList<User> list, String name,
                                      onNewChatCreatedListener onNewChatCreatedListener) {
@@ -231,7 +230,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                 data.put("title", list.get(0).getAppName());
             }
             data.put("roomImgUrl", list.get(0).getAppImagePath());
-        } else { // 단톡방인 경우
+        } else if (list.size() > 1) { // 단톡방인 경우
             data.put("title", name);
             data.put("roomImgUrl", list.get(0).getAppImagePath());
         }
@@ -243,6 +242,18 @@ public class ChatAddActivity extends AppCompatActivity implements
                 onNewChatCreatedListener.onCreate(rid[0]); //생성된 ChatRoom 의 rid 를 리스너 콜백으로 넘겨줌
             }
         });
+    }
+
+    public String getUserName(ArrayList<User> userArrayList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < userArrayList.size(); i++) {
+            String name = userArrayList.get(i).getAppName();
+            stringBuilder.append(name);
+            if (i != userArrayList.size() - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     /**

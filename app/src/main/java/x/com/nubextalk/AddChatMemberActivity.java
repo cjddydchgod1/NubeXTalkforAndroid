@@ -121,7 +121,7 @@ public class AddChatMemberActivity extends AppCompatActivity implements
         switch (v.getId()) {
             case R.id.add_chat_confirm_btn:
                 ArrayList<User> selectedUser = selectedMemberAdapter.getUserList();
-                if (addChatUser(realm, hospitalId, chatRoomId, selectedUser)) {
+                if (inviteChatUser(realm, hospitalId, chatRoomId, selectedUser)) {
                     Toast.makeText(this, "대화 상대가 추가되었습니다.", Toast.LENGTH_SHORT)
                             .show();
                 } else {
@@ -162,10 +162,9 @@ public class AddChatMemberActivity extends AppCompatActivity implements
      * @param name 사용자 이름
      */
     private void searchUser(String name) {
-        if (!this.realm.where(User.class).contains("appName", name).
-                or().contains("appNickName", name).findAll().isEmpty()) {
-            RealmResults<User> users = this.realm.where(User.class).contains("appName", name).
-                    or().contains("appNickName", name).findAll();
+        RealmResults<User> users = this.realm.where(User.class).contains("appName", name).
+                or().contains("appNickName", name).findAll();
+        if (!users.isEmpty()) {
             realmSearchAdapter.deleteAllItem();
             for (User user : users) {
                 if (!isExistUser(realm, chatRoomId, user.getUserId())) {
@@ -202,49 +201,83 @@ public class AddChatMemberActivity extends AppCompatActivity implements
      * @param userList
      * @return
      */
-    public boolean addChatUser(Realm realm, String hid, String rid, ArrayList<User> userList) {
-        try {
-            FirebaseFirestore fs = FirebaseFirestore.getInstance();
-            for (User user : userList) {
-                //Realm 에 해당 채팅방에 사용자 추가
-//                ChatRoomMember.addChatRoomMember(realm, rid, user.getUserId());
+    public boolean inviteChatUser(Realm realm, String hid, String rid, ArrayList<User> userList) {
 
-                //FireStore 에 해당 채팅방에 사용자 추가
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+        Boolean isGroupChat = false;
+        if (chatRoom != null) {
+            isGroupChat = chatRoom.getIsGroupChat();
+
+            if (isGroupChat) {
+                FirebaseFirestore fs = FirebaseFirestore.getInstance();
+                for (User user : userList) {
+
+                    //FireStore 에 해당 채팅방에 사용자 추가
+                    Map<String, Object> data = new HashMap<>();
+                    fs.collection("hospital").document(hid)
+                            .collection("chatRoom").document(rid)
+                            .collection("chatRoomMember")
+                            .document(user.getUserId()).set(data);
+                }
+
+                String uid = Config.getMyUID(realm);
+                Map<String, Object> chat = new HashMap<>();
+                String cid = uid.concat(String.valueOf(new Date().getTime()));
+                chat.put("cid", cid);
+                chat.put("uid", uid);
+                chat.put("rid", rid);
+                chat.put("content", "상대방을 초대 중 입니다.");
+                chat.put("type", "9");
+
+                ChatContent.createChat(realm, chat);
+
+                //Functions 통해 기존 사용자 및 초대된 새로운 사용자들에게 시스템 메세지 보냄
                 Map<String, Object> data = new HashMap<>();
-                fs.collection("hospital").document(hid)
-                        .collection("chatRoom").document(rid)
-                        .collection("chatRoomMember")
-                        .document(user.getUserId()).set(data);
+                JSONArray jsonArray = new JSONArray();
+                for (User user : userList) {
+                    jsonArray.put(user.getUserId());
+                }
+                data.put("chatContentId", cid);
+                data.put("hospitalId", hid);
+                data.put("senderId", Config.getMyAccount(realm).getExt1());
+                data.put("membersId", jsonArray);
+                data.put("chatRoomId", rid);
+                FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
+            } else {
+                ArrayList<User> userArrayList = new ArrayList<>(userList);
+                RealmResults<ChatRoomMember> realmResults = ChatRoom.getChatRoomUsers(realm, rid);
+                for (ChatRoomMember chatRoomMember : realmResults) {
+                    User user = realm.where(User.class).equalTo("userId", chatRoomMember.getUid()).findFirst();
+                    if (user != null) {
+                        userArrayList.add(user);
+                    }
+                }
+                Intent intent = new Intent(this, ChatRoomActivity.class);
+                ChatAddActivity.createNewChat(realm, this, userArrayList, getUserName(userArrayList), new ChatAddActivity.onNewChatCreatedListener() {
+                    @Override
+                    public void onCreate(String rid) {
+                        intent.putExtra("rid", rid).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        startActivity(intent);
+                    }
+                });
+
             }
 
-            String uid = Config.getMyUID(realm);
-            Map<String, Object> chat = new HashMap<>();
-            String cid = uid.concat(String.valueOf(new Date().getTime()));
-            chat.put("cid", cid);
-            chat.put("uid", uid);
-            chat.put("rid", rid);
-            chat.put("content", "상대방을 초대 중 입니다.");
-            chat.put("type", "9");
-
-            ChatContent.createChat(realm,chat);
-
-            //Functions 통해 기존 사용자 및 초대된 새로운 사용자들에게 시스템 메세지 보냄
-            Map<String, Object> data = new HashMap<>();
-            JSONArray jsonArray = new JSONArray();
-            for (User user : userList) {
-                jsonArray.put(user.getUserId());
-            }
-            data.put("chatContentId",cid);
-            data.put("hospitalId", hid);
-            data.put("senderId", Config.getMyAccount(realm).getExt1());
-            data.put("membersId", jsonArray);
-            data.put("chatRoomId", rid);
-            FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
+        return true;
+
+    }
+
+    public String getUserName(ArrayList<User> userArrayList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < userArrayList.size(); i++) {
+            String name = userArrayList.get(i).getAppName();
+            stringBuilder.append(name);
+            if (i != userArrayList.size() - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     /**

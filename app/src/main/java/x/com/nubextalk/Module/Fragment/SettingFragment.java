@@ -5,16 +5,20 @@
 
 package x.com.nubextalk.Module.Fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,18 +27,31 @@ import android.widget.Switch;
 import com.joanzapata.iconify.widget.IconTextView;
 
 import io.realm.Realm;
+import x.com.nubextalk.HowToUseActivity;
 import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
+import x.com.nubextalk.ThemeModeActivity;
+
 import static x.com.nubextalk.Module.CodeResources.*;
 
 public class SettingFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private ViewGroup rootview;
+    private Context mContext;
+    private Activity mActivity;
     private Realm realm;
-    private LinearLayout mWrapperScreenLock, mWrapperSetAlarm, mWrapperSetTheme, mWrapperLogout, mWrapperHowToUse, mWrapperVesionInfo;
-
+    private LinearLayout mWrapperApp, mWrapperAccount, mWrapperVesionInfo;
+    private IconTextView mWrapperHowToUse;
+    private Config myAccount;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if(context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -42,16 +59,22 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         realm               = Realm.getInstance(UtilityManager.getRealmConfig());
         rootview            = (ViewGroup) inflater.inflate(R.layout.fragment_setting, container, false);
 
-        cleanView(mWrapperScreenLock    = rootview.findViewById(R.id.wrapperScreenLock));
-        cleanView(mWrapperSetAlarm      = rootview.findViewById(R.id.wrapperSetAlarm));
-        cleanView(mWrapperSetTheme      = rootview.findViewById(R.id.wrapperSetTheme));
-        cleanView(mWrapperHowToUse      = rootview.findViewById(R.id.wrapperHowToUse));
-        cleanView(mWrapperLogout        = rootview.findViewById(R.id.wrapperLogout));
+        mWrapperHowToUse      = rootview.findViewById(R.id.wrapperHowToUse);
+
+        cleanView(mWrapperApp           = rootview.findViewById(R.id.wrapperApp));
+        cleanView(mWrapperAccount       = rootview.findViewById(R.id.wrapperAccount));
         cleanView(mWrapperVesionInfo    = rootview.findViewById(R.id.wrapperVesionInfo));
 
+        myAccount = Config.getMyAccount(realm);
 
         initView();
         return rootview;
+    }
+
+    @Override
+    public void onDetach() {
+        realm.close();
+        super.onDetach();
     }
 
     private void cleanView(LinearLayout linearLayout) {
@@ -61,51 +84,48 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
     private void initView() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        RelativeLayout l;
+        RelativeLayout l, l1;
 
         /** APP **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
         ((IconTextView) l.findViewById(R.id.titleRow)).setText("화면 잠금");
-        Switch lockSwitch = l.findViewById(R.id.switchRow);
-        lockSwitch.setChecked(false);
-        lockSwitch.setOnCheckedChangeListener(this);
+        SwitchCompat lockSwitch = l.findViewById(R.id.switchRow);
+        lockSwitch.setChecked(myAccount.getScreenLock());
+        lockSwitch.setOnCheckedChangeListener(new ScreenLockSwitchListener());
         lockSwitch.setTag(EXE_SCREENLOCK);
         l.setOnClickListener(v -> lockSwitch.performClick());
-        mWrapperScreenLock.addView(l);
+        mWrapperApp.addView(l);
 
-        l = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("알람 설정");
-        Switch AlarmSwitch = l.findViewById(R.id.switchRow);
-        AlarmSwitch.setChecked(false);
-        AlarmSwitch.setOnCheckedChangeListener(this);
+        l1 = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
+        ((IconTextView) l1.findViewById(R.id.titleRow)).setText("알람 받기");
+        SwitchCompat AlarmSwitch = l1.findViewById(R.id.switchRow);
+        AlarmSwitch.setChecked(myAccount.getAlarm());
+        AlarmSwitch.setOnCheckedChangeListener(new AlarmSwitchListener());
         AlarmSwitch.setTag(EXE_ALARM);
-        l.setOnClickListener(v -> AlarmSwitch.performClick());
-        mWrapperSetAlarm.addView(l);
+        l1.setOnClickListener(v -> AlarmSwitch.performClick());
+        mWrapperApp.addView(l1);
 
         /** dark mode **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
         ((IconTextView) l.findViewById(R.id.titleRow)).setText("테마설정");
         l.setTag(EXE_SCREENMODE);
         l.setOnClickListener(this);
-        mWrapperSetTheme.addView(l);
+        mWrapperApp.addView(l);
 
         /** USER **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
         ((IconTextView) l.findViewById(R.id.titleRow)).setText("로그아웃");
         l.setTag(EXE_LOGOUT);
         l.setOnClickListener(this);
-        mWrapperLogout.addView(l);
+        mWrapperAccount.addView(l);
 
-        /** how to use **/
-        l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("도움말");
-        l.setTag(EXE_HOWTOUSE);
-        l.setOnClickListener(this);
-        mWrapperHowToUse.addView(l);
+        /** How to use **/
+        mWrapperHowToUse.setTag(EXE_HOWTOUSE);
+        mWrapperHowToUse.setOnClickListener(this);
 
         /** Version info **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("Vesion 1.0.0");
+        ((IconTextView) l.findViewById(R.id.titleRow)).setText("Nube X Talk 1.0.0");
         l.setTag(EXE_VERSIONINFO);
         l.setOnClickListener(this);
         mWrapperVesionInfo.addView(l);
@@ -113,19 +133,25 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onClick(View view) {
-        Context context = getContext();
+        Intent intent;
         switch ((int) view.getTag()) {
-            case EXE_HOWTOUSE:
+            case EXE_SCREENMODE:
+                intent = new Intent(mActivity, ThemeModeActivity.class);
+                startActivity(intent);
                 break;
             case EXE_LOGOUT:
                 realm.executeTransaction(realm1 -> {
                     Config config = Config.getMyAccount(realm1);
-                    config.setExt5(null);
+                    config.setAutoLogin(false);
                     realm1.copyToRealmOrUpdate(config);
                 });
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent = new Intent(mActivity, LoginActivity.class);
                 startActivity(intent);
-                getActivity().finish();
+                mActivity.finish();
+                break;
+            case EXE_HOWTOUSE:
+                intent = new Intent(mActivity, HowToUseActivity.class);
+                startActivity(intent);
                 break;
             case EXE_VERSIONINFO:
                 break;
@@ -135,11 +161,66 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch ((int)buttonView.getTag()) {
-            case EXE_SCREENLOCK:
-                break;
-            case EXE_ALARM:
-                break;
+        realm.executeTransaction(realm1 -> {
+            switch ((int)buttonView.getTag()) {
+                case EXE_SCREENLOCK:
+                    if(isChecked) {
+                        Log.e("1boolean = ", Boolean.toString(isChecked));
+                        myAccount.setScreenLock(true);
+//                        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    }
+                    else {
+                        Log.e("2boolean = ", Boolean.toString(isChecked));
+                        myAccount.setScreenLock(false);
+//                        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                    }
+                    break;
+                case EXE_ALARM:
+
+                    if(isChecked) {
+                        Log.e("3boolean = ", Boolean.toString(isChecked));
+                        myAccount.setAlarm(true);
+                    }
+                    else {
+                        Log.e("4boolean = ", Boolean.toString(isChecked));
+                        myAccount.setAlarm(false);
+                    }
+                    break;
+            }
+            realm.copyToRealmOrUpdate(myAccount);
+        });
+    }
+
+    class ScreenLockSwitchListener implements  CompoundButton.OnCheckedChangeListener{
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            realm.executeTransaction(realm1 -> {
+                if (isChecked) {
+                    Log.e("1boolean = ", Boolean.toString(isChecked));
+                    myAccount.setScreenLock(true);
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                } else {
+                    Log.e("2boolean = ", Boolean.toString(isChecked));
+                    myAccount.setScreenLock(false);
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                }
+                realm.copyToRealmOrUpdate(myAccount);
+            });
+        }
+    }
+    class AlarmSwitchListener implements CompoundButton.OnCheckedChangeListener{
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            realm.executeTransaction(realm1 -> {
+                if (isChecked) {
+                    Log.e("3boolean = ", Boolean.toString(isChecked));
+                    myAccount.setAlarm(true);
+                } else {
+                    Log.e("4boolean = ", Boolean.toString(isChecked));
+                    myAccount.setAlarm(false);
+                }
+                realm.copyToRealmOrUpdate(myAccount);
+            });
         }
     }
 }

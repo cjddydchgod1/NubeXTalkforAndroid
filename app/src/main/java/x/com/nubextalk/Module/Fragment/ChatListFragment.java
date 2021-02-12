@@ -6,11 +6,13 @@
 package x.com.nubextalk.Module.Fragment;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,8 +55,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
 
-    private FloatingActionButton fab_main, fab_sub1, fab_sub2;
-    private boolean isFabOpen = false;
+    private FloatingActionButton fab_sub1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,7 +108,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         boolean fixTop = chatRoom.getSettingFixTop();
         boolean alarm = chatRoom.getSettingAlarm();
 
-        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "나가기"};
+        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "채팅방 이름 편집", "나가기"};
         menuArray[0] = alarm ? menuArray[0].concat(" 해제") : menuArray[0].concat(" 켜기");
         menuArray[2] = fixTop ? menuArray[2].concat(" 해제") : "상단 고정";
 
@@ -128,7 +129,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                             case 2: /**채팅방 상단 고정 이벤트**/
                                 updateChatRoomFixTop(chatRoom);
                                 break;
-                            case 3: /**채팅방 나가기 이벤트**/
+                            case 3: /**채팅방 이름 편집 이벤트**/
+                                openDialog(chatRoom.getRid());
+                                break;
+                            case 4: /**채팅방 나가기 이벤트**/
                                 exitChatRoom(chatRoom);
                                 break;
                         }
@@ -148,6 +152,12 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
 
     @Override
     public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
+    }
+
+    private void openDialog(String chatRoomId) {
+        DialogFragment dialogFragment = new RoomNameModificationDialogFragment(realm, chatRoomId);
+        dialogFragment.setTargetFragment(this, 0);
+        dialogFragment.show(getParentFragmentManager(), "Change RoomName");
     }
 
     public void exitChatRoom(ChatRoom chatRoom) {

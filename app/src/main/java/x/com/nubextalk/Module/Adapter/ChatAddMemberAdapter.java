@@ -9,6 +9,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,7 +50,7 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
             ViewItemHolder mHolder = (ViewItemHolder) holder;
             mHolder.profileName.setText(userList.get(position).getAppName());
 
-            if (!userList.get(position).getAppImagePath().isEmpty()) {
+            if (URLUtil.isValidUrl(userList.get(position).getAppImagePath())) {
                 aq.view(mHolder.profileImage).image(userList.get(position).getAppImagePath());
             } else {
                 aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);

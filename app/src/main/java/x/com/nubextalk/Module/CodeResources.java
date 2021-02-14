@@ -20,5 +20,11 @@ public class CodeResources {
     public static final String DATE_FORMAT_2  = "yyyy.MM.dd (E)";
     public static final String DATE_FORMAT_3  = "yyyy-MM-dd HH:mm:ss";
 
+    public static final String NOTIFICATION_CHANNEL_ID = "0608";
+    public static final String NOTIFICATION_CHANNEL_NAME = "NubeXTalk Notification Channel";
+    public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "This is notification channel for NubeXTalk.";
+    public static final String NOTIFICATION_GROUP = "NoticationGroup";
+
+
 
 }

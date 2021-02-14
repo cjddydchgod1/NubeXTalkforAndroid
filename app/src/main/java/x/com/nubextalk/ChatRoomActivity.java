@@ -159,12 +159,15 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             sendPacs(studyId, description);
         }
 
-        RealmChangeListener realmChangeListener = o -> {
-            mAdapter.update();
-            if (mAdapter.getItemCount() > 0)
-                mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
+        RealmChangeListener<RealmResults<ChatContent>> realmChangeListener = new RealmChangeListener<RealmResults<ChatContent>>() {
+            @Override
+            public void onChange(RealmResults<ChatContent> chatContents) {
+                mAdapter.update();
+                if (mAdapter.getItemCount() > 0)
+                    mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
+            }
         };
-        realm.addChangeListener(realmChangeListener);
+        mChat.addChangeListener(realmChangeListener);
 
         addContentView(km, new FrameLayout.LayoutParams(-1, -1));
         km.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
@@ -228,6 +231,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     @Override // Destroy
     protected void onDestroy() {
         super.onDestroy();
+        setChatContentRead(mChat, mChatIndex);
         realm.close();
     }
 
@@ -644,7 +648,6 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 }
             }
         });
-
         return Chats.size();
     }
 }

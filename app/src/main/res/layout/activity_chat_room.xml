@@ -3,90 +3,77 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        >
+        android:fitsSystemWindows="true">
 
-         <androidx.appcompat.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_chat_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/cBackground"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/toolbar_chat_room_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="@dimen/txt_Ml"
-                android:text=""/>
+                android:maxWidth="@dimen/toolbar_height_l"
+                android:singleLine="true"
+                android:text="우리들의 일그러진 영dsadasdasdasd"
+                android:textSize="@dimen/txt_xl" />
 
         </androidx.appcompat.widget.Toolbar>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_chat_room"
-        android:background="@color/cBackground"
-        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_chat_room"
+            android:background="@color/cBackground">
 
 
-
-        <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chat_room_content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/edit_chat"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chat_room_content"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintBottom_toTopOf="@+id/edit_chat"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
-<!--        <com.joanzapata.iconify.widget.IconButton-->
-<!--            android:id="@+id/media_button"-->
-<!--            android:layout_width="@dimen/icon_size_l"-->
-<!--            android:layout_height="@dimen/icon_size_l"-->
-<!--            android:layout_marginLeft="@dimen/margin_l"-->
-<!--            android:background="@android:color/transparent"-->
+            <EditText
+                android:id="@+id/edit_chat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_m"
+                android:layout_marginTop="@dimen/margin_m"
+                android:layout_marginRight="@dimen/margin_m"
+                android:background="@drawable/bg_chat_edit_text"
+                android:maxLength="80"
+                android:maxLines="3"
+                android:padding="@dimen/padding_m"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/send_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chat_room_content" />
 
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
-
-        <EditText
-            android:id="@+id/edit_chat"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin_m"
-            android:layout_marginRight="@dimen/margin_m"
-            android:layout_marginTop="@dimen/margin_m"
-            android:padding="@dimen/padding_m"
-            android:background="@drawable/bg_chat_edit_text"
-            android:maxLines="3"
-            android:maxLength="80"
-            app:layout_constraintTop_toBottomOf="@id/chat_room_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/send_button"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.joanzapata.iconify.widget.IconButton
-            android:id="@+id/send_button"
-            android:layout_width="@dimen/icon_size_l"
-            android:layout_height="@dimen/icon_size_l"
-            android:layout_marginRight="@dimen/margin_l"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/send_button"
+                android:layout_width="@dimen/icon_size_l"
+                android:layout_height="@dimen/icon_size_l"
+                android:layout_marginRight="@dimen/margin_l"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -96,8 +83,7 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/activity_chat_room_draw_header"
-        app:menu = "@menu/menu_drawer_navigation">
-    </com.google.android.material.navigation.NavigationView>
+        app:menu="@menu/menu_drawer_navigation" />
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

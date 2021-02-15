@@ -5,9 +5,12 @@
 
 package x.com.nubextalk.Module.Fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -36,7 +39,8 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
-import x.com.nubextalk.Module.Case.FriendlistCase;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import x.com.nubextalk.R;
 
 public class PACSFriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener   {
@@ -49,10 +53,21 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
     private Button confirmBtn;
 
     private User lastChecked;
-    private RadioButton lastRadioButton;
 
     private String studyId;
     private String description;
+
+    private Context mContext;
+    private Activity mActivity;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if(context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,17 +75,17 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView   = rootview.findViewById(R.id.friend_list_PACS_recycleview);
         confirmBtn      = rootview.findViewById(R.id.btn_confirm_PACS);
-        aq              = new AQuery(getActivity());
+        aq              = new AQuery(mActivity);
         mUserList       = new ArrayList<>();
 
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         /**
          * User data를 받아온다
          */
         getData();
 
-        mAdapter = new FriendListAdapter(getActivity() ,mUserList, aq, FriendlistCase.RADIO);
+        mAdapter = new FriendListAdapter(mActivity ,mUserList, aq, RADIO);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -88,8 +103,8 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
                     ArrayList<User> list = new ArrayList<>();
                     list.add(lastChecked);
 
-                    Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
-                    new ChatAddActivity().createNewChat(realm, getContext(), list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                    Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                    new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
                         @Override
                         public void onCreate(String rid) {
                             intent.putExtra("rid", rid);
@@ -99,19 +114,14 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
                         }
                     });
                 } else {
-                    Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                    Intent intent = new Intent(mActivity, ChatRoomActivity.class);
                     intent.putExtra("rid", chatRoom.getRid());
                     intent.putExtra("studyId", studyId);
                     intent.putExtra("description", description);
                     startActivity(intent);
-                    /**
-                     * Finish Activity (ImageViewActivity, SharePACSActivity)
-                     * 작성
-                     */
                 }
-                getActivity().finish();
             } else {
-                Toast.makeText(getActivity(), "선택된 친구 목록이 없습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "선택된 친구 목록이 없습니다.", Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -120,19 +130,15 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
     }
 
     @Override
-    public void onSelected(User address, RadioButton radioButton) {
-        if(!address.equals(lastChecked) && lastRadioButton != null) {
-            lastRadioButton.setChecked(false);
-        }
-        radioButton.setChecked(true);
-        lastRadioButton = radioButton;
-        lastChecked = address;
-
+    public void onDetach() {
+        mContext = null;
+        mActivity = null;
+        super.onDetach();
     }
 
     @Override
     public void onSelected(User address) {
-
+        lastChecked = address;
     }
 
     public void getData() {

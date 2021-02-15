@@ -58,7 +58,7 @@ public class ApiManager {
     public void login(onLoginApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
         if (myAccount != null) {
-            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getExt5(), listener);
+            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getAutoLogin(), listener);
         }
     }
 
@@ -68,7 +68,7 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, String check, onLoginApiListener listener) {
+    public void login(String id, String pwd, boolean autoLogin, onLoginApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
@@ -101,7 +101,7 @@ public class ApiManager {
                                             myAccount.setExt1(id);
                                             myAccount.setExt2(pwd);
                                             myAccount.setExt3(cookie.toUpperCase());
-                                            myAccount.setExt5(check);
+                                            myAccount.setAutoLogin(autoLogin);
                                             realm.copyToRealmOrUpdate(myAccount);
 
                                             if (listener != null) {

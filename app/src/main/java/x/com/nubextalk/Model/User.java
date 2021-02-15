@@ -129,8 +129,8 @@ public class User extends RealmObject {
         this.appNickName = appNickName;
     }
 
-    public static RealmObject getMyAccountInfo(Realm realm) {
-        return realm.where(User.class).equalTo("userId", Config.getMyAccount(realm).getExt1()).findFirst();
+    public static User getMyAccountInfo(Realm realm) {
+        return realm.where(User.class).equalTo("userId", Config.getMyAccount(realm).getExt1()).findFirst() ;
     }
     public static RealmResults<User> getUserlist(Realm realm) {
         return realm.where(User.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();

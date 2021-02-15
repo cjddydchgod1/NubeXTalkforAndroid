@@ -220,19 +220,22 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                         }
                                         // realm ChatRoom, ChatContent 생성
                                         payload.put("isFirst", true);
-                                        ChatRoom.createChatRoom(realm1, value, userIdList, null);
-                                        ChatContent.createChat(realm1, payload);
-
-                                        if (!Config.getMyUID(realm1).equals(uid)) {
-                                            new Thread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Realm realm2 = Realm.getInstance(UtilityManager.getRealmConfig());
-                                                    mNotifyManager.notify(realm2, cid);
-                                                    realm2.close();
+                                        ChatRoom.createChatRoom(realm1, value, userIdList, new ChatRoom.onChatRoomCreatedListener() {
+                                            @Override
+                                            public void onCreate(ChatRoom chatRoom) {
+                                                if (!Config.getMyUID(realm1).equals(uid)) {
+                                                    new Thread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Realm realm2 = Realm.getInstance(UtilityManager.getRealmConfig());
+                                                            mNotifyManager.notify(realm2, cid);
+                                                            realm2.close();
+                                                        }
+                                                    }).start();
                                                 }
-                                            }).start();
-                                        }
+                                            }
+                                        });
+                                        ChatContent.createChat(realm1, payload);
                                         realm1.close();
                                     } catch (JSONException e) {
                                         e.printStackTrace();

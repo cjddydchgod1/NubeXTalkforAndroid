@@ -24,7 +24,7 @@
                 android:layout_gravity="center"
                 android:maxWidth="@dimen/toolbar_height_l"
                 android:singleLine="true"
-                android:text="우리들의 일그러진 영dsadasdasdasd"
+                android:text=""
                 android:textSize="@dimen/txt_xl" />
 
         </androidx.appcompat.widget.Toolbar>

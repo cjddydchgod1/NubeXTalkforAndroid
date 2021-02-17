@@ -6,7 +6,7 @@
 package x.com.nubextalk.Module;
 
 public class CodeResources {
-    public static final String TAG   = "NubeX Talk";
+    public static final String TAG = "NubeX Talk";
     public static final String EMPTY = "";
 
     /** SettingsActivity Resourece */
@@ -33,6 +33,8 @@ public class CodeResources {
     public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "This is notification channel for NubeXTalk.";
     public static final String NOTIFICATION_GROUP = "NoticationGroup";
 
+    public static final String EMPTY_IMAGE = "empty image";
+    public static final String COMPLETE_DOWNLOAD = "다운로드 완료";
 
 
 }

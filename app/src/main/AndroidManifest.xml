@@ -22,7 +22,6 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".ImageViewActivity" />
         <activity android:name=".SharePACSActivity" />
-        <activity android:name=".AddChatMemberActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" /> <!-- FireBase -->
         <meta-data

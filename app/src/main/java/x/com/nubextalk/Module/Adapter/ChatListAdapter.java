@@ -377,10 +377,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
 
-        /**
-         * 채팅방 타입이 1대1 채팅방인 경우에는 대화 상대방의 상태가 보여야하는데 내가 누구인지 알아야 상대방 상태 표시 가
-         * 채팅방 타입이 단체방인 경우에는 어떻게 하지?
-         **/
         public void setStatusImg(ChatRoom chatRoom) {
             String rid = chatRoom.getRid();
             User myAccount = (User) User.getMyAccountInfo(realm);

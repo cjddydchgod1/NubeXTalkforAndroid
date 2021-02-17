@@ -5,8 +5,9 @@
 
 package x.com.nubextalk.Module.Fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,22 +25,14 @@ import android.widget.RadioButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import javax.annotation.Nullable;
-
-import io.realm.ObjectChangeSet;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
-import x.com.nubextalk.AddChatMemberActivity;
 import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 import x.com.nubextalk.Module.Case.ChatlistCase;
@@ -49,6 +42,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         ChatListAdapter.OnItemSelectedListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
+    private Context mContext;
+    private Activity mActivity;
 
     private String hospitalId;
 
@@ -56,6 +51,14 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     private ChatListAdapter mAdapter;
 
     private FloatingActionButton fab_sub1;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if (context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -83,7 +86,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         fab_sub1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getContext(), ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+                startActivity(new Intent(mContext, ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
             }
         });
 
@@ -122,8 +125,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 updateChatRoomAlarm(chatRoom);
                                 break;
                             case 1: /**대화상대 추가 이벤트**/
-                                startActivity(new Intent(getContext(), AddChatMemberActivity.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                                startActivity(new Intent(mContext, ChatAddActivity.class)
                                         .putExtra("rid", chatRoom.getRid()));
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트**/
@@ -145,7 +147,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
      **/
     @Override
     public void onItemSelected(@NonNull ChatRoom chatRoom) {
-        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+        Intent intent = new Intent(mActivity, ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
         startActivity(intent);
     }

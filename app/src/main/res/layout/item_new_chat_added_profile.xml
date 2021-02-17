@@ -35,9 +35,9 @@
 
     <com.joanzapata.iconify.widget.IconButton
         android:id="@+id/new_chat_added_delete_btn"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@color/cTransparent"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:background="@color/cHalfTransparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

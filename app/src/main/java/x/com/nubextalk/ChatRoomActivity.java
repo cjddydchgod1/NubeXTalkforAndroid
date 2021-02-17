@@ -507,7 +507,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
     // Invite new member -> ChatAddActivity
     private void addMember() {
-        Intent intent = new Intent(getApplicationContext(), AddChatMemberActivity.class);
+        Intent intent = new Intent(getApplicationContext(), ChatAddActivity.class);
         intent.putExtra("rid", mRid);
         startActivity(intent);
     }

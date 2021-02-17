@@ -35,8 +35,13 @@ public class ChatRoomMember extends RealmObject {
         this.uid = uid;
     }
 
-    public static void addChatRoomMember(Realm realm, String rid, String uid) {
-        realm.executeTransaction(new Realm.Transaction() {
+    public interface OnChatRoomMemberListener {
+        void onCreate();
+
+    }
+
+    public static void addChatRoomMember(Realm realm, String rid, String uid, OnChatRoomMemberListener onChatRoomMemberListener) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 //기존 채팅방 멤버인지 확인
@@ -55,6 +60,11 @@ public class ChatRoomMember extends RealmObject {
                     realm.copyToRealm(chatRoomMember);
                     realm.copyToRealmOrUpdate(chatRoom);
                 }
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                onChatRoomMemberListener.onCreate();
             }
         });
     }

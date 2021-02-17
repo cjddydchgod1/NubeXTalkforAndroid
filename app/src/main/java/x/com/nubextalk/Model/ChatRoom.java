@@ -146,7 +146,7 @@ public class ChatRoom extends RealmObject {
         return realm.where(ChatRoom.class).findAll();
     }
 
-    public interface onChatRoomCreatedListener {
+    public interface OnChatRoomCreatedListener {
         void onCreate(ChatRoom chatRoom);
     }
 
@@ -157,8 +157,8 @@ public class ChatRoom extends RealmObject {
      * @param data     채팅방 생성을 위한 데이터 Map
      * @param userList 채팅방 참여 사용자 (userId) 가 담긴 ArrayList
      */
-    public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList, onChatRoomCreatedListener onChatRoomCreatedListener) {
-        User myAccount = User.getMyAccountInfo(realm);
+    public static void createChatRoom(Realm realm, Map data, ArrayList<String> userList, @NonNull OnChatRoomCreatedListener onChatRoomCreatedListener) {
+        User myAccount = (User) User.getMyAccountInfo(realm);
 
         // userList 에 자신의 아이디 추가
         if (!userList.contains(myAccount.getUserId())) {
@@ -222,12 +222,14 @@ public class ChatRoom extends RealmObject {
                             }, new Realm.Transaction.OnSuccess() {
                                 @Override
                                 public void onSuccess() {
-                                    if (onChatRoomCreatedListener != null) {
-                                        onChatRoomCreatedListener.onCreate(chatRoom);
-                                    }
                                     //ChatRoomMember 모델에 채팅유저 생성
                                     for (String uid : userList) {
-                                        ChatRoomMember.addChatRoomMember(realm, rid[0], uid);
+                                        ChatRoomMember.addChatRoomMember(realm, rid[0], uid, new ChatRoomMember.OnChatRoomMemberListener() {
+                                            @Override
+                                            public void onCreate() {
+                                                onChatRoomCreatedListener.onCreate(chatRoom);
+                                            }
+                                        });
                                     }
 
                                 }
@@ -250,12 +252,14 @@ public class ChatRoom extends RealmObject {
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    if (onChatRoomCreatedListener != null) {
-                        onChatRoomCreatedListener.onCreate(chatRoom);
-                    }
                     //ChatRoomMember 모델에 채팅유저 생성
                     for (String uid : userList) {
-                        ChatRoomMember.addChatRoomMember(realm, rid[0], uid);
+                        ChatRoomMember.addChatRoomMember(realm, rid[0], uid, new ChatRoomMember.OnChatRoomMemberListener() {
+                            @Override
+                            public void onCreate() {
+                                onChatRoomCreatedListener.onCreate(chatRoom);
+                            }
+                        });
                     }
                 }
             });

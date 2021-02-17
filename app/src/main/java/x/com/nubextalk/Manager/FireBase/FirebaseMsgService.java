@@ -220,7 +220,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                         }
                                         // realm ChatRoom, ChatContent 생성
                                         payload.put("isFirst", true);
-                                        ChatRoom.createChatRoom(realm1, value, userIdList, new ChatRoom.onChatRoomCreatedListener() {
+                                        ChatRoom.createChatRoom(realm1, value, userIdList, new ChatRoom.OnChatRoomCreatedListener() {
                                             @Override
                                             public void onCreate(ChatRoom chatRoom) {
                                                 if (!Config.getMyUID(realm1).equals(uid)) {

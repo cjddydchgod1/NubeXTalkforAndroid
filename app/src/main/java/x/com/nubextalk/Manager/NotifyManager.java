@@ -11,19 +11,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import com.aquery.AQuery;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Random;
 
 import io.realm.Realm;
@@ -90,7 +81,7 @@ public class NotifyManager {
 
         intent.putExtra("rid", mChatContent.getRid());
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, new Random().nextInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Bitmap largeIcon = getImageFromURL(mUser.getAppImagePath());
+        Bitmap largeIcon = new ImageManager(mContext).getImageFromURL(mUser.getAppImagePath());
         builder.setContentTitle(mChatRoom.getRoomName())
                 .setSmallIcon(R.drawable.nube_x_logo)
                 .setLargeIcon(largeIcon)
@@ -116,28 +107,5 @@ public class NotifyManager {
                 .setAutoCancel(true)
                 .setNotificationSilent();
         return summaryBuilder;
-    }
-
-    private Bitmap getImageFromURL(String imageURL) {
-        URL imgUrl = null;
-        HttpURLConnection connection = null;
-        InputStream is = null;
-        Bitmap retBitmap = null;
-        try {
-            imgUrl = new URL(imageURL);
-            connection = (HttpURLConnection) imgUrl.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            is = connection.getInputStream();
-            retBitmap = BitmapFactory.decodeStream(is);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-            return retBitmap;
-        }
     }
 }

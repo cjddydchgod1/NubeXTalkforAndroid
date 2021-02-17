@@ -59,6 +59,8 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
 
+import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
+
 //채팅방 액티비티
 public class ChatRoomActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private Realm realm;
@@ -310,7 +312,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 chat.put("cid", cid);
                 chat.put("uid", mUid);
                 chat.put("rid", mRid);
-                chat.put("content", "EMPTY IMAGE");
+                chat.put("content", EMPTY_IMAGE);
                 chat.put("type", "1");
 
                 //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
@@ -473,6 +475,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     private void openAlbum() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            openAlbum();
         } else {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
+import x.com.nubextalk.Manager.ImageManager;
 import x.com.nubextalk.Manager.NotifyManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
@@ -28,6 +29,8 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
+
+import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 
 /**
  * Firebase Message Service
@@ -191,11 +194,15 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("uid", data.get("senderId"));
                 payload.put("cid", data.get("chatContentId"));
                 payload.put("rid", data.get("chatRoomId"));
-                payload.put("content", data.get("content"));
                 payload.put("type", data.get("contentType"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("ext1", data.get("ext1"));
+                if (data.get("contentType").equals("1")) {
+                    payload.put("content", EMPTY_IMAGE);
+                } else {
+                    payload.put("content", data.get("content"));
+                }
 
                 if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
                     FirebaseFunctionsManager.getChatRoom("w34qjptO0cYSJdAwScFQ", rid) //Firebase Functions 함수의 getChatRoom 함수 호출을 통해 FireStore 에 있는 채팅방 데이터 불러옴
@@ -248,6 +255,24 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                         mNotifyManager.notify(realm, cid);
                     }
                 }
+                if (data.get("contentType").equals("1")) {
+                    ImageManager imageManager = new ImageManager(this);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
+
+                            String url = data.get("content");
+                            String name = "thumb_" + data.get("chatContentId") + "(" + data.get("sendDate") + ").jpg";
+
+                            String path = imageManager.saveUrlToCache(url, name);
+                            payload.put("content", path);
+                            payload.put("ext1", url);
+                            ChatContent.createChat(realm1, payload);
+                        }
+                    }).start();
+                }
+
                 break;
         }
         realm.close();

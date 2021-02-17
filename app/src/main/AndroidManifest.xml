@@ -20,6 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ChatImageActivity"
+            android:theme="@android:style/Theme.Dialog" />
         <activity android:name=".ImageViewActivity" />
         <activity android:name=".SharePACSActivity" />
         <activity android:name=".AddChatMemberActivity" />

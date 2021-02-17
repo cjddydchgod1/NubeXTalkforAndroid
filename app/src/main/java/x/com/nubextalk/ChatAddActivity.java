@@ -163,6 +163,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     public void onItemSelected(User user) {
         ChatAddActivityUser chatRoomUserStatus = new ChatAddActivityUser(user, false);
         selectedMemberAdapter.addItem(chatRoomUserStatus);
+        selectedMemberView.scrollToPosition(selectedMemberAdapter.getItemCount() - 1);
 
         //사용자 아이템을 클릭한 뒤 사용자 검색창 초기화 및 키보드 숨기기
         userNameInput.setText("");

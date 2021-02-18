@@ -39,17 +39,16 @@ public class NotifyManager {
     private ChatRoom mChatRoom;
     private User mUser;
 
-    public NotifyManager(Context context) {
+    public NotifyManager(Context context, Realm realm) {
         this.mContext = context;
+        this.mRealm = realm;
         mNotificationManager = mContext.getSystemService(NotificationManager.class);
     }
 
-    public void notify(Realm realm, String chatContentId) {
-        mRealm = realm;
-
-        mChatContent = realm.where(ChatContent.class).equalTo("cid", chatContentId).findFirst();
-        mChatRoom = realm.where(ChatRoom.class).equalTo("rid", mChatContent.getRid()).findFirst();
-        mUser = realm.where(User.class).equalTo("userId", mChatContent.getUid()).findFirst();
+    public void notify(String chatContentId) {
+        mChatContent = mRealm.where(ChatContent.class).equalTo("cid", chatContentId).findFirst();
+        mChatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mChatContent.getRid()).findFirst();
+        mUser = mRealm.where(User.class).equalTo("userId", mChatContent.getUid()).findFirst();
 
         createNotificationChannel();
 

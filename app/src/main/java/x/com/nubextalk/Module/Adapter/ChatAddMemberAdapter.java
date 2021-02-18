@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import x.com.nubextalk.ChatAddActivity;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
 public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -50,20 +51,25 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
 
-            mHolder.profileName.setText(userList.get(position).getUser().getAppName());
+            User user = userList.get(position).getUser();
+
+            mHolder.profileName.setText(user.getAppName());
 
             if (URLUtil.isValidUrl(userList.get(position).getUser().getAppImagePath())) {
-                aq.view(mHolder.profileImage).image(userList.get(position).getUser().getAppImagePath());
+                aq.view(mHolder.profileImage).image(user.getAppImagePath());
             } else {
                 aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
             }
 
             //기존 채팅방에서 가져온 사용자인 경우 아이템 삭제 버튼 사라짐
             if (userList.get(position).getIsAlreadyChatRoomUser()) {
-                mHolder.deleteItemButton.setVisibility(View.INVISIBLE);
+                mHolder.deleteItemButton.setVisibility(View.GONE);
+            } else {
+                mHolder.deleteItemButton.setVisibility(View.VISIBLE);
+                mHolder.deleteItemButton.setOnClickListener(v -> deleteItem(position));
             }
 
-            mHolder.deleteItemButton.setOnClickListener(v -> deleteItem(position));
+
         }
     }
 

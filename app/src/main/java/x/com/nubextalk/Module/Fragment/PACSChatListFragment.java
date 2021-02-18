@@ -5,9 +5,12 @@
 
 package x.com.nubextalk.Module.Fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,8 +38,8 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
-import x.com.nubextalk.Module.Adapter.FriendListAdapter;
-import x.com.nubextalk.Module.Case.ChatlistCase;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
 import x.com.nubextalk.R;
 
 public class PACSChatListFragment extends Fragment implements ChatListAdapter.OnItemSelectedListener  {
@@ -48,10 +51,21 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
     private ChatListAdapter mAdapter;
 
     private ChatRoom lastChecked;
-    private RadioButton lastRadioButton;
 
     private String studyId;
     private String description;
+
+    private Context mContext;
+    private Activity mActivity;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if(context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,12 +79,12 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
          */
         getData();
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, ChatlistCase.RADIO);
+        mAdapter = new ChatListAdapter(mActivity, chatRoomResults, RADIO);
         mAdapter.setItemSelectedListener(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setAdapter(mAdapter);
 
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL));
 
         /**
          * Bundle (studyId, Description) 받아오기
@@ -81,36 +95,30 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
 
         confirmBtn.setOnClickListener(view -> {
             if(lastChecked != null){
-                Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
                 intent.putExtra("rid", lastChecked.getRid());
                 intent.putExtra("studyId", studyId);
                 intent.putExtra("description", description);
                 startActivity(intent);
-                /**
-                 * Finish Activity (ImageViewActivity, SharePACSActivity)
-                 * 작성
-                 */
-                getActivity().finish();
             } else {
-                Toast.makeText(getActivity(), "선택된 채팅 목록이 없습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "선택된 채팅 목록이 없습니다.", Toast.LENGTH_SHORT).show();
             }
         });
         return rootview;
     }
 
     @Override
-    public void onItemSelected(ChatRoom chatRoom) {
+    public void onDetach() {
+        mContext = null;
+        mActivity = null;
+        super.onDetach();
     }
 
     @Override
-    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
-        if(!chatRoom.getRid().equals(lastChecked) && lastRadioButton != null) {
-            lastRadioButton.setChecked(false);
-        }
-        radioButton.setChecked(true);
-        lastRadioButton = radioButton;
+    public void onItemSelected(ChatRoom chatRoom) {
         lastChecked = chatRoom;
     }
+
 
     public void getData() {
         try {

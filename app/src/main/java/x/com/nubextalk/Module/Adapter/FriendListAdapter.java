@@ -7,6 +7,7 @@ package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,8 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Module.Case.FriendlistCase;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
 import x.com.nubextalk.R;
 
 public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -32,11 +34,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private Context mContext;
     private onItemSelectedListener listener;
     private AQuery aq;
-    private FriendlistCase sel_type;
-    private String TAG = "FriendListAdapter";
+    private int sel_type;
+    private int mLastCheckedPosition = -1;
 
     public interface onItemSelectedListener{
-        void onSelected(User address, RadioButton radioButton);
         void onSelected(User address);
     }
 
@@ -44,7 +45,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.listener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data, AQuery aq, FriendlistCase sel_type) {
+    public FriendListAdapter(Context context, ArrayList<User> data, AQuery aq, int sel_type) {
         this.mDataSet = data;
         this.mContext = context;
         this.aq = aq;
@@ -56,14 +57,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View mItemView;
-        if(sel_type == FriendlistCase.NON_RADIO) {
-            mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
-            return new FriendViewHolder(mItemView);
-        } else if(sel_type == FriendlistCase.RADIO) {
-            mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend_radiobutton,parent,false);
-            return new FriendRadioViewHolder(mItemView);
-        }
-        return null;
+        mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
+        return new FriendViewHolder(mItemView);
     }
 
     @Override
@@ -72,19 +67,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if(holder instanceof FriendViewHolder) {
             FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
             friendViewHolder.bintTo(mCurrent);
-            friendViewHolder.itemView.setOnClickListener(v -> {
-                if(listener != null)
-                    listener.onSelected(mCurrent);
-            });
-        } else if(holder instanceof FriendRadioViewHolder) {
-            FriendRadioViewHolder friendRadioViewHolder = (FriendRadioViewHolder) holder;
-            friendRadioViewHolder.bintTo(mCurrent);
-            friendRadioViewHolder.itemView.setOnClickListener(v -> {
-                if(listener != null)
-                    listener.onSelected(mCurrent, friendRadioViewHolder.radioButton);
-            });
+            if(sel_type == RADIO)
+                friendViewHolder.radioButton.setChecked(mLastCheckedPosition == position);
         }
-
     }
 
     @Override
@@ -97,55 +82,34 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private final TextView profileName;
         private final ImageView profileImage;
         private final ImageView profileStatus;
-
+        private final RadioButton radioButton;
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
             // item_friend.xml에서 불러온다.
             profileName     = itemView.findViewById(R.id.profileName);
             profileImage    = itemView.findViewById(R.id.profileImage);
             profileStatus   = itemView.findViewById(R.id.profileStatus);
-        }
-        public void bintTo(User user) {
-            profileName.setText(user.getAppName());
-            if(URLUtil.isValidUrl(user.getAppImagePath())){
-                aq.view(profileImage).image(user.getAppImagePath());
-            } else {
-                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
-            }
-            // 초록
-            switch(user.getAppStatus()) {
-                case "1" :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
-                    break;
-                case "2" :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
-                    break;
-                default :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
-                    break;
-            }
-        }
-    }
-
-    public class FriendRadioViewHolder extends RecyclerView.ViewHolder {
-        private final TextView profileName;
-        private final ImageView profileImage;
-        private final ImageView profileStatus;
-        private final RadioButton radioButton;
-        public FriendRadioViewHolder(@NonNull View itemView) {
-            super(itemView);
-            // item_friend.xml에서 불러온다.
-            profileName     = itemView.findViewById(R.id.profileName);
-            profileImage    = itemView.findViewById(R.id.profileImage);
-            profileStatus   = itemView.findViewById(R.id.profileStatus);
             radioButton     = itemView.findViewById(R.id.select_user);
-            radioButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onSelected(mDataSet.get(getAdapterPosition()), radioButton);
+            View.OnClickListener clickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(listener != null) {
+                        int copyLastCheckedPosition = mLastCheckedPosition;
+                        mLastCheckedPosition = getAdapterPosition();
+                        if(sel_type == RADIO) {
+                            notifyItemChanged(copyLastCheckedPosition);
+                            notifyItemChanged(mLastCheckedPosition);
+                        }
+                        listener.onSelected(mDataSet.get(mLastCheckedPosition));
+                    }
                 }
-            });
+            };
+            itemView.setOnClickListener(clickListener);
+            radioButton.setOnClickListener(clickListener);
         }
         public void bintTo(User user) {
+            if(sel_type == RADIO)
+                radioButton.setVisibility(View.VISIBLE);
             profileName.setText(user.getAppName());
             if(URLUtil.isValidUrl(user.getAppImagePath())){
                 aq.view(profileImage).image(user.getAppImagePath());

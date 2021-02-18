@@ -22,16 +22,23 @@ import x.com.nubextalk.Manager.UtilityManager;
 public class Config extends RealmObject {
     @NonNull
     @PrimaryKey
-    String oid;
+    private String oid;
     @NonNull
-    String CODENAME;
+    private String CODENAME;
     @NonNull
-    String CODE;
-    String ext1;
-    String ext2;
-    String ext3;
-    String ext4;
-    String ext5;
+    private String CODE;
+    private String ext1;
+    private String ext2;
+    private String ext3;
+    private String ext4;
+    private boolean autoLogin;
+    private boolean screenLock;
+    private boolean alarm;
+
+    public Config () {
+        screenLock = false;
+        alarm = true;
+    }
 
     public String getOid() {
         return oid;
@@ -77,11 +84,23 @@ public class Config extends RealmObject {
     public void setExt4(String ext4) {
         this.ext4 = ext4;
     }
-    public String getExt5() {
-        return ext5;
+    public boolean getAutoLogin() {
+        return autoLogin;
     }
-    public void setExt5(String ext5) {
-        this.ext5 = ext5;
+    public void setAutoLogin(boolean autoLogin) {
+        this.autoLogin = autoLogin;
+    }
+    public boolean getScreenLock() {
+        return screenLock;
+    }
+    public void setScreenLock(boolean screenLock) {
+        this.screenLock = screenLock;
+    }
+    public boolean getAlarm() {
+        return alarm;
+    }
+    public void setAlarm(boolean alarm) {
+        this.alarm = alarm;
     }
 
     public static void init(Context context, Realm realm){
@@ -98,7 +117,7 @@ public class Config extends RealmObject {
                 config.setExt2(jsonArray.getJSONObject(i).getString("ext2"));
                 config.setExt3(jsonArray.getJSONObject(i).getString("ext3"));
                 config.setExt4(jsonArray.getJSONObject(i).getString("ext4"));
-                config.setExt5(jsonArray.getJSONObject(i).getString("ext5"));
+                config.setAutoLogin(jsonArray.getJSONObject(i).getBoolean("autoLogin"));
                 list.add(config);
             }
             realm.copyToRealmOrUpdate(list);

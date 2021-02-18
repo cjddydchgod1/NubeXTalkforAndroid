@@ -34,8 +34,9 @@ import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.User;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
-import x.com.nubextalk.Module.Case.ChatlistCase;
 import x.com.nubextalk.R;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
@@ -69,7 +70,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, ChatlistCase.NON_RADIO);
+        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, NON_RADIO);
         mAdapter.setItemLongSelectedListener(this);
         mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -150,10 +151,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         Intent intent = new Intent(mActivity, ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
         startActivity(intent);
-    }
-
-    @Override
-    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
     }
 
     private void openDialog(String chatRoomId) {

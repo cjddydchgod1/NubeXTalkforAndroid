@@ -41,6 +41,8 @@
         android:layout_marginStart="@dimen/margin_m"
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
+        android:padding="@dimen/padding_s"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/layout_profile_image" />
 
@@ -62,6 +64,8 @@
         android:layout_marginEnd="@dimen/margin_m"
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
+        android:padding="@dimen/padding_s"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_date" />

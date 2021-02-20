@@ -30,7 +30,7 @@ import x.com.nubextalk.Model.ChatContent;
 
 import static x.com.nubextalk.Module.CodeResources.COMPLETE_DOWNLOAD;
 
-public class ChatImageActivity extends Activity implements View.OnClickListener {
+public class ChatImageViewActivity extends Activity implements View.OnClickListener {
     private Realm mRealm;
     private AQuery mAquery;
     private Context mContext;
@@ -44,7 +44,7 @@ public class ChatImageActivity extends Activity implements View.OnClickListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_image);
+        setContentView(R.layout.activity_chat_image_view);
         mContext = this;
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mAquery = new AQuery(this);
@@ -52,7 +52,7 @@ public class ChatImageActivity extends Activity implements View.OnClickListener 
         mTouchImageView = (TouchImageView) findViewById(R.id.touch_image_view);
         mDownloadButton = (IconButton) findViewById(R.id.download_button);
 
-        mDownloadButton.setText("{fas-download 35dp #FFFFFF}");
+        mDownloadButton.setText("{fas-download 35dp #000000}");
 
         Intent intent = getIntent();
         mCid = intent.getStringExtra("cid");

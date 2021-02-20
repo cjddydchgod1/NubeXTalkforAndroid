@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import x.com.nubextalk.ChatImageActivity;
+import x.com.nubextalk.ChatImageViewActivity;
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -168,7 +168,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     cmvHolder.myChatImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent intent = new Intent(mContext, ChatImageActivity.class);
+                            Intent intent = new Intent(mContext, ChatImageViewActivity.class);
                             intent.putExtra("cid", chat.getCid());
                             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             mContext.startActivity(intent);
@@ -201,7 +201,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cmvHolder.otherChatImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(mContext, ChatImageActivity.class);
+                        Intent intent = new Intent(mContext, ChatImageViewActivity.class);
                         intent.putExtra("cid", chat.getCid());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         mContext.startActivity(intent);

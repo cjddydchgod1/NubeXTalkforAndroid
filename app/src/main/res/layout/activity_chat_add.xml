@@ -44,20 +44,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
-        app:layout_constraintBottom_toTopOf="@id/chat_add_chat_room_input"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_description" />
-
-    <EditText
-        android:id="@+id/chat_add_chat_room_input"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:hint="채팅방 이름을 입력하세요."
         app:layout_constraintBottom_toTopOf="@id/chat_add_chat_user_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_added_member_view" />
+        app:layout_constraintTop_toBottomOf="@id/chat_add_description" />
 
     <EditText
         android:id="@+id/chat_add_chat_user_input"
@@ -67,7 +57,7 @@
         app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_add_chat_room_input" />
+        app:layout_constraintTop_toBottomOf="@id/chat_added_member_view" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_add_member_search_view"

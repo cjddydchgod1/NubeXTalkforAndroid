@@ -14,18 +14,26 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.json.JSONArray;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
@@ -48,6 +56,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     private RecyclerView selectedMemberView;
     private Realm realm;
     private String chatRoomId = null;
+    private String hospitalId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +69,7 @@ public class ChatAddActivity extends AppCompatActivity implements
             chatRoomId = intent.getExtras().getString("rid");
         }
 
+        hospitalId = "w34qjptO0cYSJdAwScFQ";
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         chatRoomNameInput = findViewById(R.id.chat_add_chat_room_input);
@@ -183,16 +193,35 @@ public class ChatAddActivity extends AppCompatActivity implements
 
                 String roomName = chatRoomNameInput.getText().toString();
 
-                //선택된 유저가 한명일 때
-                if (selectedUser.size() == 1) {
-                    ChatRoom chatRoom = User.getChatroom(realm, selectedUser.get(0).getUser());
-                    //선택된 유저와의 채팅방이 없으면 새로운 채팅방 생성
-                    if (chatRoom == null) {
-                        Intent intent = new Intent(this, ChatRoomActivity.class);
+                if (chatRoomId == null) { //새로운 채팅방 생성
+                    //선택된 유저가 한명일 때 - 1:1 채팅방
+                    if (selectedUser.size() == 1) {
+                        ChatRoom chatRoom = User.getChatroom(realm, selectedUser.get(0).getUser());
+                        //선택된 유저와의 채팅방이 없으면 새로운 채팅방 생성
+                        if (chatRoom == null) {
+                            Intent intent = new Intent(this, ChatRoomActivity.class);
 
-                        // 1:1 채팅방 생성의 경우 서버에 기존 1:1 채팅방이 있는지 확인
-                        // 존재하는 경우에는 해당 채팅방의 rid 를 서버로부터 받아와 로컬에 채팅방 만듦
-                        // 존재하지 않는 경우에는 로컬에서 새로 만듦
+                            // 1:1 채팅방 생성의 경우 서버에 기존 1:1 채팅방이 있는지 확인
+                            // 존재하는 경우에는 해당 채팅방의 rid 를 서버로부터 받아와 로컬에 채팅방 만듦
+                            // 존재하지 않는 경우에는 로컬에서 새로 만듦
+                            createNewChat(this.realm, this, userArrayList, roomName, new onNewChatCreatedListener() {
+                                @Override
+                                public void onCreate(String rid) {
+                                    intent.putExtra("rid", rid);
+                                    startActivity(intent);
+                                }
+                            });
+                        } else { //기존에 선택된 유저와 채팅방이 있으면 그 채팅방으로 이동
+                            Intent intent = new Intent(this, ChatRoomActivity.class);
+                            intent.putExtra("rid", chatRoom.getRid());
+                            startActivity(intent);
+                        }
+
+                    } else if (selectedUser.size() > 1) { //선택된 유저가 여러명일 때, 단톡방
+                        if (roomName.isEmpty()) {
+                            roomName = getUserName(userArrayList);
+                        }
+                        Intent intent = new Intent(this, ChatRoomActivity.class);
                         createNewChat(this.realm, this, userArrayList, roomName, new onNewChatCreatedListener() {
                             @Override
                             public void onCreate(String rid) {
@@ -200,24 +229,34 @@ public class ChatAddActivity extends AppCompatActivity implements
                                 startActivity(intent);
                             }
                         });
-                    } else { //기존에 선택된 유저와 채팅방이 있으면 그 채팅방으로 이동
-                        Intent intent = new Intent(this, ChatRoomActivity.class);
-                        intent.putExtra("rid", chatRoom.getRid());
-                        startActivity(intent);
                     }
+                } else { //기존 채팅방에서 대화 상대 추가
+                    ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", chatRoomId).findFirst();
+                    if (chatRoom.getIsGroupChat()) { //단체 채팅방인 경우 선택한 사용자(들)만 초대
 
-                } else if (selectedUser.size() > 1) { //선택된 유저가 여러명일 때, 단톡방
-                    if (roomName.isEmpty()) {
-                        roomName = getUserName(userArrayList);
-                    }
-                    Intent intent = new Intent(this, ChatRoomActivity.class);
-                    createNewChat(this.realm, this, userArrayList, roomName, new onNewChatCreatedListener() {
-                        @Override
-                        public void onCreate(String rid) {
-                            intent.putExtra("rid", rid);
-                            startActivity(intent);
+                        //기존에 있던 유저들은 초대에서 제외
+                        for (ChatAddActivityUser chatAddActivityUser : selectedUser) {
+                            if (chatAddActivityUser.getIsAlreadyChatRoomUser()) {
+                                userArrayList.remove(chatAddActivityUser.getUser());
+                            }
                         }
-                    });
+
+                        inviteChatUser(realm, hospitalId, chatRoomId, userArrayList);
+                        Toast.makeText(this, "대화 상대가 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                        onBackPressed();
+
+                    } else { // 기존 1:1 채팅방에서 새로운 대화상대를 초대하는 경우 새로운 단체 채팅방 생성
+
+                        roomName = getUserName(userArrayList);
+                        Intent intent = new Intent(this, ChatRoomActivity.class);
+                        createNewChat(realm, this, userArrayList, roomName, new onNewChatCreatedListener() {
+                            @Override
+                            public void onCreate(String rid) {
+                                intent.putExtra("rid", rid);
+                                startActivity(intent);
+                            }
+                        });
+                    }
                 }
                 break;
 
@@ -281,6 +320,81 @@ public class ChatAddActivity extends AppCompatActivity implements
     }
 
     /**
+     * 기존 채팅방 대화 상대 추가 함수
+     * 1:1 채팅방에서 대화 상대 추가의 경우 새로운 realm 채팅방 생성
+     * 단체 채팅방에서 대화 상대 추가의 경우 대화 상대 FireStore 에 추가 후 기존 단체 채팅방 유저들에게 알림
+     *
+     * @param realm
+     * @param hid
+     * @param rid
+     * @param userList
+     */
+    public void inviteChatUser(Realm realm, String hid, String rid, ArrayList<User> userList) {
+        Boolean isGroupChat = false;
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+        if (chatRoom != null) {
+            isGroupChat = chatRoom.getIsGroupChat();
+
+            if (isGroupChat) { //단체 채팅방인 경우
+                FirebaseFirestore fs = FirebaseFirestore.getInstance();
+                for (User user : userList) {
+                    Map<String, Object> data = new HashMap<>();
+                    fs.collection("hospital").document(hid)
+                            .collection("chatRoom").document(rid)
+                            .collection("chatRoomMember")
+                            .document(user.getUserId()).set(data);
+                }
+
+                String uid = User.getMyAccountInfo(realm).getUserId();
+                Map<String, Object> chat = new HashMap<>();
+                String cid = uid.concat(String.valueOf(new Date().getTime()));
+                chat.put("cid", cid);
+                chat.put("uid", uid);
+                chat.put("rid", rid);
+                chat.put("content", "상대방을 초대중 입니다.");
+                chat.put("type", "9");
+
+                ChatContent.createChat(realm, chat);
+
+                Map<String, Object> data = new HashMap<>();
+                JSONArray jsonArray = new JSONArray();
+
+                for (User user : userList) {
+                    jsonArray.put(user.getUserId());
+                }
+
+                data.put("chatContentId", cid);
+                data.put("hospitalId", hid);
+                data.put("senderId", uid);
+                data.put("membersId", jsonArray);
+                data.put("chatRoomId", rid);
+
+                FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
+                
+            } else { // 1:1 채팅방인 경우
+                ArrayList<User> userArrayList = new ArrayList<>(userList);
+                RealmResults<ChatRoomMember> realmResults = ChatRoom.getChatRoomUsers(realm, rid);
+
+                for (ChatRoomMember chatRoomMember : realmResults) {
+                    User user = realm.where(User.class).equalTo("userId", chatRoomMember.getUid()).findFirst();
+                    if (user != null) {
+                        userArrayList.add(user);
+                    }
+                }
+
+                Intent intent = new Intent(this, ChatRoomActivity.class);
+                ChatAddActivity.createNewChat(realm, this, userArrayList, getUserName(userArrayList), new onNewChatCreatedListener() {
+                    @Override
+                    public void onCreate(String rid) {
+                        intent.putExtra("rid", rid);
+                        startActivity(intent);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
      * 사용자 이름 검색창에서 텍스트 입력 감지에 사용되는 TextWatcher
      */
     private final TextWatcher textWatcher = new TextWatcher() {
@@ -302,7 +416,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     /**
      * 사용자가 기존 채팅방에 있었던 사용자인지 새롭게 추가되는 사용자인지 확인하기 위한 정보를 담은 클래스
      */
-    public static class ChatAddActivityUser{
+    public static class ChatAddActivityUser {
         private User user;
         private Boolean isAlreadyChatRoomUser;
 

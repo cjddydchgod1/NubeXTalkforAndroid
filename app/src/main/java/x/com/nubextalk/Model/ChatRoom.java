@@ -44,7 +44,8 @@ public class ChatRoom extends RealmObject {
     @NonNull
     private Date updatedDate;
     private String notificationId;
-    private int memberCount = 0;
+    @NonNull
+    private int memberCount;
     private Boolean isGroupChat = false;
 
     @NonNull
@@ -105,6 +106,15 @@ public class ChatRoom extends RealmObject {
 
     public void setUpdatedDate(@NonNull Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    @NonNull
+    public int getMemeberCount() {
+        return memberCount;
+    }
+
+    public void setMemeberCount(int memberCount) {
+        this.memberCount = memberCount;
     }
 
     @NonNull
@@ -297,13 +307,5 @@ public class ChatRoom extends RealmObject {
     public static RealmResults<ChatRoomMember> getChatRoomUsers(Realm realm, String rid) {
         return realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
 
-    }
-
-    public int getMemeberCount() {
-        return memberCount;
-    }
-
-    public void setMemeberCount(int memberCount) {
-        this.memberCount = memberCount;
     }
 }

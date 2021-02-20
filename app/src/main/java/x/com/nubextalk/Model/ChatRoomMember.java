@@ -85,8 +85,9 @@ public class ChatRoomMember extends RealmObject {
                             .equalTo("uid", id).findAll().isEmpty()) {
                         chatRoomMember.setRid(rid);
                         chatRoomMember.setUid(id);
-                        memberCount += 1;
+                        chatRoom.setMemeberCount(memberCount + 1);
                         realm.copyToRealm(chatRoomMember);
+                        realm.copyToRealmOrUpdate(chatRoom);
                     }
 
                 }

@@ -430,27 +430,31 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              * 3. 해당 rid값으로 intent로 넘겨준다.
              */
 
-            ChatRoom chatRoom = User.getChatroom(realm, user);
+            User.getChatroom(realm, user, new User.UserListener() {
+                @Override
+                public void onFindPersonalChatRoom(ChatRoom chatRoom) {
+                     if(chatRoom==null){
+                        // 새로만든 채팅이 없다면 새로 만든다.
+                        ArrayList<User> list = new ArrayList<>();
+                        list.add(user);
+                        Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                        new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                            @Override
+                            public void onCreate(String rid) {
+                                intent.putExtra("rid", rid);
+                                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                            }
+                        });
 
-            if(chatRoom==null){
-                // 새로만든 채팅이 없다면 새로 만든다.
-                ArrayList<User> list = new ArrayList<>();
-                list.add(user);
-//                ChatAddActivity.createNewChat(realm, this, list, "");
-                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
-                    @Override
-                    public void onCreate(String rid) {
-                        intent.putExtra("rid", rid);
-                        ((MainActivity) getActivity()).startChatRoomActivity(intent);
-                    }
-                });
+                     } else {
+                        Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                        intent.putExtra("rid", chatRoom.getRid());
+                        ((MainActivity) mActivity).startChatRoomActivity(intent);
+                     }
+                }
+            });
 
-            } else {
-                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                intent.putExtra("rid", chatRoom.getRid());
-                ((MainActivity) mActivity).startChatRoomActivity(intent);
-            }
+
         });
 
 

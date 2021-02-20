@@ -21,8 +21,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ChatImageActivity"
-            android:theme="@android:style/Theme.Dialog" />
+            android:name=".ChatImageViewActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoadingActivity"
             android:noHistory="true"

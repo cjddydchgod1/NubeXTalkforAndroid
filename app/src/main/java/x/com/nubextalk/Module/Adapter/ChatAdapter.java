@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import x.com.nubextalk.ChatImageActivity;
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -41,6 +42,7 @@ import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_1;
 import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_2;
 import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_3;
 import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.SENDING;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -157,9 +159,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             if (chat.getUid().equals(mUid)) {
                 cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
+
                 cmvHolder.myTime.setText(sendTime);
-                cmvHolder.myChatImg.setVisibility(View.VISIBLE);
                 cmvHolder.myTime.setVisibility(View.VISIBLE);
+                cmvHolder.myChatImg.setVisibility(View.VISIBLE);
+
+                if (!chat.getContent().equals(EMPTY_IMAGE)) {
+                    cmvHolder.myChatImg.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(mContext, ChatImageActivity.class);
+                            intent.putExtra("cid", chat.getCid());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            mContext.startActivity(intent);
+                        }
+                    });
+                }
+
                 cmvHolder.profileImage.setVisibility(View.GONE);
                 cmvHolder.profileName.setVisibility(View.GONE);
                 cmvHolder.otherTime.setVisibility(View.GONE);
@@ -168,11 +184,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
                 cmvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
-                cmvHolder.profileName.setText(mUserData.getAppName());
                 cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
+
+                cmvHolder.profileName.setText(mUserData.getAppName());
                 cmvHolder.otherTime.setText(sendTime);
-
-
                 if (chat.getUid().equals(preSenderId)) {
                     cmvHolder.profileImage.setVisibility(View.GONE);
                     cmvHolder.profileName.setVisibility(View.GONE);
@@ -181,9 +196,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     cmvHolder.profileImage.setVisibility(View.VISIBLE);
                     cmvHolder.profileName.setVisibility(View.VISIBLE);
                 }
-
                 cmvHolder.otherTime.setVisibility(View.VISIBLE);
                 cmvHolder.otherChatImg.setVisibility(View.VISIBLE);
+                cmvHolder.otherChatImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(mContext, ChatImageActivity.class);
+                        intent.putExtra("cid", chat.getCid());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        mContext.startActivity(intent);
+                    }
+                });
+
+
                 cmvHolder.myChatImg.setVisibility(View.GONE);
                 cmvHolder.myTime.setVisibility(View.GONE);
             }
@@ -227,7 +252,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     public void onClick(View view) {
                         Intent intent = new Intent(mContext, ImageViewActivity.class);
                         intent.putExtra("studyId", chat.getExt1());
-                        Log.d("PACS", chat.getExt1());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         mContext.startActivity(intent);
                     }
                 });

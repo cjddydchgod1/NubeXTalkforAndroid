@@ -5,12 +5,15 @@
 
 package x.com.nubextalk.Module.Fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,39 +25,41 @@ import android.widget.RadioButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import javax.annotation.Nullable;
-
-import io.realm.ObjectChangeSet;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
-import x.com.nubextalk.AddChatMemberActivity;
 import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.User;
+import static x.com.nubextalk.Module.CodeResources.RADIO;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
-import x.com.nubextalk.Module.Case.ChatlistCase;
 import x.com.nubextalk.R;
 
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
-        ChatListAdapter.OnItemSelectedListener, View.OnClickListener {
+        ChatListAdapter.OnItemSelectedListener {
     private Realm realm;
     private RealmResults<ChatRoom> chatRoomResults;
+    private Context mContext;
+    private Activity mActivity;
 
     private String hospitalId;
 
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
 
-    private FloatingActionButton fab_main, fab_sub1, fab_sub2;
-    private boolean isFabOpen = false;
+    private FloatingActionButton fab_sub1;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if (context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,7 +70,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         chatRoomResults = ChatRoom.getAll(realm);
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, ChatlistCase.NON_RADIO);
+        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, NON_RADIO);
         mAdapter.setItemLongSelectedListener(this);
         mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -78,12 +83,13 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
             }
         });
 
-        fab_main = rootView.findViewById(R.id.chat_fab_main);
         fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
-        fab_sub2 = rootView.findViewById(R.id.chat_fab_sub2);
-        fab_main.setOnClickListener(this);
-        fab_sub1.setOnClickListener(this);
-        fab_sub2.setOnClickListener(this);
+        fab_sub1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mContext, ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+            }
+        });
 
         return rootView;
     }
@@ -106,7 +112,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         boolean fixTop = chatRoom.getSettingFixTop();
         boolean alarm = chatRoom.getSettingAlarm();
 
-        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "나가기"};
+        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "채팅방 이름 편집", "나가기"};
         menuArray[0] = alarm ? menuArray[0].concat(" 해제") : menuArray[0].concat(" 켜기");
         menuArray[2] = fixTop ? menuArray[2].concat(" 해제") : "상단 고정";
 
@@ -120,14 +126,16 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 updateChatRoomAlarm(chatRoom);
                                 break;
                             case 1: /**대화상대 추가 이벤트**/
-                                startActivity(new Intent(getContext(), AddChatMemberActivity.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                                startActivity(new Intent(mContext, ChatAddActivity.class)
                                         .putExtra("rid", chatRoom.getRid()));
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트**/
                                 updateChatRoomFixTop(chatRoom);
                                 break;
-                            case 3: /**채팅방 나가기 이벤트**/
+                            case 3: /**채팅방 이름 편집 이벤트**/
+                                openDialog(chatRoom.getRid());
+                                break;
+                            case 4: /**채팅방 나가기 이벤트**/
                                 exitChatRoom(chatRoom);
                                 break;
                         }
@@ -140,31 +148,15 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
      **/
     @Override
     public void onItemSelected(@NonNull ChatRoom chatRoom) {
-        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+        Intent intent = new Intent(mActivity, ChatRoomActivity.class);
         intent.putExtra("rid", chatRoom.getRid());
         startActivity(intent);
     }
 
-    @Override
-    public void onItemSelected(ChatRoom chatRoom, RadioButton radioButton) {
-    }
-
-    @Override
-    public void onClick(@NonNull View v) {
-        switch (v.getId()) {
-            case R.id.chat_fab_main:
-                toggleFab();
-                break;
-
-            case R.id.chat_fab_sub1:
-                toggleFab();
-                startActivity(new Intent(getContext(), ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
-                break;
-
-            case R.id.chat_fab_sub2:
-                toggleFab();
-                break;
-        }
+    private void openDialog(String chatRoomId) {
+        DialogFragment dialogFragment = new RoomNameModificationDialogFragment(realm, chatRoomId);
+        dialogFragment.setTargetFragment(this, 0);
+        dialogFragment.show(getParentFragmentManager(), "Change RoomName");
     }
 
     public void exitChatRoom(ChatRoom chatRoom) {
@@ -215,19 +207,5 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void refreshChatList() {
         mAdapter.notifyDataSetChanged();
         mAdapter.sortChatRoomByDate();
-    }
-
-    private void toggleFab() {
-        if (isFabOpen) {
-            fab_main.setImageResource(R.drawable.ic_floating_btn_24);
-            fab_sub1.hide();
-            fab_sub2.hide();
-            isFabOpen = false;
-        } else {
-            fab_main.setImageResource(R.drawable.ic_baseline_close_24);
-            fab_sub1.show();
-            fab_sub2.show();
-            isFabOpen = true;
-        }
     }
 }

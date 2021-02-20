@@ -6,12 +6,20 @@
 package x.com.nubextalk.Module;
 
 public class CodeResources {
-    public static final String TAG   = "NubeX Talk";
+    public static final String TAG = "NubeX Talk";
     public static final String EMPTY = "";
 
     /** SettingsActivity Resourece */
-    public static final int EXE_LOGOUT  = 0;
-    public static final int EXE_SWITCH  = 1;
+    public static final int EXE_SCREENLOCK  = 0;
+    public static final int EXE_ALARM       = 1;
+    public static final int EXE_SCREENMODE  = 2;
+    public static final int EXE_HOWTOUSE    = 3;
+    public static final int EXE_LOGOUT      = 4;
+    public static final int EXE_VERSIONINFO = 5;
+
+    /** SharePACSActivity Resource */
+    public static final int NON_RADIO   = 0;
+    public static final int RADIO       = 1;
 
     /** Chat Adapter Resource */
     public static final String SENDING        = "전송중";
@@ -25,6 +33,9 @@ public class CodeResources {
     public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "This is notification channel for NubeXTalk.";
     public static final String NOTIFICATION_GROUP = "NoticationGroup";
 
+    public static final String EMPTY_IMAGE = "empty image";
+    public static final String COMPLETE_DOWNLOAD = "다운로드 완료";
 
 
 }
+

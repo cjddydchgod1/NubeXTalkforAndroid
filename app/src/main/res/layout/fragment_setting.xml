@@ -10,22 +10,6 @@
     android:layout_height="match_parent"
     tools:context=".Module.Fragment.SettingFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/actrionbar_height"
-            android:background="?android:attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/mRoot"
@@ -45,24 +29,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/nav_item_height"
                 style="@style/SettingTextHeaderStyle"
-                android:text="계정 설정"/>
+                android:text="앱 설정"/>
 
             <LinearLayout
-                android:id="@+id/wrapperUser"
+                android:id="@+id/wrapperApp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="@dimen/elevation_m"
                 android:orientation="vertical"/>
 
-            <!-- -->
             <com.joanzapata.iconify.widget.IconTextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/nav_item_height"
                 style="@style/SettingTextHeaderStyle"
-                android:text="앱 설정"/>
+                android:text="계정 설정"/>
 
             <LinearLayout
-                android:id="@+id/wrapperApp"
+                android:id="@+id/wrapperAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/elevation_m"
+                android:orientation="vertical"/>
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:id="@+id/wrapperHowToUse"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="도움말"/>
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_item_height"
+                style="@style/SettingTextHeaderStyle"
+                android:text="버전 정보"/>
+
+            <LinearLayout
+                android:id="@+id/wrapperVesionInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="@dimen/elevation_m"

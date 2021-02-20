@@ -5,29 +5,15 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
-import com.google.gson.Gson;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.realm.Realm;
-import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.ChatRoomMember;
-import x.com.nubextalk.Model.Config;
-import x.com.nubextalk.Model.User;
 
 /**
  * FireBase Functions 함수 기능 부분
@@ -44,8 +30,8 @@ public class FirebaseFunctionsManager {
     /**
      * Interface
      **/
-    public interface OnCompleteListsner {
-        void onComplete();
+    public interface OnCompleteListener {
+        void onComplete(String result);
     }
 
     /**
@@ -55,7 +41,7 @@ public class FirebaseFunctionsManager {
         return executeTest(token, null);
     }
 
-    public static Task<HttpsCallableResult> executeTest(String token, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> executeTest(String token, OnCompleteListener onCompleteListener) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
         Map<String, Object> params = new HashMap<>();
@@ -76,7 +62,7 @@ public class FirebaseFunctionsManager {
         return createChatRoom(data, null);
     }
 
-    public static Task<HttpsCallableResult> createChatRoom(@NonNull Map data, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> createChatRoom(@NonNull Map data, OnCompleteListener onCompleteListener) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
         params.put("hospital", data.get("hospital"));
@@ -104,7 +90,7 @@ public class FirebaseFunctionsManager {
         return getChatRoom(hospitalId, chatRoomId, null);
     }
 
-    public static Task<HttpsCallableResult> getChatRoom(@NonNull String hospitalId, @NonNull String chatRoomId, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> getChatRoom(@NonNull String hospitalId, @NonNull String chatRoomId, OnCompleteListener onCompleteListener) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
         params.put("hospitalId", hospitalId);
@@ -125,7 +111,7 @@ public class FirebaseFunctionsManager {
         return notifyToChatRoomAddedUser(data, null);
     }
 
-    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(@NonNull Map data, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(@NonNull Map data, OnCompleteListener onCompleteListener) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
         params.put("chatContentId", data.get("chatContentId"));
@@ -151,7 +137,7 @@ public class FirebaseFunctionsManager {
         return exitChatRoom(hospitalId, userId, chatRoomId, null);
     }
 
-    public static Task<HttpsCallableResult> exitChatRoom(@NonNull String hospitalId, @NonNull String userId, @NonNull String chatRoomId, OnCompleteListsner onCompleteListsner) {
+    public static Task<HttpsCallableResult> exitChatRoom(@NonNull String hospitalId, @NonNull String userId, @NonNull String chatRoomId, OnCompleteListener onCompleteListener) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         Map<String, Object> params = new HashMap<>();
         params.put("hospitalId", hospitalId);
@@ -160,5 +146,39 @@ public class FirebaseFunctionsManager {
         return functions
                 .getHttpsCallable("exitChatRoom")
                 .call(params);
+    }
+
+    /**
+     * 1:1 채팅방 생성 시 FireStore 에 기존 1:1 채팅방 존재 여부 확인 함수
+     * onComplete 콜백으로 채팅방이 존재하면 해당 채팅방의 rid 값을 없으면 null 값을 리턴
+     *
+     * @param hospitalId
+     * @param myUserId
+     * @param anotherUserId
+     * @return
+     */
+    public static Task<HttpsCallableResult> checkIfOneOnOneChatRoomExists(
+            @NonNull String hospitalId, @NonNull String myUserId, @NonNull String anotherUserId) {
+        return checkIfOneOnOneChatRoomExists(hospitalId, myUserId, anotherUserId,null);
+    }
+
+    public static Task<HttpsCallableResult> checkIfOneOnOneChatRoomExists(
+            @NonNull String hospitalId, @NonNull String myUserId,
+            @NonNull String anotherUserId, OnCompleteListener onCompleteListener) {
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        Map<String, Object> params = new HashMap<>();
+        params.put("hospitalId", hospitalId);
+        params.put("myUserId", myUserId);
+        params.put("anotherUserId", anotherUserId);
+        return functions
+                .getHttpsCallable("checkIfOneOnOneChatRoomExists")
+                .call(params)
+                .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<HttpsCallableResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                        String chatRoomId = String.valueOf(task.getResult().getData());
+                        onCompleteListener.onComplete(chatRoomId);
+                    }
+                });
     }
 }

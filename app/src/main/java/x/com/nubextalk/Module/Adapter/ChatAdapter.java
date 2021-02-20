@@ -223,7 +223,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chat.getUid().equals(mUid)) {
                 cpvHolder.myTime.setText(sendTime);
                 cpvHolder.myPacsDescription.setText(chat.getContent());
-                cpvHolder.myPacsButton.setOnClickListener(new View.OnClickListener() {
+                cpvHolder.myChatPacs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(mContext, ImageViewActivity.class);
@@ -247,7 +247,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.profileName.setText(mUserData.getAppName());
                 cpvHolder.otherTime.setText(sendTime);
                 cpvHolder.otherPacsDescription.setText(chat.getContent());
-                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener() {
+                cpvHolder.otherChatPacs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(mContext, ImageViewActivity.class);

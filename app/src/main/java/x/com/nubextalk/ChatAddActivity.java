@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -28,6 +27,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.realm.Realm;
@@ -144,6 +144,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                 }
 
             }
+            removeExistUserItem(userList);
         }
     }
 
@@ -155,13 +156,20 @@ public class ChatAddActivity extends AppCompatActivity implements
     private void searchUser(String name) {
         RealmResults<User> users = this.realm.where(User.class).contains("appName", name).
                 or().contains("appNickName", name).findAll();
+        ArrayList<User> userArrayList = new ArrayList<>();
         if (!users.isEmpty()) {
             realmSearchAdapter.deleteAllItem();
+
             for (User user : users) {
                 if (!user.getUserId().contentEquals(Config.getMyAccount(realm).getExt1())) {
-                    realmSearchAdapter.addItem(user);
+                    userArrayList.add(user);
                 }
             }
+            removeExistUserItem(userArrayList);
+            for (User user : userArrayList) {
+                realmSearchAdapter.addItem(user);
+            }
+
         } else {
             realmSearchAdapter.deleteAllItem();
             realmSearchAdapter.setItem(userList);
@@ -203,9 +211,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                             public void onFindPersonalChatRoom(ChatRoom chatRoom) {
                                 //선택된 유저와의 채팅방이 없으면 새로운 채팅방 생성
                                 if (chatRoom == null) {
-//                                    Log.d("CHATROOM", chatRoom.getRid());
-
-                                    String roomName = getUserName(userArrayList);
+                                    String roomName = getUserNameSequence(userArrayList);
 
                                     // 1:1 채팅방 생성의 경우 서버에 기존 1:1 채팅방이 있는지 확인
                                     // 존재하는 경우에는 해당 채팅방의 rid 를 서버로부터 받아와 로컬에 채팅방 만듦
@@ -218,8 +224,6 @@ public class ChatAddActivity extends AppCompatActivity implements
                                         }
                                     });
                                 } else { //기존에 선택된 유저와 채팅방이 있으면 그 채팅방으로 이동
-                                    Log.d("CHATROOM", chatRoom.getRid());
-
                                     intent.putExtra("rid", chatRoom.getRid());
                                     startActivity(intent);
                                 }
@@ -228,7 +232,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
 
                     } else if (selectedUser.size() > 1) { //선택된 유저가 여러명일 때, 단톡방
-                        String roomName = getUserName(userArrayList);
+                        String roomName = getUserNameSequence(userArrayList);
                         Intent intent = new Intent(this, ChatRoomActivity.class);
                         createNewChat(this.realm, this, userArrayList, roomName, new onNewChatCreatedListener() {
                             @Override
@@ -261,7 +265,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
                                 } else { // 기존 1:1 채팅방에서 새로운 대화상대를 초대하는 경우 새로운 단체 채팅방 생성
                                     if (userArrayList.size() != 2) {
-                                        String roomName = getUserName(userArrayList);
+                                        String roomName = getUserNameSequence(userArrayList);
                                         createNewChat(realm, mContext, userArrayList, roomName, new onNewChatCreatedListener() {
                                             @Override
                                             public void onCreate(String rid) {
@@ -317,7 +321,12 @@ public class ChatAddActivity extends AppCompatActivity implements
         });
     }
 
-    public String getUserName(ArrayList<User> userArrayList) {
+    /**
+     * 유저 리스트를 입력받아 유저들의 이름 시퀀스 문자열을 반환해주는 함수
+     * @param userArrayList
+     * @return
+     */
+    public String getUserNameSequence(ArrayList<User> userArrayList) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < userArrayList.size(); i++) {
             String name = userArrayList.get(i).getAppName();
@@ -327,6 +336,22 @@ public class ChatAddActivity extends AppCompatActivity implements
             }
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * 기존 채팅방 유저가 있는 경우 유저 검색 리스트에 기존 채팅방 유저가 나오지 않도록 데이터 제거 해주는 함수
+     * @param userList
+     */
+    public void removeExistUserItem(ArrayList<User> userList) {
+        RealmResults<ChatRoomMember> chatRoomMembers = ChatRoom.getChatRoomUsers(realm, chatRoomId);
+        for (ChatRoomMember chatRoomMember : chatRoomMembers) {
+            Iterator<User> userIterator = userList.iterator();
+            while (userIterator.hasNext()) {
+                if (chatRoomMember.getUid().equals(userIterator.next().getUserId())) {
+                    userIterator.remove();
+                }
+            }
+        }
     }
 
     /**
@@ -393,7 +418,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                 }
 
                 Intent intent = new Intent(this, ChatRoomActivity.class);
-                ChatAddActivity.createNewChat(realm, this, userArrayList, getUserName(userArrayList), new onNewChatCreatedListener() {
+                ChatAddActivity.createNewChat(realm, this, userArrayList, getUserNameSequence(userArrayList), new onNewChatCreatedListener() {
                     @Override
                     public void onCreate(String rid) {
                         intent.putExtra("rid", rid);

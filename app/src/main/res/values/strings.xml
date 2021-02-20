@@ -46,4 +46,5 @@
     <string name="sign_hospital">병원 등록</string>
     <string name="auto_login">자동 로그인</string>
     <string name="hint_user_id">USER ID</string>
+    <string name="search_pacs">PACS 이동</string>
 </resources>

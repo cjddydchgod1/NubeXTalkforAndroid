@@ -66,8 +66,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          */
         intent = new Intent(getApplicationContext(), MainActivity.class);
         Config myAccount = Config.getMyAccount(realm);
-        if (myAccount != null) {
-            if (UtilityManager.checkString(myAccount.getExt5())) {
+        if(myAccount != null) {
+            if(myAccount.getAutoLogin()) {
                 apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
@@ -96,10 +96,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.login_sign_in:
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
-                String autoLogin = null;
-                if (checkAutoLogin.isChecked())
-                    autoLogin = "checked";
-                apiManager.login(id, password, autoLogin, new ApiManager.onLoginApiListener() { // lee777 , tech1!
+                boolean autoLogin = false;
+                if(checkAutoLogin.isChecked())
+                    autoLogin = true;
+                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
                         Log.d("RESUlT", response.toString());
@@ -111,7 +111,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             @Override
                             public void onSuccess(Void aVoid) {
                                 startActivity(intent);
-                                finish();
                             }
                         });
 

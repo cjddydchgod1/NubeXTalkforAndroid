@@ -23,11 +23,48 @@
         <activity
             android:name=".ChatImageActivity"
             android:theme="@android:style/Theme.Dialog" />
-        <activity android:name=".ImageViewActivity" />
-        <activity android:name=".SharePACSActivity" />
-        <activity android:name=".AddChatMemberActivity" />
+        <activity
+            android:name=".LoadingActivity"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" /> <!-- FireBase -->
+        <activity
+            android:name=".LoginActivity"
+            android:noHistory="true" />
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        <activity android:name=".AddChatMemberActivity" />
+        <activity android:name=".ImageViewActivity" />
+        <activity
+            android:name=".SharePACSActivity"
+            android:noHistory="true" />
+        <activity
+            android:name=".ChatAddActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ChatRoomActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" /> <!-- FireBase -->
+        <activity android:name=".ThemeModeActivity" />
+        <activity android:name=".HowToUseActivity" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@android:drawable/ic_menu_mylocation" />
@@ -48,30 +85,6 @@
             </intent-filter>
         </service>
 
-        <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-        </activity>
-        <activity
-            android:name=".LoadingActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ChatAddActivity"
-            android:theme="@style/AppTheme" />
-
         <meta-data
             android:name="android.app.searchable"
             android:resource="@xml/searchable" />
@@ -83,12 +96,6 @@
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
         <activity android:name=".Example.ExampleList" />
-        <activity
-            android:name=".ChatRoomActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
     </application>
 
 </manifest>

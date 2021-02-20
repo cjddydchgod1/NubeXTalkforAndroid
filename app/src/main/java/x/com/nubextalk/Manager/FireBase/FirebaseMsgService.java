@@ -5,6 +5,7 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,8 +40,8 @@ import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
  * - 참고 : https://firebase.google.com/docs/cloud-messaging/android/client?authuser=0
  */
 public class FirebaseMsgService extends FirebaseMessagingService {
-    Realm realm;
-    NotifyManager mNotifyManager;
+    private Realm realm;
+    private Context mContext;
 
     @Override
     public void onNewToken(String s) {
@@ -85,8 +86,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mNotifyManager = new NotifyManager(this);
-
+        mContext = this;
 
         Map<String, String> data = remoteMessage.getData();
         Map<String, Object> payload;
@@ -227,7 +227,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                         }
                                         // realm ChatRoom, ChatContent 생성
                                         payload.put("isFirst", true);
-                                        ChatRoom.createChatRoom(realm1, value, userIdList, new ChatRoom.onChatRoomCreatedListener() {
+                                        ChatRoom.createChatRoom(realm1, value, userIdList, new ChatRoom.OnChatRoomCreatedListener() {
                                             @Override
                                             public void onCreate(ChatRoom chatRoom) {
                                                 if (!Config.getMyUID(realm1).equals(uid)) {
@@ -235,7 +235,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                                         @Override
                                                         public void run() {
                                                             Realm realm2 = Realm.getInstance(UtilityManager.getRealmConfig());
-                                                            mNotifyManager.notify(realm2, cid);
+                                                            new NotifyManager(mContext, realm2).notify(cid);
                                                             realm2.close();
                                                         }
                                                     }).start();
@@ -252,7 +252,14 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 } else { // 기존 realm 에 채팅방이 있는 경우에는 ChatContent 만 생성
                     ChatContent.createChat(realm, payload);
                     if (!Config.getMyUID(realm).equals(uid)) {
-                        mNotifyManager.notify(realm, cid);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Realm realm2 = Realm.getInstance(UtilityManager.getRealmConfig());
+                                new NotifyManager(mContext, realm2).notify(cid);
+                                realm2.close();
+                            }
+                        }).start();
                     }
                 }
                 if (data.get("contentType").equals("1")) {

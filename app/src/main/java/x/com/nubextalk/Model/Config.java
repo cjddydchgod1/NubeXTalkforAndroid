@@ -31,14 +31,7 @@ public class Config extends RealmObject {
     private String ext2;
     private String ext3;
     private String ext4;
-    private boolean autoLogin;
-    private boolean screenLock;
-    private boolean alarm;
-
-    public Config () {
-        screenLock = false;
-        alarm = true;
-    }
+    private String ext5;
 
     public String getOid() {
         return oid;
@@ -84,27 +77,16 @@ public class Config extends RealmObject {
     public void setExt4(String ext4) {
         this.ext4 = ext4;
     }
-    public boolean getAutoLogin() {
-        return autoLogin;
+    public String getExt5() {
+        return ext5;
     }
-    public void setAutoLogin(boolean autoLogin) {
-        this.autoLogin = autoLogin;
-    }
-    public boolean getScreenLock() {
-        return screenLock;
-    }
-    public void setScreenLock(boolean screenLock) {
-        this.screenLock = screenLock;
-    }
-    public boolean getAlarm() {
-        return alarm;
-    }
-    public void setAlarm(boolean alarm) {
-        this.alarm = alarm;
+    public void setExt5(String ext5) {
+        this.ext5 = ext5;
     }
 
-    public static void init(Context context, Realm realm){
-        realm.where(Config.class).findAll().deleteAllFromRealm();
+    public static void settingInit(Context context, Realm realm){
+        realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findAll().deleteAllFromRealm();
+        realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {
             jsonArray = new JSONArray(UtilityManager.loadJson(context, "config.json"));
@@ -117,7 +99,7 @@ public class Config extends RealmObject {
                 config.setExt2(jsonArray.getJSONObject(i).getString("ext2"));
                 config.setExt3(jsonArray.getJSONObject(i).getString("ext3"));
                 config.setExt4(jsonArray.getJSONObject(i).getString("ext4"));
-                config.setAutoLogin(jsonArray.getJSONObject(i).getBoolean("autoLogin"));
+                config.setExt5(jsonArray.getJSONObject(i).getString("ext5"));
                 list.add(config);
             }
             realm.copyToRealmOrUpdate(list);
@@ -136,5 +118,14 @@ public class Config extends RealmObject {
     }
     public static String getMyUID(Realm realm){
         return getMyAccount(realm).getExt1();
+    }
+    public static Config getAutoLogin(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findFirst();
+    }
+    public static Config getAlarm(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME","Alarm").findFirst();
+    }
+    public static Config getLastLoginID(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "LastLoginID").findFirst();
     }
 }

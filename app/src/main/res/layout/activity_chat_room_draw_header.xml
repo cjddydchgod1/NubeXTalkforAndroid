@@ -19,6 +19,6 @@
         android:singleLine="true"
         android:text=""
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="@dimen/txt_Gl" />
+        android:textSize="@dimen/txt_xl" />
 
 </LinearLayout>

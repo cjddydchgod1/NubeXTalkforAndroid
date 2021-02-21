@@ -47,4 +47,14 @@
     <string name="auto_login">자동 로그인</string>
     <string name="hint_user_id">USER ID</string>
     <string name="search_pacs">PACS 이동</string>
+    <string name="pacs">PACS</string>
+    <string name="setting">설정</string>
+    <string name="fix_top">상단 고정</string>
+    <string name="setting_alarm">알람 설정</string>
+    <string name="chat_room_member">채팅방 멤버</string>
+    <string name="invite_member">대화상대 초대</string>
+    <string name="exit">나가기</string>
+    <string name="camera">카메라</string>
+    <string name="gallery">갤러리</string>
+    <string name="rename_chat_room">채팅방 이름 편집</string>
 </resources>

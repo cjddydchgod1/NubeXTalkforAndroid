@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -58,6 +59,7 @@ import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
+import x.com.nubextalk.Module.Fragment.RoomNameModificationDialogFragment;
 
 import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 
@@ -74,8 +76,8 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     private String mUid;
 
     private ChatAdapter mAdapter;
-    private RealmResults<ChatContent> mChat;
-    private int mChatIndex;
+    private RealmResults<ChatContent> mChatContents;
+    private int mChatContentsIndex;
 
     private RecyclerView mRecyclerView;
     private DrawerLayout mDrawerLayout;
@@ -103,8 +105,8 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         mUid = Config.getMyUID(realm);
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
-        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
-        String roomTitle = roomInfo.getRoomName();
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        String chatRoomTitle = chatRoom.getRoomName();
 
         // 채팅방 툴바 설정
         Toolbar toolbar = findViewById(R.id.toolbar_chat_room);
@@ -116,12 +118,12 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         TextView title = (TextView) findViewById(R.id.toolbar_chat_room_title);
-        title.setText(roomTitle);
+        title.setText(chatRoomTitle);
 
         // rid 참조하여 채팅내용 불러옴
-        mChat = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
-        mChat = mChat.sort("sendDate", Sort.ASCENDING);
-        mChatIndex = setChatContentRead(mChat, 0);
+        mChatContents = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
+        mChatContents = mChatContents.sort("sendDate", Sort.ASCENDING);
+        mChatContentsIndex = setChatContentRead(mChatContents, 0);
 
         // 하단 미디어 버튼, 에디트텍스트 , 전송 버튼을 아이디로 불러옴
         mEditChat = (EditText) findViewById(R.id.edit_chat);
@@ -138,7 +140,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
         // 리사이클러 뷰와 어댑터를 연결 채팅을 불러 올수 있음
         mRecyclerView = (RecyclerView) findViewById(R.id.chat_room_content);
-        mAdapter = new ChatAdapter(this, mChat);
+        mAdapter = new ChatAdapter(this, mChatContents);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -151,7 +153,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
         View header = mNavigationView.getHeaderView(0);
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
-        drawerTitle.setText(roomTitle);
+        drawerTitle.setText(chatRoomTitle);
 
         // pacs 데이터를 인텐트로 받은 상태로 채팅방 입장시
         String studyId = getIntent().getStringExtra("studyId");
@@ -169,7 +171,42 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
             }
         };
-        mChat.addChangeListener(realmChangeListener);
+
+        RealmChangeListener<ChatRoom> realmChangeListener1 = new RealmChangeListener<ChatRoom>() {
+            @Override
+            public void onChange(ChatRoom chatRoom) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
+                        ChatRoom chatRoom = realm1.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+                        String chatRoomTitle = chatRoom.getRoomName();
+
+                        title.setText(chatRoomTitle);
+                        drawerTitle.setText(chatRoomTitle);
+                        aq.toast("채팅방 이름이 변경 되었습니다.");
+                    }
+                });
+//
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
+//                        ChatRoom chatRoom = realm1.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+//                        String chatRoomTitle = chatRoom.getRoomName();
+//
+//                        TextView title = (TextView) findViewById(R.id.toolbar_chat_room_title);
+//                        TextView drawerTitle = (TextView) findViewById(R.id.drawer_title);
+//
+//                        title.setText(chatRoomTitle);
+//                        drawerTitle.setText(chatRoomTitle);
+//                        aq.toast("채팅방 이름이 변경 되었습니다. realm");
+//                    }
+//                }).start();
+            }
+        };
+        mChatContents.addChangeListener(realmChangeListener);
+        chatRoom.addChangeListener(realmChangeListener1);
 
         addContentView(km, new FrameLayout.LayoutParams(-1, -1));
         km.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
@@ -193,8 +230,8 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
         mRid = intent.getExtras().getString("rid");
 
-        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
-        String roomTitle = roomInfo.getRoomName();
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        String chatRoomTitle = chatRoom.getRoomName();
         Toolbar toolbar = findViewById(R.id.toolbar_chat_room);
         setSupportActionBar(toolbar);
 
@@ -204,24 +241,24 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         TextView title = (TextView) findViewById(R.id.toolbar_chat_room_title);
-        title.setText(roomTitle);
-        mChat = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
-        mChat = mChat.sort("sendDate", Sort.ASCENDING);
-        mChatIndex = setChatContentRead(mChat, 0);
-        mAdapter = new ChatAdapter(this, mChat);
+        title.setText(chatRoomTitle);
+        mChatContents = realm.where(ChatContent.class).equalTo("rid", mRid).findAll();
+        mChatContents = mChatContents.sort("sendDate", Sort.ASCENDING);
+        mChatContentsIndex = setChatContentRead(mChatContents, 0);
+        mAdapter = new ChatAdapter(this, mChatContents);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
         View header = mNavigationView.getHeaderView(0);
         TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
-        drawerTitle.setText(roomTitle);
+        drawerTitle.setText(chatRoomTitle);
     }
 
     @Override // Back pressed
     public void onBackPressed() {
         super.onBackPressed();
-        setChatContentRead(mChat, mChatIndex);
+        setChatContentRead(mChatContents, mChatContentsIndex);
         realm.close();
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -233,7 +270,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     @Override // Destroy
     protected void onDestroy() {
         super.onDestroy();
-        setChatContentRead(mChat, mChatIndex);
+        setChatContentRead(mChatContents, mChatContentsIndex);
         realm.close();
     }
 
@@ -284,6 +321,12 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 alarmSwitch.toggle();
                 break;
 
+            case R.id.nav_rename_chat_room:
+                mDrawerLayout.closeDrawers();
+                renameChatRoom();
+                break;
+
+
             case R.id.nav_add_member:
                 mDrawerLayout.closeDrawers();
                 addMember();
@@ -305,7 +348,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 Date date = new Date();
 
                 //realm 에 사진 채팅 추가
-                ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
 
                 Map<String, Object> chat = new HashMap<>();
                 String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
@@ -330,9 +373,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     chatRoomData.put("chatRoomId", mRid);
                     chatRoomData.put("senderId", mUid);
                     chatRoomData.put("members", chatRoomMemberJsonArray);
-                    chatRoomData.put("title", roomInfo.getRoomName());
-                    chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
-                    chatRoomData.put("notificationId", roomInfo.getNotificationId());
+                    chatRoomData.put("title", chatRoom.getRoomName());
+                    chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
+                    chatRoomData.put("notificationId", chatRoom.getNotificationId());
                     FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                         @Override
                         public void onSuccess(HttpsCallableResult httpsCallableResult) {
@@ -349,7 +392,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 Date date = new Date();
 
                 //realm 에 사진 채팅 추가
-                ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
 
                 Map<String, Object> chat = new HashMap<>();
                 String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
@@ -373,9 +416,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     chatRoomData.put("chatRoomId", mRid);
                     chatRoomData.put("senderId", mUid);
                     chatRoomData.put("members", chatRoomMemberJsonArray);
-                    chatRoomData.put("title", roomInfo.getRoomName());
-                    chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
-                    chatRoomData.put("notificationId", roomInfo.getNotificationId());
+                    chatRoomData.put("title", chatRoom.getRoomName());
+                    chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
+                    chatRoomData.put("notificationId", chatRoom.getNotificationId());
                     FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                         @Override
                         public void onSuccess(HttpsCallableResult httpsCallableResult) {
@@ -397,7 +440,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         MenuItem item = menu.findItem(R.id.menu_chat_member);
         SubMenu subMenu = item.getSubMenu();
 
-        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
         RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", mRid).findAll();
 
         subMenu.clear();
@@ -409,12 +452,12 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_fix_top)).findViewById(R.id.drawer_switch);
         SwitchCompat alarmSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_alarm)).findViewById(R.id.drawer_switch);
 
-        if (roomInfo.getSettingFixTop()) {
+        if (chatRoom.getSettingFixTop()) {
             fixTopSwitch.setChecked(true);
         } else {
             fixTopSwitch.setChecked(false);
         }
-        if (roomInfo.getSettingAlarm()) {
+        if (chatRoom.getSettingAlarm()) {
             alarmSwitch.setChecked(true);
         } else {
             alarmSwitch.setChecked(false);
@@ -427,18 +470,18 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            roomInfo.setSettingFixTop(true);
+                            chatRoom.setSettingFixTop(true);
                             Toast.makeText(getApplicationContext(), "상단고정이 설정 되었습니다.", Toast.LENGTH_SHORT).show();
-                            realm.copyToRealmOrUpdate(roomInfo);
+                            realm.copyToRealmOrUpdate(chatRoom);
                         }
                     });
                 } else {
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            roomInfo.setSettingFixTop(false);
+                            chatRoom.setSettingFixTop(false);
                             Toast.makeText(getApplicationContext(), "상단고정이 해제 되었습니다.", Toast.LENGTH_SHORT).show();
-                            realm.copyToRealmOrUpdate(roomInfo);
+                            realm.copyToRealmOrUpdate(chatRoom);
                         }
                     });
                 }
@@ -451,18 +494,18 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            roomInfo.setSettingAlarm(true);
+                            chatRoom.setSettingAlarm(true);
                             Toast.makeText(getApplicationContext(), "알람기능이 설정 되었습니다.", Toast.LENGTH_SHORT).show();
-                            realm.copyToRealmOrUpdate(roomInfo);
+                            realm.copyToRealmOrUpdate(chatRoom);
                         }
                     });
                 } else {
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            roomInfo.setSettingAlarm(false);
+                            chatRoom.setSettingAlarm(false);
                             Toast.makeText(getApplicationContext(), "알람기능이 해제 되었습니다.", Toast.LENGTH_SHORT).show();
-                            realm.copyToRealmOrUpdate(roomInfo);
+                            realm.copyToRealmOrUpdate(chatRoom);
                         }
                     });
                 }
@@ -522,7 +565,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             aq.toast("메세지를 입력하세요");
         } else {
             Date date = new Date();
-            ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+            ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
 
             Map<String, Object> chat = new HashMap<>();
             String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
@@ -547,9 +590,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 chatRoomData.put("chatRoomId", mRid);
                 chatRoomData.put("senderId", mUid);
                 chatRoomData.put("members", chatRoomMemberJsonArray);
-                chatRoomData.put("title", roomInfo.getRoomName());
-                chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
-                chatRoomData.put("notificationId", roomInfo.getNotificationId());
+                chatRoomData.put("title", chatRoom.getRoomName());
+                chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
+                chatRoomData.put("notificationId", chatRoom.getNotificationId());
                 FirebaseFunctionsManager.createChatRoom(chatRoomData)
                         .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                             @Override
@@ -578,7 +621,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     // Send new pacs
     private void sendPacs(String studyId, String description) {
         Date date = new Date();
-        ChatRoom roomInfo = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
 
         Map<String, Object> chat = new HashMap<>();
         String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
@@ -604,9 +647,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             chatRoomData.put("senderId", mUid);
             chatRoomData.put("chatRoomId", mRid);
             chatRoomData.put("members", chatRoomMemberJsonArray);
-            chatRoomData.put("title", roomInfo.getRoomName());
-            chatRoomData.put("roomImgUrl", roomInfo.getRoomImg());
-            chatRoomData.put("notificationId", roomInfo.getNotificationId());
+            chatRoomData.put("title", chatRoom.getRoomName());
+            chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
+            chatRoomData.put("notificationId", chatRoom.getNotificationId());
             FirebaseFunctionsManager.createChatRoom(chatRoomData)
                     .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                         @Override
@@ -652,5 +695,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             }
         });
         return Chats.size();
+    }
+
+    // Rename ChatRoom
+    private void renameChatRoom() {
+        RoomNameModificationDialogFragment fragment = new RoomNameModificationDialogFragment(realm, mRid);
+        fragment.show(getSupportFragmentManager(), "Change RoomName");
     }
 }

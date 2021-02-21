@@ -37,5 +37,7 @@ public class CodeResources {
     public static final String COMPLETE_DOWNLOAD = "다운로드 완료";
 
 
+
+
 }
 

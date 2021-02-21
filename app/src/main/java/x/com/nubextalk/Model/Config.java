@@ -31,9 +31,7 @@ public class Config extends RealmObject {
     private String ext2;
     private String ext3;
     private String ext4;
-    private boolean autoLogin;
-    private boolean screenLock;
-    private boolean alarm;
+    private String ext5;
 
     public Config () {
         screenLock = false;
@@ -103,8 +101,9 @@ public class Config extends RealmObject {
         this.alarm = alarm;
     }
 
-    public static void init(Context context, Realm realm){
-        realm.where(Config.class).findAll().deleteAllFromRealm();
+    public static void settingInit(Context context, Realm realm){
+        realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findAll().deleteAllFromRealm();
+        realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {
             jsonArray = new JSONArray(UtilityManager.loadJson(context, "config.json"));
@@ -136,5 +135,14 @@ public class Config extends RealmObject {
     }
     public static String getMyUID(Realm realm){
         return getMyAccount(realm).getExt1();
+    }
+    public static Config getAutoLogin(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findFirst();
+    }
+    public static Config getAlarm(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME","Alarm").findFirst();
+    }
+    public static Config getLastLoginID(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "LastLoginID").findFirst();
     }
 }

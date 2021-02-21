@@ -57,4 +57,10 @@
     <string name="camera">카메라</string>
     <string name="gallery">갤러리</string>
     <string name="rename_chat_room">채팅방 이름 편집</string>
+
+    <string name="frinedList">친구목록</string>
+    <string name="chatList">채팅목록</string>
+    <string name="PACSReference">PACS</string>
+    <string name="setting">설정</string>
+
 </resources>

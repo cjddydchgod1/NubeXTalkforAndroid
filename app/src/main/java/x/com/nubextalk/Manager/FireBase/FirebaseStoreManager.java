@@ -26,7 +26,9 @@ public class FirebaseStoreManager {
         data.put("fcm", token);
         return hospital.collection("users").document(userid).set(data);
     }
-
+    public void deleteToken(String userid) {
+        hospital.collection("users").document(userid).delete();
+    }
     public void addChatContent(){ /*send chat*/ };
 
     public Task getReference(String documentPath){

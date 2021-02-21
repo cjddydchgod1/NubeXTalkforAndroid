@@ -57,8 +57,9 @@ public class ApiManager {
      */
     public void login(onLoginApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
+        Config myAutoLogin = Config.getAutoLogin(realm);
         if (myAccount != null) {
-            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getAutoLogin(), listener);
+            login(myAccount.getExt1(), myAccount.getExt2(), myAutoLogin.getExt1(), listener);
         }
     }
 
@@ -68,7 +69,7 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, boolean autoLogin, onLoginApiListener listener) {
+    public void login(String id, String pwd, String autoLogin, onLoginApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
@@ -93,17 +94,35 @@ public class ApiManager {
                                         @Override
                                         public void execute(Realm realm) {
                                             Config myAccount = Config.getMyAccount(realm);
+
                                             if(myAccount == null){
                                                 myAccount = new Config();
                                                 myAccount.setCODENAME("MyAccount");
                                                 myAccount.setCODE("MyAccount");
+
+                                                /** 설정 초기화 **/
+                                                Config.settingInit(context, realm);
                                             }
                                             myAccount.setExt1(id);
                                             myAccount.setExt2(pwd);
                                             myAccount.setExt3(cookie.toUpperCase());
-                                            myAccount.setAutoLogin(autoLogin);
-                                            realm.copyToRealmOrUpdate(myAccount);
 
+                                            /** 자동 로그인 설정 **/
+                                            Config myAutoLogin = Config.getAutoLogin(realm);
+                                            myAutoLogin.setExt1(autoLogin);
+
+                                            /** 마지막 로그인한 ID 기억 **/
+                                            Config lastLoginID = Config.getLastLoginID(realm);
+                                            if(lastLoginID == null){
+                                                lastLoginID = new Config();
+                                                lastLoginID.setCODENAME("LastLoginID");
+                                                lastLoginID.setCODE("LastLoginID");
+                                            }
+                                            lastLoginID.setExt1(id);
+
+                                            realm.copyToRealmOrUpdate(myAccount);
+                                            realm.copyToRealmOrUpdate(myAutoLogin);
+                                            realm.copyToRealmOrUpdate(lastLoginID);
                                             if (listener != null) {
                                                 listener.onSuccess(response, body);
                                             }

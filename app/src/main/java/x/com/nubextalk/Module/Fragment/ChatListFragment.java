@@ -61,6 +61,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
+        mActivity.setTitle(getString(R.string.chatList));
         hospitalId = "w34qjptO0cYSJdAwScFQ";
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);

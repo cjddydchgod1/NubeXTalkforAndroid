@@ -25,7 +25,7 @@ public class LoadingActivity extends Activity {
             public void run() {
                 try {
                     // 로그인하는 화면
-                    startActivity(new Intent(activity, LoginActivity.class));
+                    startActivity(new Intent(activity, MainActivity.class));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

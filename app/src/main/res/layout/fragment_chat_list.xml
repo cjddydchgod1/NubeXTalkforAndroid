@@ -19,20 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/chat_fab_main"
-            android:layout_width="428dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_m"
-            android:layout_marginBottom="@dimen/margin_m"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:clickable="true"
-            android:focusable="true"
-            app:backgroundTint="@color/colorPrimaryDark"
-            app:fabSize="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_floating_btn_24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/chat_fab_sub1"
@@ -43,28 +29,12 @@
             android:backgroundTint="@color/colorPrimaryDark"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="invisible"
             app:backgroundTint="@color/colorPrimaryDark"
             app:fabSize="normal"
-            app:layout_constraintBottom_toTopOf="@+id/chat_fab_main"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_baseline_chat_24" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/chat_fab_sub2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_m"
-            android:layout_marginBottom="@dimen/margin_m"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:clickable="true"
-            android:focusable="true"
-            android:visibility="invisible"
-            app:backgroundTint="@color/colorPrimaryDark"
-            app:fabSize="normal"
-            app:layout_constraintBottom_toTopOf="@+id/chat_fab_sub1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_outline_settings_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

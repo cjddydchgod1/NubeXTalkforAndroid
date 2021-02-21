@@ -9,13 +9,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
-
-import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,9 +20,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+
+import java.util.ArrayList;
+
+import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Module.Fragment.ChatListFragment;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
+import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.SettingFragment;
 
 /**
@@ -50,28 +52,52 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
     private String token;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //툴바 설정
+        //Setting toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Setting bottom navigation
+        bottomNavigationView = findViewById(R.id.bottom_nav);
         initBottomNavigation();
+
+        // Begin fragment transaction
+        String requestChatList = getIntent().getStringExtra("requestChatList");
+        fragmentTransaction = fragmentManager.beginTransaction();
+        if (UtilityManager.checkString(requestChatList)) {
+            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        } else {
+            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+        }
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("NEWINTENT", "main activity new intent");
+
+        String requestChatList = intent.getStringExtra("requestChatList");
+        fragmentTransaction = fragmentManager.beginTransaction();
+        if (UtilityManager.checkString(requestChatList)) {
+            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        } else {
+            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+        }
+    }
+
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/
     private void initBottomNavigation() {
-        //네비게이션 설정
-        bottomNavigationView = findViewById(R.id.bottom_nav);
-
-        //프래그먼트 전환 관리 설정 - 처음 실행시에는 친구목록 프래그먼트
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
-
         //네비게이션 버튼 해당 프래그먼트로 전환
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -96,11 +122,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * ChatListFragment 에서 MainActivity -> ChatAddActivity 를 실행하는 하도록 호출해주는 함수
-     **/
-    public void startChatAddActivity() {
-        startActivityForResult(new Intent(MainActivity.this, ChatAddActivity.class), CHAT_ADD);
+    public void startChatAddActivity(Intent intent) {
+        startActivityForResult(intent, CHAT_ADD);
     }
 
     public void startChatRoomActivity(Intent intent) {
@@ -114,21 +137,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CHAT_ADD) {
-            if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHAT_ADD) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                if(fragment instanceof ChatListFragment) {
-                    ((ChatListFragment) fragment).refreshChatList();
+                if (fragment instanceof ChatListFragment) {
+                    startChatRoomActivity(data);
                 }
             }
         }
 
-        if (requestCode == MOVE_TO_CHAT_ROOM) {
-            if (resultCode == 10) {
-                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-                if(fragment instanceof ChatListFragment) {
-                    ((ChatListFragment) fragment).refreshChatList();
-                }
+        if (resultCode == RESULT_OK) {
+            if (requestCode == MOVE_TO_CHAT_ROOM) {
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+                bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
             }
         }
     }
@@ -164,4 +186,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 }

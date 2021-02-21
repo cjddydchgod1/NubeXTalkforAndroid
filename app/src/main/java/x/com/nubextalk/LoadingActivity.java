@@ -26,11 +26,10 @@ public class LoadingActivity extends Activity {
                 try {
                     // 로그인하는 화면
                     startActivity(new Intent(activity, LoginActivity.class));
-                    finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        }, 2000);
+        }, 1000);
     }
 }

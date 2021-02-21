@@ -33,6 +33,7 @@ public class User extends RealmObject {
     private String appName; // 이름
     private String appFcmKey; // FCM key값 저장
     private String appNickName;
+
     @NonNull
     public String getCode() {
         return code;
@@ -96,14 +97,14 @@ public class User extends RealmObject {
     }
 
     public void setAppStatus(String appStatus) {
-        if(UtilityManager.checkString(appStatus))
+        if (UtilityManager.checkString(appStatus))
             this.appStatus = appStatus;
         else
             this.appStatus = "0";
     }
 
     public String getAppName() {
-        if(UtilityManager.checkString(this.appNickName))
+        if (UtilityManager.checkString(this.appNickName))
             return this.appNickName;
         else
             return appName;
@@ -129,30 +130,35 @@ public class User extends RealmObject {
         this.appNickName = appNickName;
     }
 
-    public static RealmObject getMyAccountInfo(Realm realm) {
+    public static User getMyAccountInfo(Realm realm) {
         return realm.where(User.class).equalTo("userId", Config.getMyAccount(realm).getExt1()).findFirst();
     }
+
     public static RealmResults<User> getUserlist(Realm realm) {
         return realm.where(User.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();
     }
 
-    public static ChatRoom getChatroom(Realm realm, User user) {
+    public interface UserListener {
+        void onFindPersonalChatRoom(ChatRoom chatRoom);
+    }
+
+    public static void getChatroom(Realm realm, User user, UserListener userListener) {
         RealmResults<ChatRoomMember> chatList = realm.where(ChatRoomMember.class).equalTo("uid", user.getUserId()).findAll();
         ChatRoom chatRoom = null;
-        if(chatList.size() != 0) {
 
-                Iterator<ChatRoomMember> mChat;
-                /**
-                 * 1대1채팅방을 찾았다면 그 값이 chatRoom
-                 * 찾지 못했다면 chatRoom은 null값
-                 */
-                for(mChat = chatList.iterator(); chatRoom == null ;mChat.hasNext()) {
-                    chatRoom = realm.where(ChatRoom.class)
-                            .equalTo("rid", mChat.next().getRid())
-                            .and()
-                            .equalTo("isGroupChat", false).findFirst();
-                }
+        if (chatList.size() != 0) {
+
+            /**s
+             * 1대1채팅방을 찾았다면 그 값이 chatRoom
+             * 찾지 못했다면 chatRoom은 null값
+             */
+            for (ChatRoomMember chatRoomMember : chatList) {
+                chatRoom = realm.where(ChatRoom.class)
+                        .equalTo("rid", chatRoomMember.getRid())
+                        .and()
+                        .equalTo("isGroupChat", false).findFirst();
             }
-        return chatRoom;
+        }
+        userListener.onFindPersonalChatRoom(chatRoom);
     }
 }

@@ -12,27 +12,27 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="카메라" />
+            android:title="@string/camera" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="갤러리" />
+            android:title="@string/gallery" />
         <item
             android:id="@+id/nav_pacs"
             android:icon="@drawable/ic_doctor"
-            android:title="PACS" />
+            android:title="@string/pacs" />
     </group>
 
-    <item android:title="설정">
+    <item android:title="@string/setting">
         <menu>
             <group android:id="@+id/menu_settings">
                 <item
                     android:id="@+id/nav_setting_fix_top"
-                    android:title="상단 고정"
+                    android:title="@string/fix_top"
                     app:actionLayout="@layout/activity_chat_room_draw_switch" />
                 <item
                     android:id="@+id/nav_setting_alarm"
-                    android:title="알람 설정"
+                    android:title="@string/setting_alarm"
                     app:actionLayout="@layout/activity_chat_room_draw_switch" />
             </group>
         </menu>
@@ -40,16 +40,20 @@
 
     <item
         android:id="@+id/menu_chat_member"
-        android:title="채팅방 멤버">
+        android:title="@string/chat_room_member">
         <menu>
         </menu>
     </item>
 
     <item
+        android:id="@+id/nav_rename_chat_room"
+        android:title="@string/rename_chat_room" />
+
+    <item
         android:id="@+id/nav_add_member"
-        android:title="대화상대 초대" />
+        android:title="@string/invite_member" />
 
     <item
         android:id="@+id/nav_exit"
-        android:title="나가기" />
+        android:title="@string/exit" />
 </menu>

@@ -30,6 +30,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:maxWidth="164dp"
+        android:maxHeight="22dp"
+        android:singleLine="true"
         android:text="Person Name"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -43,10 +46,21 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="6dp"
         android:maxWidth="250dp"
+        android:singleLine="true"
         android:text="Chat content..."
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/chat_list_chat_picture"
         app:layout_constraintTop_toBottomOf="@+id/chat_list_friend_name" />
+
+    <RadioButton
+        android:id="@+id/select_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_l"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/chat_list_chat_time"
@@ -97,10 +111,10 @@
         android:id="@+id/chat_member_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="9dp"
         android:layout_marginStart="4dp"
+        android:layout_marginTop="9dp"
         android:text=""
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/chat_list_friend_name" />
+        app:layout_constraintStart_toEndOf="@id/chat_list_friend_name"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -211,19 +211,4 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
             });
         }
     }
-    class AlarmSwitchListener implements CompoundButton.OnCheckedChangeListener{
-        @Override
-        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-            realm.executeTransaction(realm1 -> {
-                if (isChecked) {
-                    Log.e("3boolean = ", Boolean.toString(isChecked));
-                    myAccount.setAlarm(true);
-                } else {
-                    Log.e("4boolean = ", Boolean.toString(isChecked));
-                    myAccount.setAlarm(false);
-                }
-                realm.copyToRealmOrUpdate(myAccount);
-            });
-        }
-    }
 }

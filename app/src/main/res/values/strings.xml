@@ -4,7 +4,7 @@
   -->
 
 <resources>
-    <string name="app_name">NubeX Talk</string>
+    <string name="app_name">NubeX Messenger</string>
     <string name="title_activity_loading">LoadingActivity</string>
     <!--
     This string is used for square devices and overridden by hello_world in

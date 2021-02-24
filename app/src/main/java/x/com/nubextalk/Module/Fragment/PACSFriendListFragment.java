@@ -97,25 +97,33 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
         description = bundle.getString("description");
         confirmBtn.setOnClickListener(view -> {
             if(lastChecked != null) {
-                ChatRoom chatRoom = User.getChatroom(realm, lastChecked);
-                if(chatRoom==null){
-                    // 새로만든 채팅이 없다면 새로 만든다.
-                    ArrayList<User> list = new ArrayList<>();
-                    list.add(lastChecked);
+                User.getChatroom(realm, lastChecked, new User.UserListener() {
+                    @Override
+                    public void onFindPersonalChatRoom(ChatRoom chatRoom) {
+                        if(chatRoom==null){
+                            // 새로만든 채팅이 없다면 새로 만든다.
+                            ArrayList<User> list = new ArrayList<>();
+                            list.add(lastChecked);
 
-                    String rid = new ChatAddActivity().createNewChat(realm, mContext, list, "");
-                    Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                    intent.putExtra("rid", rid);
-                    intent.putExtra("studyId", studyId);
-                    intent.putExtra("description", description);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                    intent.putExtra("rid", chatRoom.getRid());
-                    intent.putExtra("studyId", studyId);
-                    intent.putExtra("description", description);
-                    startActivity(intent);
-                }
+                            Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                            new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                                @Override
+                                public void onCreate(String rid) {
+                                    intent.putExtra("rid", rid);
+                                    intent.putExtra("studyId", studyId);
+                                    intent.putExtra("description", description);
+                                    startActivity(intent);
+                                }
+                            });
+                        } else {
+                            Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                            intent.putExtra("rid", chatRoom.getRid());
+                            intent.putExtra("studyId", studyId);
+                            intent.putExtra("description", description);
+                            startActivity(intent);
+                        }
+                    }
+                });
             } else {
                 Toast.makeText(mActivity, "선택된 친구 목록이 없습니다.", Toast.LENGTH_SHORT).show();
             }

@@ -310,6 +310,16 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         SearchView searchView = (SearchView) searchItem.getActionView();
         // 바로 검색이 가능하게끔
         searchView.onActionViewExpanded();
+
+        //Change searchView widgets color
+        SearchView.SearchAutoComplete searchAutoComplete =
+                (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchAutoComplete.setHintTextColor(getResources().getColor(R.color.cWhite, null));
+        searchAutoComplete.setTextColor(getResources().getColor(R.color.cWhite, null));
+
+        ImageView clearButton = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        clearButton.setColorFilter(getResources().getColor(R.color.cWhite, null));
+
         /**
          * keyboard
          */
@@ -430,22 +440,31 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              * 3. 해당 rid값으로 intent로 넘겨준다.
              */
 
-            ChatRoom chatRoom = User.getChatroom(realm, user);
+            User.getChatroom(realm, user, new User.UserListener() {
+                @Override
+                public void onFindPersonalChatRoom(ChatRoom chatRoom) {
+                     if(chatRoom==null){
+                        // 새로만든 채팅이 없다면 새로 만든다.
+                        ArrayList<User> list = new ArrayList<>();
+                        list.add(user);
+                        Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                        new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                            @Override
+                            public void onCreate(String rid) {
+                                intent.putExtra("rid", rid);
+                                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                            }
+                        });
 
-            if(chatRoom==null){
-                // 새로만든 채팅이 없다면 새로 만든다.
-                ArrayList<User> list = new ArrayList<>();
-                list.add(user);
-                String rid = new ChatAddActivity().createNewChat(realm, mContext, list, "");
-                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                intent.putExtra("rid", rid);
+                     } else {
+                        Intent intent = new Intent(mActivity, ChatRoomActivity.class);
+                        intent.putExtra("rid", chatRoom.getRid());
+                        ((MainActivity) mActivity).startChatRoomActivity(intent);
+                     }
+                }
+            });
 
-                ((MainActivity) mActivity).startChatRoomActivity(intent);
-            } else {
-                Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                intent.putExtra("rid", chatRoom.getRid());
-                ((MainActivity) mActivity).startChatRoomActivity(intent);
-            }
+
         });
 
 

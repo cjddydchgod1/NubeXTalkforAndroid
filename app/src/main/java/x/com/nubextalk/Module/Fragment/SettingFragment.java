@@ -8,12 +8,14 @@ package x.com.nubextalk.Module.Fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +57,13 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         super.onAttach(context);
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        if(context instanceof Activity)
+            mActivity = (Activity) context;
+        super.onAttach(context);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,7 +109,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         cleanView(mWrapperVesionInfo);
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        RelativeLayout l;
+        RelativeLayout l, l1;
 
         /** APP **/
 
@@ -184,5 +193,20 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
             }
             realm.copyToRealmOrUpdate(alarm);
         });
+    }
+    class AlarmSwitchListener implements CompoundButton.OnCheckedChangeListener{
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            realm.executeTransaction(realm1 -> {
+                if (isChecked) {
+                    Log.e("3boolean = ", Boolean.toString(isChecked));
+                    myAccount.setAlarm(true);
+                } else {
+                    Log.e("4boolean = ", Boolean.toString(isChecked));
+                    myAccount.setAlarm(false);
+                }
+                realm.copyToRealmOrUpdate(myAccount);
+            });
+        }
     }
 }

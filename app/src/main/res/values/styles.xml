@@ -62,4 +62,13 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
+    <style name="DarkMode" parent="AppTheme">
+        <item name="bgColor">@color/colorPrimaryDark</item>
+        <item name="textColor">@color/cWhite</item>
+    </style>
+
+    <style name="LightMode" parent="AppTheme">
+        <item name="bgColor">@color/colorPrimary</item>
+        <item name="textColor">@color/cBlack</item>
+    </style>
 </resources>

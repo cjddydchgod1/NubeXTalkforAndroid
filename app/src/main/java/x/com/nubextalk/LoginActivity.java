@@ -25,7 +25,11 @@ import io.realm.Realm;
 import okhttp3.Response;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
+import x.com.nubextalk.Model.User;
 import x.com.nubextalk.PACS.ApiManager;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -43,6 +47,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private CheckBox checkAutoLogin;
 
+    private boolean equalUID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,9 +70,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          * SessionID가 만료가 되지 않게 id, pwd를 박아서 다시 로그인하는 방식으로 하였다.
          */
         intent = new Intent(getApplicationContext(), MainActivity.class);
-        Config myAccount = Config.getMyAccount(realm);
-        if(myAccount != null) {
-            if(myAccount.getAutoLogin()) {
+        Config myAutoLogin = Config.getAutoLogin(realm);
+        if(myAutoLogin != null) {
+            if(myAutoLogin.getExt1().equals("checked")) {
                 apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
@@ -96,25 +101,71 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.login_sign_in:
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
-                boolean autoLogin = false;
+                String autoLogin = "false";
                 if(checkAutoLogin.isChecked())
-                    autoLogin = true;
+                    autoLogin = "true";
+
+                /** 마지막으로 로그인한 아이디와 일치하는지 확인 **/
+                Config lastLoginID = Config.getLastLoginID(realm);
+                if(lastLoginID == null || UtilityManager.checkString(lastLoginID.getExt1()))
+                    equalUID = false;
+                else {
+                    if(lastLoginID.getExt1().equals(id))
+                        equalUID = true;
+                    else
+                        equalUID = false;
+                }
+
                 apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", response.toString());
+                        Log.d("RESUlT onSuccess", response.toString());
                         /**
-                         * uid, token을 firestore에 올리는 작업
+                         * 전에 있던 사용자가 그대로 로그인했다면 데이터 유지
+                         * 다른 사용자가 로그인했다면 데이터 삭제 및 해당 사용자가 속해있는 ChatRoom을 가져오기
                          */
-                        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                startActivity(intent);
-                            }
-                        });
+                        if(!equalUID) {
+                            Log.e("equal", "false");
+                            realm.executeTransactionAsync(realm1 -> {
+                                realm1.where(User.class).findAll().deleteAllFromRealm();
+                                realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
+                                realm1.where(ChatRoomMember.class).findAll().deleteAllFromRealm();
+                                realm1.where(ChatContent.class).findAll().deleteAllFromRealm();
 
-
+                                Config.settingInit(getApplicationContext(), realm1);
+                            }, new Realm.Transaction.OnSuccess() {
+                                @Override
+                                public void onSuccess() {
+                                    /**
+                                     * uid, token을 firestore에 올리는 작업
+                                     */
+                                    FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                                    firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            startActivity(intent);
+                                        }
+                                    });
+                                }
+                            }, new Realm.Transaction.OnError() {
+                                @Override
+                                public void onError(Throwable error) {
+                                    error.printStackTrace();
+                                }
+                            });
+                        } else {
+                            /**
+                             * uid, token을 firestore에 올리는 작업
+                             */
+                            Log.e("equal", "true");
+                            FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+                            firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    startActivity(intent);
+                                }
+                            });
+                        }
                     }
 
                     @Override
@@ -122,15 +173,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(activity, "아이디/비밀번호를 확인하세요.", Toast.LENGTH_SHORT).show();
                     }
                 });
-//                apiManager.login(id,password);
-//                /**
-//                 * uid, token을 firestore에 올리는 작업
-//                 */
-//                FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-//                firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4());
-//                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-//                startActivity(intent);
-//                finish();
                 break;
         }
     }

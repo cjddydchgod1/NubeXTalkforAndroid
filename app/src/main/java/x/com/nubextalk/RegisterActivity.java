@@ -59,7 +59,6 @@ public class RegisterActivity extends AppCompatActivity {
                         String name = nameInput.getText().toString().equals("") ? "" : nameInput.getText().toString();
                         if (serverInfo == null) {
                             serverInfo = new Config();
-                            serverInfo.setOid("[null]");
                             serverInfo.setCODENAME("ServerInfo");
                             serverInfo.setCODE("ServerInfo");
                         }

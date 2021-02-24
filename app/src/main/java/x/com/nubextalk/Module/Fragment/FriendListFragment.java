@@ -7,6 +7,7 @@ package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -123,7 +124,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         super.onCreate(savedInstanceState);
 
         realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-        apiManager = new ApiManager(mActivity, realm);
+        apiManager      = new ApiManager(mActivity, realm);
     }
 
     @Override
@@ -134,6 +135,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
         mUserList       = new ArrayList<>();
         aq              = new AQuery(mActivity);
+
+        mActivity.setTitle(getString(R.string.frinedList));
 
         /**
          * bottomSheet

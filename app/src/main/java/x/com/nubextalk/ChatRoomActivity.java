@@ -184,7 +184,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
                         title.setText(chatRoomTitle);
                         drawerTitle.setText(chatRoomTitle);
-                        aq.toast("채팅방 이름이 변경 되었습니다.");
+//                        aq.toast("채팅방 이름이 변경 되었습니다.");
                     }
                 });
 //

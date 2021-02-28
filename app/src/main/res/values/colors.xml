@@ -5,10 +5,20 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#A8C3B3</color>
+    <!--<color name="colorPrimary">#A8C3B3</color>
     <color name="colorPrimaryDark">#B0C2C4</color>
-    <color name="colorAccent">#C1FFC3</color>
+    <color name="colorAccent">#C1FFC3</color>-->
 
+
+    <!--<color name="colorPrimary">#F5E7D4</color>
+    <color name="colorPrimaryDark">#F5E7D4</color>
+    <color name="colorAccent">#E07264</color>-->
+
+    <color name="colorPrimary">#384050</color>
+    <color name="colorPrimaryDark">#384050</color>
+    <color name="colorAccent">#0e809d</color>
+
+    <color name="cChatRoomBackground">#A8C3B3</color>
     <color name="cBackground">#F3F3F3</color>
     <color name="cStatusOn">#5EE49F</color>
     <color name="cStatusOff">#FBEE6B</color>

@@ -313,6 +313,16 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         SearchView searchView = (SearchView) searchItem.getActionView();
         // 바로 검색이 가능하게끔
         searchView.onActionViewExpanded();
+
+        //Change searchView widgets color
+        SearchView.SearchAutoComplete searchAutoComplete =
+                (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchAutoComplete.setHintTextColor(getResources().getColor(R.color.cWhite, null));
+        searchAutoComplete.setTextColor(getResources().getColor(R.color.cWhite, null));
+
+        ImageView clearButton = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        clearButton.setColorFilter(getResources().getColor(R.color.cWhite, null));
+
         /**
          * keyboard
          */

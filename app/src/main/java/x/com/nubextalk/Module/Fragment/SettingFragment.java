@@ -12,6 +12,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -55,24 +56,18 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
             mActivity = (Activity) context;
         super.onAttach(context);
     }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        mContext = context;
-        if(context instanceof Activity)
-            mActivity = (Activity) context;
-        super.onAttach(context);
-    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mWrapperApp           = rootview.findViewById(R.id.wrapperApp);
-        mWrapperAccount       = rootview.findViewById(R.id.wrapperAccount);
-        mWrapperVesionInfo    = rootview.findViewById(R.id.wrapperVesionInfo);
         realm               = Realm.getInstance(UtilityManager.getRealmConfig());
         rootview            = (ViewGroup) inflater.inflate(R.layout.fragment_setting, container, false);
 
-        mActivity.setTitle(getString(R.string.setting));
+        mWrapperApp           = rootview.findViewById(R.id.wrapperApp);
+        mWrapperAccount       = rootview.findViewById(R.id.wrapperAccount);
+        mWrapperVesionInfo    = rootview.findViewById(R.id.wrapperVesionInfo);
+
+        mActivity.setTitle(getString(R.string.settingFragment));
 
         mWrapperHowToUse      = rootview.findViewById(R.id.wrapperHowToUse);
 
@@ -111,11 +106,11 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
         /** APP **/
 
-        l1 = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
-        ((IconTextView) l1.findViewById(R.id.titleRow)).setText("알람 받기");
-        SwitchCompat AlarmSwitch = l1.findViewById(R.id.switchRow);
+        l = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
+        ((IconTextView) l.findViewById(R.id.titleRow)).setText("알람 받기");
+        SwitchCompat AlarmSwitch = l.findViewById(R.id.switchRow);
         AlarmSwitch.setChecked(alarm.getExt1().equals("true"));
-        AlarmSwitch.setOnCheckedChangeListener(new AlarmSwitchListener());
+        AlarmSwitch.setOnCheckedChangeListener(this);
         AlarmSwitch.setTag(EXE_ALARM);
         l.setOnClickListener(v -> AlarmSwitch.performClick());
         mWrapperApp.addView(l);
@@ -181,34 +176,15 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         realm.executeTransaction(realm1 -> {
             switch ((int)buttonView.getTag()) {
                 case EXE_ALARM:
-
                     if(isChecked) {
-                        Log.e("3boolean = ", Boolean.toString(isChecked));
                         alarm.setExt1("true");
                     }
                     else {
-                        Log.e("4boolean = ", Boolean.toString(isChecked));
                         alarm.setExt1("false");
                     }
                     break;
             }
             realm.copyToRealmOrUpdate(alarm);
         });
-    }
-
-    class AlarmSwitchListener implements CompoundButton.OnCheckedChangeListener{
-        @Override
-        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-            realm.executeTransaction(realm1 -> {
-                if (isChecked) {
-                    Log.e("3boolean = ", Boolean.toString(isChecked));
-                    alarm.setExt1("true");
-                } else {
-                    Log.e("4boolean = ", Boolean.toString(isChecked));
-                    alarm.setExt1("false");
-                }
-                realm.copyToRealmOrUpdate(alarm);
-            });
-        }
     }
 }

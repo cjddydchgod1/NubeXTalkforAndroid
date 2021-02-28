@@ -6,6 +6,7 @@
 package x.com.nubextalk.PACS;
 
 import android.content.Context;
+import android.util.Log;
 
 import io.realm.Realm;
 import okhttp3.FormBody;
@@ -93,23 +94,30 @@ public class ApiManager {
                                     realm.executeTransaction(new Realm.Transaction() {
                                         @Override
                                         public void execute(Realm realm) {
+
                                             Config myAccount = Config.getMyAccount(realm);
 
                                             if(myAccount == null){
                                                 myAccount = new Config();
                                                 myAccount.setCODENAME("MyAccount");
                                                 myAccount.setCODE("MyAccount");
-
-                                                /** 설정 초기화 **/
-                                                Config.settingInit(context, realm);
                                             }
                                             myAccount.setExt1(id);
                                             myAccount.setExt2(pwd);
                                             myAccount.setExt3(cookie.toUpperCase());
+                                            realm.copyToRealmOrUpdate(myAccount);
+
 
                                             /** 자동 로그인 설정 **/
                                             Config myAutoLogin = Config.getAutoLogin(realm);
+                                            if(myAutoLogin == null){
+                                                myAutoLogin = new Config();
+                                                myAutoLogin.setCODENAME("AutoLogin");
+                                                myAutoLogin.setCODE("AutoLogin");
+                                            }
                                             myAutoLogin.setExt1(autoLogin);
+                                            realm.copyToRealmOrUpdate(myAutoLogin);
+
 
                                             /** 마지막 로그인한 ID 기억 **/
                                             Config lastLoginID = Config.getLastLoginID(realm);
@@ -120,14 +128,14 @@ public class ApiManager {
                                             }
                                             lastLoginID.setExt1(id);
 
-                                            realm.copyToRealmOrUpdate(myAccount);
-                                            realm.copyToRealmOrUpdate(myAutoLogin);
+
                                             realm.copyToRealmOrUpdate(lastLoginID);
-                                            if (listener != null) {
-                                                listener.onSuccess(response, body);
-                                            }
+
                                         }
                                     });
+                                    if (listener != null) {
+                                        listener.onSuccess(response, body);
+                                    }
                                 }
                             } catch (Exception e){
                                 if(listener != null){

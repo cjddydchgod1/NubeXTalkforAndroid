@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private CheckBox checkAutoLogin;
 
-    private boolean equalUID = true;
+    private boolean equalUID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,26 +106,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     autoLogin = "true";
 
                 /** 마지막으로 로그인한 아이디와 일치하는지 확인 **/
-                Config myAccount = Config.getMyAccount(realm);
-                if(!(myAccount == null || myAccount.getExt1().equals(id)))
+                Config lastLoginID = Config.getLastLoginID(realm);
+                if(lastLoginID == null || UtilityManager.checkString(lastLoginID.getExt1()))
                     equalUID = false;
+                else {
+                    if(lastLoginID.getExt1().equals(id))
+                        equalUID = true;
+                    else
+                        equalUID = false;
+                }
+
                 apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
                     @Override
                     public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT", response.toString());
+                        Log.d("RESUlT onSuccess", response.toString());
                         /**
                          * 전에 있던 사용자가 그대로 로그인했다면 데이터 유지
                          * 다른 사용자가 로그인했다면 데이터 삭제 및 해당 사용자가 속해있는 ChatRoom을 가져오기
                          */
                         if(!equalUID) {
-                            Log.e("if", "if문");
+                            Log.e("equal", "false");
                             realm.executeTransactionAsync(realm1 -> {
-                                realm.where(User.class).findAll().deleteAllFromRealm();
-                                realm.where(ChatRoom.class).findAll().deleteAllFromRealm();
-                                realm.where(ChatRoomMember.class).findAll().deleteAllFromRealm();
-                                realm.where(ChatContent.class).findAll().deleteAllFromRealm();
+                                realm1.where(User.class).findAll().deleteAllFromRealm();
+                                realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
+                                realm1.where(ChatRoomMember.class).findAll().deleteAllFromRealm();
+                                realm1.where(ChatContent.class).findAll().deleteAllFromRealm();
 
-                                Config.settingInit(getApplicationContext(), realm);
+                                Config.settingInit(getApplicationContext(), realm1);
                             }, new Realm.Transaction.OnSuccess() {
                                 @Override
                                 public void onSuccess() {
@@ -147,10 +154,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 }
                             });
                         } else {
-                            Log.e("else", "else문");
                             /**
                              * uid, token을 firestore에 올리는 작업
                              */
+                            Log.e("equal", "true");
                             FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
                             firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

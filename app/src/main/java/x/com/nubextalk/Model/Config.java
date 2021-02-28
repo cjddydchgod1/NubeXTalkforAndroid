@@ -6,6 +6,7 @@
 package x.com.nubextalk.Model;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,9 +21,8 @@ import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.UtilityManager;
 
 public class Config extends RealmObject {
-    @NonNull
+//    @NonNull
     @PrimaryKey
-    private String oid;
     @NonNull
     private String CODENAME;
     @NonNull
@@ -33,12 +33,12 @@ public class Config extends RealmObject {
     private String ext4;
     private String ext5;
 
-    public String getOid() {
-        return oid;
-    }
-    public void setOid(String oid) {
-        this.oid = oid;
-    }
+//    public String getOid() {
+//        return oid;
+//    }
+//    public void setOid(String oid) {
+//        this.oid = oid;
+//    }
     @NonNull
     public String getCODENAME() {
         return CODENAME;
@@ -89,6 +89,7 @@ public class Config extends RealmObject {
         realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {
+            Log.e("init", "try");
             jsonArray = new JSONArray(UtilityManager.loadJson(context, "config.json"));
             RealmList<Config> list = new RealmList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -101,10 +102,12 @@ public class Config extends RealmObject {
                 config.setExt4(jsonArray.getJSONObject(i).getString("ext4"));
                 config.setExt5(jsonArray.getJSONObject(i).getString("ext5"));
                 list.add(config);
+                Log.e("init", jsonArray.getJSONObject(i).getString("CODENAME"));
             }
             realm.copyToRealmOrUpdate(list);
         }
         catch (JSONException e) {
+            Log.e("init", "catch");
             e.printStackTrace();
         }
     }

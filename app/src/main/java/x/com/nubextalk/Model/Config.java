@@ -33,12 +33,6 @@ public class Config extends RealmObject {
     private String ext4;
     private String ext5;
 
-//    public String getOid() {
-//        return oid;
-//    }
-//    public void setOid(String oid) {
-//        this.oid = oid;
-//    }
     @NonNull
     public String getCODENAME() {
         return CODENAME;
@@ -85,7 +79,6 @@ public class Config extends RealmObject {
     }
 
     public static void settingInit(Context context, Realm realm){
-        realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findAll().deleteAllFromRealm();
         realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {

@@ -72,13 +72,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         intent = new Intent(getApplicationContext(), MainActivity.class);
         Config myAutoLogin = Config.getAutoLogin(realm);
         if(myAutoLogin != null) {
-            if(myAutoLogin.getExt1().equals("checked")) {
+            if(myAutoLogin.getExt1().equals("true")) {
                 apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         startActivity(intent);
                     }
-
                     @Override
                     public void onFail() {
                         Toast.makeText(LoginActivity.this, "자동 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
@@ -125,7 +124,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                          * 다른 사용자가 로그인했다면 데이터 삭제 및 해당 사용자가 속해있는 ChatRoom을 가져오기
                          */
                         if(!equalUID) {
-                            Log.e("equal", "false");
                             realm.executeTransactionAsync(realm1 -> {
                                 realm1.where(User.class).findAll().deleteAllFromRealm();
                                 realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();

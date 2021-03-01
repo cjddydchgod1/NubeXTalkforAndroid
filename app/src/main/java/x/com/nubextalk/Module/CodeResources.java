@@ -36,8 +36,11 @@ public class CodeResources {
     public static final String EMPTY_IMAGE = "empty image";
     public static final String COMPLETE_DOWNLOAD = "다운로드 완료";
 
-
-
+    /** ThemeMode Resource **/
+    public static final String THEME_MODE   = "theme mode";
+    public static final int LIGHT_MODE      = 0;
+    public static final int DARK_MODE       = 1;
+    public static final int USER_MODE       = 2;
 
 }
 

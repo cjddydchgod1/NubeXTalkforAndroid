@@ -5,15 +5,27 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.realm.Realm;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
 
 /**
  * FireBase Functions 함수 기능 부분
@@ -102,7 +114,9 @@ public class FirebaseFunctionsManager {
     }
 
     /**
-     * Firebase Functions 통해 FireStore 에서 사용자가 현재 참여중인 채팅방 id 가져오기
+     * Firebase Functions 통해 FireStore 에서 사용자가 현재 참여중인 채팅방 id 가져오고 채팅방 id 가 존재하면 realm
+     * 로컬에 생성한다.
+     *
      * @param hospitalId
      * @param userId
      * @return
@@ -118,7 +132,65 @@ public class FirebaseFunctionsManager {
         params.put("userId", userId);
 
         return functions.getHttpsCallable("getUserAttendingChatRoom")
-                .call(params);
+                .call(params).addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<HttpsCallableResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                        Gson gson = new Gson();
+                        try {
+                            JSONObject result = new JSONObject(gson.toJson(task.getResult())).getJSONObject("data");
+//                            Log.d("login test", "user chatroom list: " + result.toString());
+
+                            // 유저 참여중이던 채팅방 id 가 존재하면 채팅방 데이터륿 불러와서 로컬에 생성해준다.
+                            if (result.getInt("code") == 200) {
+                                JSONArray dataJsonArray = result.getJSONArray("data");
+                                ArrayList<String> chatRoomIdList = new ArrayList<>();
+
+                                for (int i = 0; i < dataJsonArray.length(); i++) {
+                                    chatRoomIdList.add(dataJsonArray.getString(i));
+                                }
+
+                                for (String rid : chatRoomIdList) {
+//                                    Log.d("login test", "chatroom id: " + rid);
+                                    getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
+                                            .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<HttpsCallableResult>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                                                    Map<String, Object> value = new HashMap<>();
+                                                    try {
+                                                        Realm realm = Realm.getInstance(UtilityManager.getRealmConfig());
+                                                        JSONObject chatRoomResult = new JSONObject(gson.toJson(task.getResult().getData())).getJSONObject("chatRoom");
+                                                        JSONArray chatRoomMemberResult = new JSONObject(gson.toJson(task.getResult().getData())).getJSONArray("chatRoomMember");
+                                                        ArrayList<String> userIdList = new ArrayList<>();
+//                                                        Log.d("login test", "chat room data got: " + chatRoomResult.toString());
+                                                        value.put("rid", rid);
+                                                        value.put("title", chatRoomResult.getString("roomName"));
+                                                        value.put("roomImgUrl", chatRoomResult.getString("roomImg"));
+                                                        value.put("updatedDate", chatRoomResult.getString("updatedDate"));
+                                                        value.put("notificationId", chatRoomResult.get("notificationId"));
+
+                                                        for (int i = 0; i < chatRoomMemberResult.length(); i++) {
+                                                            userIdList.add(chatRoomMemberResult.getString(i));
+                                                        }
+
+                                                        ChatRoom.createChatRoom(realm, value, userIdList, new ChatRoom.OnChatRoomCreatedListener() {
+                                                            @Override
+                                                            public void onCreate(ChatRoom chatRoom) {
+//                                                                Log.d("login test", "chat room " + chatRoom.getRoomName() + " created!");
+                                                            }
+                                                        });
+
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     /**
@@ -179,7 +251,7 @@ public class FirebaseFunctionsManager {
      */
     public static Task<HttpsCallableResult> checkIfOneOnOneChatRoomExists(
             @NonNull String hospitalId, @NonNull String myUserId, @NonNull String anotherUserId) {
-        return checkIfOneOnOneChatRoomExists(hospitalId, myUserId, anotherUserId,null);
+        return checkIfOneOnOneChatRoomExists(hospitalId, myUserId, anotherUserId, null);
     }
 
     public static Task<HttpsCallableResult> checkIfOneOnOneChatRoomExists(

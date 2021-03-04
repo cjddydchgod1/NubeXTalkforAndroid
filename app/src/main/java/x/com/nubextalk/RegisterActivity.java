@@ -54,12 +54,11 @@ public class RegisterActivity extends AppCompatActivity {
                     public void execute(Realm realm) {
                         Config serverInfo = Config.getServerInfo(realm);
                         String ssl = sslInput.isChecked() ? "https://" : "http://";
-                        String host = hostInput.getText().toString().equals("") ? "192.168.3.156" : hostInput.getText().toString();
+                        String host = hostInput.getText().toString().equals("") ? "121.166.85.235" : hostInput.getText().toString();
                         String port = portInput.getText().toString().equals("") ? "" : ":".concat(portInput.getText().toString());
                         String name = nameInput.getText().toString().equals("") ? "" : nameInput.getText().toString();
                         if (serverInfo == null) {
                             serverInfo = new Config();
-                            serverInfo.setOid("[null]");
                             serverInfo.setCODENAME("ServerInfo");
                             serverInfo.setCODE("ServerInfo");
                         }
@@ -72,14 +71,14 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
                 clearModels(realm);
-                startActivity(new Intent(activity, LoginActivity.class));
-                finish();
+                startActivity(new Intent(activity, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
     }
 
     /**
      * 서버 최초 등록 및 재등록 시에 Config 모델을 제외한 나머지 모델들 데이터 초기화 함수
+     *
      * @param realm
      */
     private void clearModels(Realm realm) {

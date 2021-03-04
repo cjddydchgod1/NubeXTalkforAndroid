@@ -31,7 +31,7 @@
                     android:id="@+id/my_profileImage"
                     android:layout_width="@dimen/profile_image_m"
                     android:layout_height="@dimen/profile_image_m"
-                    android:src="@drawable/baseline_account_circle_black_24dp"
+                    android:src="@drawable/baseline_account_circle_white_24dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,6 +50,7 @@
                 android:paddingStart="@dimen/padding_l"
                 android:textSize="@dimen/txt_xl"
                 android:textStyle="bold"
+                android:textColor="@color/cWhite"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/profileFrameLayout"
                 app:layout_constraintTop_toTopOf="parent" />

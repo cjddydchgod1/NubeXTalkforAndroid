@@ -4,14 +4,24 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/padding_s">
 
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_profile_image"
         android:layout_width="@dimen/profile_image_xs"
-        android:layout_height="@dimen/profile_image_xs"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_date" />
+        app:layout_constraintTop_toBottomOf="@+id/chat_date">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="@dimen/profile_image_xs"
+            android:layout_height="@dimen/profile_image_xs"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/profile_name"
@@ -19,23 +29,26 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_m"
         app:layout_constraintBottom_toTopOf="@+id/other_chat_pacs"
-        app:layout_constraintStart_toEndOf="@+id/profile_image"
+        app:layout_constraintStart_toEndOf="@+id/layout_profile_image"
         app:layout_constraintTop_toBottomOf="@+id/chat_date" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/other_chat_pacs"
         android:layout_width="250dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_m"
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
+        android:minHeight="96dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_image">
+        app:layout_constraintStart_toEndOf="@+id/layout_profile_image">
 
         <TextView
             android:id="@+id/other_pacs_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="96dp"
             android:padding="@dimen/padding_l"
             android:text=""
             app:layout_constraintStart_toStartOf="parent"
@@ -43,18 +56,20 @@
 
         <Button
             android:id="@+id/other_pacs_button"
+            style="?android:attr/borderlessButtonStyle"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_l"
-
+            android:layout_margin="@dimen/margin_s"
             android:background="@drawable/bg_chat_text"
             android:padding="@dimen/padding_m"
-            android:text="PACS 조회하기"
+            android:text="@string/search_pacs"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/other_pacs_description"
+
 
             />
 
@@ -82,12 +97,13 @@
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_date">
+        app:layout_constraintTop_toBottomOf="@+id/chat_date">
 
         <TextView
             android:id="@+id/my_pacs_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="96dp"
             android:padding="@dimen/padding_l"
             android:text=""
             app:layout_constraintStart_toStartOf="parent"
@@ -95,20 +111,20 @@
 
         <Button
             android:id="@+id/my_pacs_button"
+            style="?android:attr/borderlessButtonStyle"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_l"
-
+            android:layout_margin="@dimen/margin_s"
             android:background="@drawable/bg_chat_text"
             android:padding="@dimen/padding_m"
-            android:text="PACS 조회하기"
+            android:text="@string/search_pacs"
+
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/my_pacs_description"
-
-            />
+            app:layout_constraintTop_toBottomOf="@id/my_pacs_description" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

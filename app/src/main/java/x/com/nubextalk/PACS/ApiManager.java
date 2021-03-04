@@ -6,6 +6,7 @@
 package x.com.nubextalk.PACS;
 
 import android.content.Context;
+import android.util.Log;
 
 import io.realm.Realm;
 import okhttp3.FormBody;
@@ -57,8 +58,9 @@ public class ApiManager {
      */
     public void login(onLoginApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
+        Config myAutoLogin = Config.getAutoLogin(realm);
         if (myAccount != null) {
-            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getAutoLogin(), listener);
+            login(myAccount.getExt1(), myAccount.getExt2(), myAutoLogin.getExt1(), listener);
         }
     }
 
@@ -68,7 +70,7 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, boolean autoLogin, onLoginApiListener listener) {
+    public void login(String id, String pwd, String autoLogin, onLoginApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
@@ -92,7 +94,9 @@ public class ApiManager {
                                     realm.executeTransaction(new Realm.Transaction() {
                                         @Override
                                         public void execute(Realm realm) {
+
                                             Config myAccount = Config.getMyAccount(realm);
+
                                             if(myAccount == null){
                                                 myAccount = new Config();
                                                 myAccount.setCODENAME("MyAccount");
@@ -101,14 +105,37 @@ public class ApiManager {
                                             myAccount.setExt1(id);
                                             myAccount.setExt2(pwd);
                                             myAccount.setExt3(cookie.toUpperCase());
-                                            myAccount.setAutoLogin(autoLogin);
                                             realm.copyToRealmOrUpdate(myAccount);
 
-                                            if (listener != null) {
-                                                listener.onSuccess(response, body);
+
+                                            /** 자동 로그인 설정 **/
+                                            Config myAutoLogin = Config.getAutoLogin(realm);
+                                            if(myAutoLogin == null){
+                                                myAutoLogin = new Config();
+                                                myAutoLogin.setCODENAME("AutoLogin");
+                                                myAutoLogin.setCODE("AutoLogin");
                                             }
+                                            myAutoLogin.setExt1(autoLogin);
+                                            realm.copyToRealmOrUpdate(myAutoLogin);
+
+
+                                            /** 마지막 로그인한 ID 기억 **/
+                                            Config lastLoginID = Config.getLastLoginID(realm);
+                                            if(lastLoginID == null){
+                                                lastLoginID = new Config();
+                                                lastLoginID.setCODENAME("LastLoginID");
+                                                lastLoginID.setCODE("LastLoginID");
+                                            }
+                                            lastLoginID.setExt1(id);
+
+
+                                            realm.copyToRealmOrUpdate(lastLoginID);
+
                                         }
                                     });
+                                    if (listener != null) {
+                                        listener.onSuccess(response, body);
+                                    }
                                 }
                             } catch (Exception e){
                                 if(listener != null){

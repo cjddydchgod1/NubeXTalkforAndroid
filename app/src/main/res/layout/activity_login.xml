@@ -14,20 +14,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@color/colorPrimaryDark" />
+        android:layout_weight="1"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center">
+        android:layout_weight="4"
+        android:layout_gravity="center">
 
-        <TextView
+        <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NubeXTalk"
-            android:textSize="@dimen/txt_GGl" />
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_main"
+            android:scaleType="centerInside"/>
 
     </LinearLayout>
 
@@ -35,47 +34,26 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="4"
         android:orientation="vertical"
         tools:context=".LoginActivity">
-
-
-        <EditText
-            android:id="@+id/login_hospital_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_l"
-
-            android:hint="HOSPITAL"
-            android:inputType="text"
-
-
-            app:layout_constraintBottom_toTopOf="@+id/login_id_edit"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <EditText
             android:id="@+id/login_id_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_l"
-
-            android:hint="USER ID"
+            android:hint="@string/hint_user_id"
             android:inputType="text"
-
-
             app:layout_constraintBottom_toTopOf="@+id/login_password_edit"
-            app:layout_constraintTop_toBottomOf="@id/login_hospital_edit" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/login_password_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_l"
-
-            android:hint="PASSWORD"
+            android:hint="@string/hint_password"
             android:inputType="textPassword"
-
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_id_edit" />
 
@@ -85,7 +63,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -94,16 +72,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="@dimen/margin_l"
             android:background="@color/cWhite"
-            android:text="sign up" />
+            android:text="@string/sign_hospital" />
 
         <Button
             android:id="@+id/login_sign_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_l"
             android:layout_marginTop="10dp"
             android:background="@color/cWhite"
-            android:text="sign in" />
+            android:text="@string/login" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -114,13 +94,12 @@
             android:id="@+id/checkAutoLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="자동 로그인"/>
+            android:text="@string/auto_login"/>
     </LinearLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@color/colorPrimaryDark" />
+        android:layout_weight="2"/>
 </LinearLayout>

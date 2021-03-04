@@ -24,7 +24,7 @@ public class FirebaseStoreManager {
         Map<String, Object> data = new HashMap<>();
         data.put("uid", userid);
         data.put("fcm", token);
-        return hospital.collection("users").document(userid).set(data);
+        return hospital.collection("users").document(userid).set(data, SetOptions.merge());
     }
     public void deleteToken(String userid) {
         hospital.collection("users").document(userid).delete();

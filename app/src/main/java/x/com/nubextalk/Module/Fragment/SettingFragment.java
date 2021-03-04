@@ -8,12 +8,14 @@ package x.com.nubextalk.Module.Fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +56,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
             mActivity = (Activity) context;
         super.onAttach(context);
     }
-
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,7 +102,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         cleanView(mWrapperVesionInfo);
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        RelativeLayout l;
+        RelativeLayout l, l1;
 
         /** APP **/
 

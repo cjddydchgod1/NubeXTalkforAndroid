@@ -598,10 +598,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                             @Override
                             public void onSuccess(HttpsCallableResult httpsCallableResult) {
                                 Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
-                                fs.collection("hospital").document(mHid)
-                                        .collection("chatRoom").document(mRid)
-                                        .collection("chatContent").document(cid)
-                                        .set(chat);
+//                                fs.collection("hospital").document(mHid)
+//                                        .collection("chatRoom").document(mRid)
+//                                        .collection("chatContent").document(cid)
+//                                        .set(chat);
+                                FirebaseFunctionsManager.createChat(chat);
                             }
                         });
             } else {
@@ -609,10 +610,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 ChatContent.createChat(realm, chat);
 
                 //서버에 채팅 추가
-                fs.collection("hospital").document(mHid)
-                        .collection("chatRoom").document(mRid)
-                        .collection("chatContent").document(cid)
-                        .set(chat);
+//                fs.collection("hospital").document(mHid)
+//                        .collection("chatRoom").document(mRid)
+//                        .collection("chatContent").document(cid)
+//                        .set(chat);
+                FirebaseFunctionsManager.createChat(chat);
             }
             mEditChat.setText("");
         }
@@ -655,10 +657,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                         @Override
                         public void onSuccess(HttpsCallableResult httpsCallableResult) {
                             Log.d("CHATROOM", "서버에 채팅방 생성 완료!");
-                            fs.collection("hospital").document(mHid)
-                                    .collection("chatRoom").document(mRid)
-                                    .collection("chatContent").document(cid)
-                                    .set(chat);
+//                            fs.collection("hospital").document(mHid)
+//                                    .collection("chatRoom").document(mRid)
+//                                    .collection("chatContent").document(cid)
+//                                    .set(chat);
+                            FirebaseFunctionsManager.createChat(chat);
                         }
                     });
         } else {
@@ -666,10 +669,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             ChatContent.createChat(realm, chat);
 
             //서버에 채팅 추가
-            fs.collection("hospital").document(mHid)
-                    .collection("chatRoom").document(mRid)
-                    .collection("chatContent").document(cid)
-                    .set(chat);
+//            fs.collection("hospital").document(mHid)
+//                    .collection("chatRoom").document(mRid)
+//                    .collection("chatContent").document(cid)
+//                    .set(chat);
+            FirebaseFunctionsManager.createChat(chat);
         }
 
     }

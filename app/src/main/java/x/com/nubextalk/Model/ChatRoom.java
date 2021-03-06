@@ -44,7 +44,8 @@ public class ChatRoom extends RealmObject {
     @NonNull
     private Date updatedDate;
     private String notificationId;
-    private int memberCount = 0;
+    @NonNull
+    private int memberCount;
     private Boolean isGroupChat = false;
 
     @NonNull
@@ -105,6 +106,15 @@ public class ChatRoom extends RealmObject {
 
     public void setUpdatedDate(@NonNull Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    @NonNull
+    public int getMemeberCount() {
+        return memberCount;
+    }
+
+    public void setMemeberCount(int memberCount) {
+        this.memberCount = memberCount;
     }
 
     @NonNull
@@ -195,10 +205,21 @@ public class ChatRoom extends RealmObject {
         String finalRoomImg = roomImg;
         Boolean finalIsGroupChat = isGroupChat;
 
+
+
         // realm 로컬 채팅방 생성
         if (memberCount == 2) { // 1:1 채팅방 생성인 경우 FireStore 에 기존 채팅방 존재 여부 확인
+
+            String anotherUserId = null;
+            for(String userId : userList) {
+                if(!userId.equals(myAccount.getUserId())){
+                    anotherUserId = userId;
+                }
+            }
+
             FirebaseFunctionsManager.checkIfOneOnOneChatRoomExists(
-                    "w34qjptO0cYSJdAwScFQ", myAccount.getUserId(), userList.get(0),
+
+                    "w34qjptO0cYSJdAwScFQ", myAccount.getUserId(), anotherUserId,
                     new FirebaseFunctionsManager.OnCompleteListener() {
                         @Override
                         public void onComplete(String result) {
@@ -297,13 +318,5 @@ public class ChatRoom extends RealmObject {
     public static RealmResults<ChatRoomMember> getChatRoomUsers(Realm realm, String rid) {
         return realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
 
-    }
-
-    public int getMemeberCount() {
-        return memberCount;
-    }
-
-    public void setMemeberCount(int memberCount) {
-        this.memberCount = memberCount;
     }
 }

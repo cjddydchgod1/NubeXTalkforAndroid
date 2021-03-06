@@ -6,6 +6,7 @@
 package x.com.nubextalk.Model;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,9 +21,8 @@ import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.UtilityManager;
 
 public class Config extends RealmObject {
-    @NonNull
+//    @NonNull
     @PrimaryKey
-    private String oid;
     @NonNull
     private String CODENAME;
     @NonNull
@@ -31,21 +31,14 @@ public class Config extends RealmObject {
     private String ext2;
     private String ext3;
     private String ext4;
-    private boolean autoLogin;
-    private boolean screenLock;
-    private boolean alarm;
+    private String ext5;
 
-    public Config () {
-        screenLock = false;
-        alarm = true;
-    }
-
-    public String getOid() {
-        return oid;
-    }
-    public void setOid(String oid) {
-        this.oid = oid;
-    }
+//    public String getOid() {
+//        return oid;
+//    }
+//    public void setOid(String oid) {
+//        this.oid = oid;
+//    }
     @NonNull
     public String getCODENAME() {
         return CODENAME;
@@ -84,29 +77,19 @@ public class Config extends RealmObject {
     public void setExt4(String ext4) {
         this.ext4 = ext4;
     }
-    public boolean getAutoLogin() {
-        return autoLogin;
+    public String getExt5() {
+        return ext5;
     }
-    public void setAutoLogin(boolean autoLogin) {
-        this.autoLogin = autoLogin;
-    }
-    public boolean getScreenLock() {
-        return screenLock;
-    }
-    public void setScreenLock(boolean screenLock) {
-        this.screenLock = screenLock;
-    }
-    public boolean getAlarm() {
-        return alarm;
-    }
-    public void setAlarm(boolean alarm) {
-        this.alarm = alarm;
+    public void setExt5(String ext5) {
+        this.ext5 = ext5;
     }
 
-    public static void init(Context context, Realm realm){
-        realm.where(Config.class).findAll().deleteAllFromRealm();
+    public static void settingInit(Context context, Realm realm){
+        realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findAll().deleteAllFromRealm();
+        realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {
+            Log.e("init", "try");
             jsonArray = new JSONArray(UtilityManager.loadJson(context, "config.json"));
             RealmList<Config> list = new RealmList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -117,12 +100,14 @@ public class Config extends RealmObject {
                 config.setExt2(jsonArray.getJSONObject(i).getString("ext2"));
                 config.setExt3(jsonArray.getJSONObject(i).getString("ext3"));
                 config.setExt4(jsonArray.getJSONObject(i).getString("ext4"));
-                config.setAutoLogin(jsonArray.getJSONObject(i).getBoolean("autoLogin"));
+                config.setExt5(jsonArray.getJSONObject(i).getString("ext5"));
                 list.add(config);
+                Log.e("init", jsonArray.getJSONObject(i).getString("CODENAME"));
             }
             realm.copyToRealmOrUpdate(list);
         }
         catch (JSONException e) {
+            Log.e("init", "catch");
             e.printStackTrace();
         }
     }
@@ -136,5 +121,14 @@ public class Config extends RealmObject {
     }
     public static String getMyUID(Realm realm){
         return getMyAccount(realm).getExt1();
+    }
+    public static Config getAutoLogin(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findFirst();
+    }
+    public static Config getAlarm(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME","Alarm").findFirst();
+    }
+    public static Config getLastLoginID(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "LastLoginID").findFirst();
     }
 }

@@ -102,6 +102,26 @@ public class FirebaseFunctionsManager {
     }
 
     /**
+     * Firebase Functions 통해 FireStore 에서 사용자가 현재 참여중인 채팅방 id 가져오기
+     * @param hospitalId
+     * @param userId
+     * @return
+     */
+    public static Task<HttpsCallableResult> getUserAttendingChatRoom(@NonNull String hospitalId, @NonNull String userId) {
+        return getUserAttendingChatRoom(hospitalId, userId, null);
+    }
+
+    public static Task<HttpsCallableResult> getUserAttendingChatRoom(@NonNull String hospitalId, @NonNull String userId, OnCompleteListener onCompleteListener) {
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        Map<String, Object> params = new HashMap<>();
+        params.put("hospitalId", hospitalId);
+        params.put("userId", userId);
+
+        return functions.getHttpsCallable("getUserAttendingChatRoom")
+                .call(params);
+    }
+
+    /**
      * 기존 채팅방에서 새로운 유저들이 추가되면 해당 유저들에게 fcm 메세지 보내는 함수
      *
      * @param data 병원 id, 유저들 userId, 채팅방 id 가 담긴 데이터 Map

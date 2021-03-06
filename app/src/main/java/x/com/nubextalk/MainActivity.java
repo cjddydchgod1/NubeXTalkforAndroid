@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private SettingFragment settingFrag = new SettingFragment();
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private FragmentTransaction fragmentTransaction;
+    private FragmentTransaction fragmentTransaction2;
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
     private String token;
@@ -70,12 +71,17 @@ public class MainActivity extends AppCompatActivity {
         // Begin fragment transaction
         String requestChatList = getIntent().getStringExtra("requestChatList");
         fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction2 = fragmentManager.beginTransaction();
+
         if (UtilityManager.checkString(requestChatList)) {
             fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
             bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
             fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
             bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+        }
+        if (UtilityManager.isTablet(this)) {
+            fragmentTransaction2.replace(R.id.tablet_main_side, pacsReferenceFrag).commitAllowingStateLoss();
         }
     }
 

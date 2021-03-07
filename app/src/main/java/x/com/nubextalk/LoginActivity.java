@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 /** 마지막으로 로그인한 아이디와 일치하는지 확인 **/
                 Config lastLoginID = Config.getLastLoginID(realm);
-                if(lastLoginID == null || UtilityManager.checkString(lastLoginID.getExt1()))
+                if(lastLoginID == null)
                     equalUID = false;
                 else {
                     if(lastLoginID.getExt1().equals(id))
@@ -125,7 +125,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                          * 다른 사용자가 로그인했다면 데이터 삭제 및 해당 사용자가 속해있는 ChatRoom을 가져오기
                          */
                         if(!equalUID) {
-                            Log.e("equal", "false");
                             realm.executeTransactionAsync(realm1 -> {
                                 realm1.where(User.class).findAll().deleteAllFromRealm();
                                 realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
@@ -136,16 +135,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             }, new Realm.Transaction.OnSuccess() {
                                 @Override
                                 public void onSuccess() {
-                                    /**
-                                     * uid, token을 firestore에 올리는 작업
-                                     */
-                                    FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                                    firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            startActivity(intent);
-                                        }
-                                    });
+                                    updateFirebaseStore(id);
                                 }
                             }, new Realm.Transaction.OnError() {
                                 @Override
@@ -154,17 +144,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 }
                             });
                         } else {
-                            /**
-                             * uid, token을 firestore에 올리는 작업
-                             */
-                            Log.e("equal", "true");
-                            FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                            firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    startActivity(intent);
-                                }
-                            });
+                            updateFirebaseStore(id);
                         }
                     }
 
@@ -175,5 +155,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 });
                 break;
         }
+    }
+
+    /**
+     * uid, token을 firestore에 올리는 작업
+     */
+    private void updateFirebaseStore(String id) {
+        FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
+        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                startActivity(intent);
+            }
+        });
     }
 }

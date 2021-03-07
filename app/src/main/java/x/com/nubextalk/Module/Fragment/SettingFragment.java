@@ -6,30 +6,30 @@
 package x.com.nubextalk.Module.Fragment;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.joanzapata.iconify.widget.IconTextView;
 
 import io.realm.Realm;
 import x.com.nubextalk.HowToUseActivity;
+import x.com.nubextalk.LoadingActivity;
 import x.com.nubextalk.LoginActivity;
+import x.com.nubextalk.Manager.FcmTokenRefreshService;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
@@ -154,12 +154,17 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
                     autoLogin.setExt1("false");
                     realm1.copyToRealmOrUpdate(autoLogin);
                 });
+                /** Firebase에서 Token값 삭제 **/
                 FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
                 firebaseStoreManager.deleteToken(myAccount.getExt1());
 
+                /** token삭제 후 재발급 **/
+                Intent tokenIntent = new Intent(mActivity, LoginActivity.class);
+                tokenIntent.setClass(mActivity.getApplication(), FcmTokenRefreshService.class);
+                mActivity.startService(tokenIntent);
+
                 intent = new Intent(mActivity, LoginActivity.class);
                 startActivity(intent);
-                mActivity.finish();
                 break;
             case EXE_HOWTOUSE:
                 intent = new Intent(mActivity, HowToUseActivity.class);

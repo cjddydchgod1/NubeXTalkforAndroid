@@ -95,6 +95,10 @@
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
         <activity android:name=".Example.ExampleList" />
+
+        <service android:name=".Manager.FcmTokenRefreshService"
+            android:exported="true"/>
+
     </application>
 
 </manifest>

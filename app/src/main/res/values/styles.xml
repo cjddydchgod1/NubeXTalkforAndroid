@@ -15,8 +15,11 @@
         <item name="android:label">@color/cWhite</item>
         <item name="bgColor">@color/colorPrimary</item>
         <item name="textColor">@color/cBlack</item>
+
+        <item name="bgButton">@color/colorPrimaryDark</item>
+        <item name="bgToolbar">@color/cBackground</item>
         <item name="bgBottomSheetColor">@color/colorPrimary</item>
-        <item name="bgChatRoomColor">@color/colorPrimary</item>
+        <item name="bgChatRoomColor">@color/cChatRoomBackground</item>
         <item name="bgSettingIconColor">@color/colorPrimary</item>
         <item name="bgSettingClickColor">@color/cWhiteGray</item>
 

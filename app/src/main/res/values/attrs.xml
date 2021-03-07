@@ -7,6 +7,8 @@
 <resources>
     <attr name="bgColor" format="color"/>
     <attr name="textColor" format="color"/>
+    <attr name="bgButton" format="color"/>
+    <attr name="bgToolbar" format="color"/>
     <attr name="bgBottomSheetColor" format="color"/>
     <attr name="bgChatRoomColor" format="color"/>
     <attr name="bgSettingIconColor" format="color"/>

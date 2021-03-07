@@ -19,7 +19,8 @@ import x.com.nubextalk.Model.Config;
 
 public class ThemeModeActivity extends AppCompatActivity {
     private RadioGroup radioGroup;
-    SharedPreferences sharedPreferences;
+    private RadioButton rb_1, rb_2, rb_3;
+    private SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +28,21 @@ public class ThemeModeActivity extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        radioGroup = findViewById(R.id.radioGroupTheme);
+        radioGroup  = findViewById(R.id.radioGroupTheme);
+        rb_1        = findViewById(R.id.rgt_btn1);
+        rb_2        = findViewById(R.id.rgt_btn2);
+        rb_3        = findViewById(R.id.rgt_btn3);
+        rb_1.setChecked(getThemeMode()==LIGHT_MODE);
+        rb_2.setChecked(getThemeMode()==DARK_MODE);
+        rb_3.setChecked(getThemeMode()==USER_MODE);
+        changeTheme();
+
+    }
+    public int getThemeMode(){
+        return sharedPreferences.getInt(THEME_MODE, USER_MODE);
+    }
+
+    public void changeTheme() {
         radioGroup.setOnCheckedChangeListener((radioGroup1, i) -> {
             if(i == R.id.rgt_btn1){
                 sharedPreferences.edit().putInt(THEME_MODE, LIGHT_MODE).apply();

@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/margin_l"
-            android:background="@color/cWhite"
+            android:background="?attr/bgButton"
             android:text="@string/sign_hospital" />
 
         <Button
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_l"
             android:layout_marginTop="10dp"
-            android:background="@color/cWhite"
+            android:background="?attr/bgButton"
             android:text="@string/login" />
     </LinearLayout>
     <LinearLayout

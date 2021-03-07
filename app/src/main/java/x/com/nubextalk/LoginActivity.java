@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         intent = new Intent(getApplicationContext(), MainActivity.class);
         Config myAutoLogin = Config.getAutoLogin(realm);
         if(myAutoLogin != null) {
-            if(myAutoLogin.getExt1().equals("checked")) {
+            if(myAutoLogin.getExt1().equals("true")) {
                 apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 /** 마지막으로 로그인한 아이디와 일치하는지 확인 **/
                 Config lastLoginID = Config.getLastLoginID(realm);
-                if(lastLoginID == null || UtilityManager.checkString(lastLoginID.getExt1()))
+                if(lastLoginID == null)
                     equalUID = false;
                 else {
                     if(lastLoginID.getExt1().equals(id))

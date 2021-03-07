@@ -85,7 +85,6 @@ public class Config extends RealmObject {
     }
 
     public static void settingInit(Context context, Realm realm){
-        realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findAll().deleteAllFromRealm();
         realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {

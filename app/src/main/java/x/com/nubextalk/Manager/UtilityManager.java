@@ -8,6 +8,7 @@ package x.com.nubextalk.Manager;
 import android.animation.ObjectAnimator;
 import android.animation.StateListAnimator;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -164,5 +165,17 @@ public class UtilityManager {
         } else {
             ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(i);
         }
+    }
+
+    /**
+     class 파일 에서 tablet 확인
+     **/
+    public static boolean isTablet(Context context) {
+        int screenSizeType = context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        if(screenSizeType==Configuration.SCREENLAYOUT_SIZE_XLARGE || screenSizeType==Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            return true;
+        }
+        return false;
     }
 }

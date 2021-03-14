@@ -37,7 +37,9 @@ public class FirebaseFunctionsManager {
 
     public static final String FUNTION_TEST = "executeTest";
     public static final String FUNCTION_CREATE_CHAT_ROOM = "createChatRoom";
+    public static final String FUNTION_CREATE_CHAT = "createChat";
     public static final String FUNCTION_GET_CHAT_ROOM = "getChatRoom";
+
 
     /**
      * Interface
@@ -89,6 +91,32 @@ public class FirebaseFunctionsManager {
                 .getHttpsCallable(FUNCTION_CREATE_CHAT_ROOM)
                 .call(params);
 
+    }
+
+    /**
+     * Firebase Functions 통해 FireStore 에 채팅 메세지 생성 후 채팅방 유저들에게 FCM 메세지 보냄
+     * @param data
+     * @return
+     */
+    public static Task<HttpsCallableResult> createChat(@NonNull Map data) {
+        return createChat(data, null);
+    }
+
+    public static Task<HttpsCallableResult> createChat(@NonNull Map data, OnCompleteListener onCompleteListener) {
+        FirebaseFunctions functions = FirebaseFunctions.getInstance("asia-northeast3");
+        Map<String, Object> params = new HashMap<>();
+//        params.put("hospitalId", data.get("hid"));
+        params.put("hospitalId", "w34qjptO0cYSJdAwScFQ");
+        params.put("chatRoomId", data.get("rid"));
+        params.put("chatContentId", data.get("cid"));
+        params.put("senderId", data.get("uid"));
+        params.put("content", data.get("content"));
+        params.put("type", data.get("type"));
+        params.put("ext1", data.get("ext1"));
+
+        return functions
+                .getHttpsCallable(FUNTION_CREATE_CHAT)
+                .call(params);
     }
 
     /**

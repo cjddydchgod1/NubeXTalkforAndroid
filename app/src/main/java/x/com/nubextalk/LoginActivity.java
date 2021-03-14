@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 
 import io.realm.Realm;
 import okhttp3.Response;
+import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
@@ -165,6 +166,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                FirebaseFunctionsManager.getUserAttendingChatRoom("w34qjptO0cYSJdAwScFQ", id);
                 startActivity(intent);
             }
         });

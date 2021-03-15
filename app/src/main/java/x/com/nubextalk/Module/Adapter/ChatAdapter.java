@@ -9,6 +9,7 @@ package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
@@ -29,12 +33,16 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import x.com.nubextalk.ChatImageViewActivity;
+import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
+import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Module.Fragment.PACSFriendListFragment;
+import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
@@ -53,14 +61,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private User mUserData;
     private RealmResults<ChatContent> mChatData;
     private String mUid;
+    private FragmentManager mFragmentManager;
 
-    public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog) {
+    public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog, FragmentManager fragmentManager) {
         this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
 
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
         this.mUid = Config.getMyUID(realm);
+        this.mFragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -204,7 +214,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         Intent intent = new Intent(mContext, ChatImageViewActivity.class);
                         intent.putExtra("cid", chat.getCid());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        mContext.startActivity(intent);
+
                     }
                 });
 
@@ -226,10 +236,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.myChatPacs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(mContext, ImageViewActivity.class);
-                        intent.putExtra("studyId", chat.getExt1());
-                        Log.d("PACS", chat.getExt1());
-                        mContext.startActivity(intent);
+                        if (UtilityManager.isTablet(mContext)) {
+                            Fragment fragment = new PACSReferenceFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", chat.getExt1());
+
+                            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                            fragment.setArguments(bundle);
+                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                        } else {
+                            Intent intent = new Intent(mContext, ImageViewActivity.class);
+                            intent.putExtra("studyId", chat.getExt1());
+                            Log.d("PACS", chat.getExt1());
+                            mContext.startActivity(intent);
+                        }
                     }
                 });
 
@@ -250,10 +270,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.otherChatPacs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(mContext, ImageViewActivity.class);
-                        intent.putExtra("studyId", chat.getExt1());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        mContext.startActivity(intent);
+                        if (UtilityManager.isTablet(mContext)) {
+                            Fragment fragment = new PACSReferenceFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", chat.getExt1());
+
+                            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                            fragment.setArguments(bundle);
+                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                        } else {
+                            Intent intent = new Intent(mContext, ImageViewActivity.class);
+                            intent.putExtra("studyId", chat.getExt1());
+                            Log.d("PACS", chat.getExt1());
+                            mContext.startActivity(intent);
+                        }
                     }
                 });
 

@@ -23,8 +23,10 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 
 import io.realm.Realm;
+import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.PACS.PacsWebView;
 import x.com.nubextalk.R;
@@ -44,7 +46,7 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
     @Override
     public void onAttach(@NonNull Context context) {
         mContext = context;
-        if(context instanceof Activity)
+        if (context instanceof Activity)
             mActivity = (Activity) context;
         super.onAttach(context);
     }
@@ -56,20 +58,32 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mApiManager = new ApiManager(mContext, realm);
 
-        rootview    = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
-        mPacsWebView    = rootview.findViewById(R.id.webView);
+        mActivity.setTitle(getString(R.string.PACSReference));
+
+        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
+        mPacsWebView = rootview.findViewById(R.id.webView);
         /* 쿠키 생성 후 넣기 */
         try {
             mPacsWebView.init(realm);
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {
-            if(realm != null)
+            if (realm != null)
                 realm.close();
         }
-
         mPacsWebView.setJavaScriptListener(this);
-        mPacsWebView.loadUrl("/mobile/app/");
+
+        String studyId = null;
+        if (UtilityManager.isTablet(mContext)) {
+            Bundle bundle = getArguments();
+            studyId = bundle != null ? bundle.getString("studyId") : null;
+        }
+
+        if (UtilityManager.checkString(studyId)) {
+            mPacsWebView.loadUrl("/mobile/app/?studyId=" + studyId);
+        } else {
+            mPacsWebView.loadUrl("/mobile/app/");
+        }
         return rootview;
     }
 
@@ -82,16 +96,19 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
 
     @Override
     public void onCall(String func, String... arg) {
-        switch (func){
+        switch (func) {
             case "shareApp":
-                Intent intent = new Intent(mActivity, SharePACSActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("studyId", arg[0]);
-                bundle.putString("description", arg[1]);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                if (mActivity instanceof ChatRoomActivity) {
+                    ((ChatRoomActivity) mActivity).sendPacs(arg[0], arg[1], Realm.getInstance(UtilityManager.getRealmConfig()));
+                } else {
+                    Intent intent = new Intent(mActivity, SharePACSActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("studyId", arg[0]);
+                    bundle.putString("description", arg[1]);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
                 break;
         }
-
     }
 }

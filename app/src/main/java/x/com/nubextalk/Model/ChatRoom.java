@@ -205,10 +205,20 @@ public class ChatRoom extends RealmObject {
         String finalRoomImg = roomImg;
         Boolean finalIsGroupChat = isGroupChat;
 
+
         // realm 로컬 채팅방 생성
         if (memberCount == 2) { // 1:1 채팅방 생성인 경우 FireStore 에 기존 채팅방 존재 여부 확인
+
+            String anotherUserId = null;
+            for (String userId : userList) {
+                if (!userId.equals(myAccount.getUserId())) {
+                    anotherUserId = userId;
+                }
+            }
+
             FirebaseFunctionsManager.checkIfOneOnOneChatRoomExists(
-                    "w34qjptO0cYSJdAwScFQ", myAccount.getUserId(), userList.get(0),
+
+                    "w34qjptO0cYSJdAwScFQ", myAccount.getUserId(), anotherUserId,
                     new FirebaseFunctionsManager.OnCompleteListener() {
                         @Override
                         public void onComplete(String result) {
@@ -237,10 +247,10 @@ public class ChatRoom extends RealmObject {
                                         ChatRoomMember.addChatRoomMember(realm, rid[0], uid, new ChatRoomMember.OnChatRoomMemberListener() {
                                             @Override
                                             public void onCreate() {
-                                                onChatRoomCreatedListener.onCreate(chatRoom);
                                             }
                                         });
                                     }
+                                    onChatRoomCreatedListener.onCreate(chatRoom);
 
                                 }
                             });
@@ -267,10 +277,10 @@ public class ChatRoom extends RealmObject {
                         ChatRoomMember.addChatRoomMember(realm, rid[0], uid, new ChatRoomMember.OnChatRoomMemberListener() {
                             @Override
                             public void onCreate() {
-                                onChatRoomCreatedListener.onCreate(chatRoom);
                             }
                         });
                     }
+                    onChatRoomCreatedListener.onCreate(chatRoom);
                 }
             });
         }

@@ -48,7 +48,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".AddChatMemberActivity" />
         <activity android:name=".ImageViewActivity" />
         <activity
             android:name=".SharePACSActivity"
@@ -96,6 +95,10 @@
         <activity android:name=".Example.Example_Font" />
         <activity android:name=".Example.Example_HttpManager" />
         <activity android:name=".Example.ExampleList" />
+
+        <service android:name=".Manager.FcmTokenRefreshService"
+            android:exported="true"/>
+
     </application>
 
 </manifest>

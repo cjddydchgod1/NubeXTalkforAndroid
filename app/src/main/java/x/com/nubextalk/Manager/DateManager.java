@@ -176,7 +176,7 @@ public class DateManager {
             return day +"일전";
         }
         else{
-            if(sec==0)                  { return "방금 전"; }
+            if(sec<=0)                  { return "방금 전"; }
             else if(sec<60)             { return sec +"초 전"; }
             else if(60<sec&&min<60)     { return min +"분 전"; }
             else if(60<min&&hour<24)    { return hour +"시간 전"; }

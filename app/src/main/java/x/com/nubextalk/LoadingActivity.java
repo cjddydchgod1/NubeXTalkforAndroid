@@ -18,8 +18,6 @@ public class LoadingActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_loading);
-
         /** Theme Mode 설정 **/
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int option = sharedPreferences.getInt(THEME_MODE, USER_MODE);
@@ -38,6 +36,10 @@ public class LoadingActivity extends Activity {
                 }
                 break;
         }
+
+        setContentView(R.layout.activity_loading);
+
+
         startLoading();
     }
 

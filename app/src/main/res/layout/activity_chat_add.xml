@@ -9,7 +9,7 @@
     android:id="@+id/chat_add_search_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/bgColor"
+    android:background="@color/cBackground"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
@@ -18,23 +18,27 @@
         android:id="@+id/chat_add_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@color/colorPrimaryDark"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        app:titleTextColor="@color/cWhite"
         app:layout_constraintBottom_toTopOf="@id/chat_add_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="새로운 채팅방 추가" />
+        app:title="새로운 채팅방 추가" />
 
     <TextView
         android:id="@+id/chat_add_description"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_m"
-        android:layout_marginTop="@dimen/margin_m"
-        android:layout_marginBottom="@dimen/margin_m"
-        android:text="추가된 사용자"
+        android:paddingStart="@dimen/padding_m"
+        android:paddingBottom="@dimen/padding_m"
+        android:paddingTop="@dimen/padding_m"
+        android:text="@string/added_user"
+        android:textColor="@color/cWhite"
+        android:background="@color/colorPrimary"
+        android:elevation="@dimen/elevation_xs"
         app:layout_constraintBottom_toTopOf="@id/chat_added_member_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_add_toolbar" />
@@ -53,7 +57,7 @@
         android:id="@+id/chat_add_chat_user_input"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:hint="사용자 검색"
+        android:hint="@string/search_user"
         app:layout_constraintBottom_toTopOf="@id/chat_add_member_search_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +93,6 @@
             android:layout_marginRight="2dp"
             android:layout_marginBottom="@dimen/margin_s"
             android:layout_weight="1"
-            android:background="?attr/bgButton"
             android:text="확   인" />
 
         <Button
@@ -98,8 +101,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_s"
             android:layout_weight="1"
-
-            android:background="?attr/bgButton"
             android:text="취   소" />
     </LinearLayout>
 

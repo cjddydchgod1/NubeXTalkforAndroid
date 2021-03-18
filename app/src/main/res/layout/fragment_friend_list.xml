@@ -17,7 +17,6 @@
             android:id="@+id/profileConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/bgColor"
             android:padding="6dp">
 
             <FrameLayout
@@ -50,7 +49,6 @@
                 android:paddingStart="@dimen/padding_l"
                 android:textSize="@dimen/txt_xl"
                 android:textStyle="bold"
-                android:textColor="?attr/textColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/profileFrameLayout"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -59,21 +57,24 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/bgColor">
+            android:background="@color/colorPrimary"
+            android:elevation="@dimen/elevation_xs">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/padding_m"
-                android:text="전체"
-                android:textColor="?attr/textColor" />
+                android:paddingStart="@dimen/padding_xl"
+                android:paddingBottom="@dimen/padding_m"
+                android:paddingTop="@dimen/padding_m"
+                android:text="@string/entire_friends"
+                android:textColor="@color/cWhite"
+                />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRecycleview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/bgColor"/>
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <LinearLayout

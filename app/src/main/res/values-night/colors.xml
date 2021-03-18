@@ -16,13 +16,18 @@
 
     <color name="colorPrimary">#384050</color>
     <color name="colorPrimaryDark">#384050</color>
-    <color name="colorAccent">#0e809d</color>
+    <color name="colorAccent">#0F56A3</color>
 
-    <color name="cChatRoomBackground">#384050</color>
-    <color name="cBackground">#384050</color>
+    <color name="cChatRoomBackground">#1C1D20</color>
+    <color name="cBackground">#2E2F33</color>
     <color name="cStatusOn">#5EE49F</color>
     <color name="cStatusOff">#FBEE6B</color>
     <color name="cStatusVac">#E80000</color>
+    <color name="cEditText">#CECED8</color>
+    <color name="cEditTextBackground">#1C1D20</color>
+    <color name="cChatRemain">#F4E558</color>
+    <color name="cSettingIconBackground">#1C1D20</color>
+    <color name="cActionBarIcon">#CECED8</color>
 
     <color name="cGradientStart">#000000</color>
     <color name="cGradientMiddle">#5B1D1D</color>
@@ -35,7 +40,7 @@
     <color name="cBlackLight">#323232</color>
     <color name="cWhite">#FFFFFF</color>
     <color name="cGrey">#696969</color>
-    <color name="cContentText">#747475</color>
+    <color name="cContentText">#DBDBDF</color>
     <color name="cContent">#e3e3e3</color>
     <color name="cContentHalf">#EEe3e3e3</color>
 
@@ -61,10 +66,7 @@
     <color name="cInvalid">#D50000</color>
     <color name="cValid">#00C853</color>
 
-    <color name="mainBackground">#F3F3F3</color>
-    <color name="actionBar">#A8C3B3</color>
-    <color name="menuBar">#B0C2C4</color>
-    <color name="menuBarUnSelected">#D7E2E2</color>
-    <color name="chatRemain">#F4E558</color>
+
+
 
 </resources>

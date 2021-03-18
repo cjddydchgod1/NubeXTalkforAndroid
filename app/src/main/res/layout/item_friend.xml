@@ -42,7 +42,6 @@
             android:paddingStart="@dimen/padding_l"
             android:textSize="@dimen/txt_xl"
             android:textStyle="bold"
-            android:textColor="?attr/textColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/profileFrameLayout"
             app:layout_constraintTop_toTopOf="parent"

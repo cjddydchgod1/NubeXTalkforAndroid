@@ -8,21 +8,11 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:label">@color/cWhite</item>
-        <item name="bgColor">@color/colorPrimary</item>
-        <item name="textColor">@color/cBlack</item>
-
-        <item name="bgButton">@color/colorPrimaryDark</item>
-        <item name="bgToolbar">@color/cBackground</item>
-        <item name="bgBottomSheetColor">@color/colorPrimary</item>
-        <item name="bgChatRoomColor">@color/cChatRoomBackground</item>
-        <item name="bgSettingIconColor">@color/colorPrimary</item>
-        <item name="bgSettingClickColor">@color/cWhiteGray</item>
-
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -55,8 +45,8 @@
         <item name="android:paddingRight">@dimen/padding_m</item>
         <item name="android:layout_marginTop">@dimen/margin_xl</item>
         <item name="android:textSize">15dp</item>
-        <item name="android:textColor">?attr/textColor</item>
-        <item name="android:background">?attr/bgSettingIconColor</item>
+        <item name="android:textColor">@color/cBlack</item>
+        <item name="android:background">@color/cBackground</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 
@@ -73,5 +63,4 @@
         <item name="android:textColor">@color/cContentText</item>
         <item name="android:gravity">center_vertical</item>
     </style>
-
 </resources>

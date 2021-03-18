@@ -13,15 +13,6 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:label">@color/cBlack</item>
-        <item name="bgColor">@color/colorPrimaryDark</item>
-        <item name="textColor">@color/cWhite</item>
-
-        <item name="bgButton">@color/cGrey</item>
-        <item name="bgToolbar">@color/cBackground</item>
-        <item name="bgBottomSheetColor">@color/colorPrimary</item>
-        <item name="bgChatRoomColor">@color/cChatRoomBackground</item>
-        <item name="bgSettingIconColor">@color/cGrey</item>
-        <item name="bgSettingClickColor">@color/cWhiteGray</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -54,8 +45,8 @@
         <item name="android:paddingRight">@dimen/padding_m</item>
         <item name="android:layout_marginTop">@dimen/margin_xl</item>
         <item name="android:textSize">15dp</item>
-        <item name="android:textColor">?attr/textColor</item>
-        <item name="android:background">?attr/bgSettingIconColor</item>
+        <item name="android:textColor">@color/cWhite</item>
+        <item name="android:background">@color/cBackground</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 

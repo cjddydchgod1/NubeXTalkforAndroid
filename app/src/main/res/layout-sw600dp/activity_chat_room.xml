@@ -23,7 +23,7 @@
                 android:id="@+id/toolbar_chat_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimaryDark"
+                android:background="@color/cBackground"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -61,6 +61,9 @@
                 android:maxLength="80"
                 android:maxLines="3"
                 android:padding="@dimen/padding_m"
+                android:layout_marginBottom="@dimen/margin_m"
+                android:textColor="@color/cEditText"
+                android:backgroundTint="@color/cEditTextBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/send_button"
                 app:layout_constraintStart_toStartOf="parent"

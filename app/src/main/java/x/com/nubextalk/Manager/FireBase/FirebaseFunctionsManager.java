@@ -181,7 +181,12 @@ public class FirebaseFunctionsManager {
                                                             uidList.add(chatRoomMemberResult.getString(i));
                                                         }
 
-                                                        ChatRoom.createChatRoom(realm, value, uidList,null);
+                                                        ChatRoom.createChatRoom(realm, value, uidList, new ChatRoom.OnChatRoomCreatedListener() {
+                                                            @Override
+                                                            public void onCreate(ChatRoom chatRoom) {
+
+                                                            }
+                                                        });
 
                                                     } catch (JSONException e) {
                                                         e.printStackTrace();

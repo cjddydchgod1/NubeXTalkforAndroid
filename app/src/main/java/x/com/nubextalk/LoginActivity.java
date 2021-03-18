@@ -76,7 +76,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     public void onSuccess(Response response, String body) {
                         startActivity(mIntent);
                     }
-
                     @Override
                     public void onFail() {
                         Toast.makeText(LoginActivity.this, MSG_LOGIN_FAIL, Toast.LENGTH_SHORT).show();

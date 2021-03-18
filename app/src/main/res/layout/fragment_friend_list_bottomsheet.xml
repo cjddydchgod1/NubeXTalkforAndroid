@@ -7,11 +7,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cWhite"
     android:elevation="@dimen/elevation_l"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="@dimen/padding_xl"
+    android:background="@color/cBackground"
     android:translationY="8000dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -78,7 +78,6 @@
                 android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/cBlack"
                 android:textSize="@dimen/txt_Ml"
                 android:textStyle="bold"
                 android:visibility="visible" />
@@ -87,7 +86,6 @@
                 android:id="@+id/modifyName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/cBlack"
                 android:textSize="@dimen/txt_Ml"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -112,7 +110,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_s"
-                android:background="@color/cWhite"
                 android:elevation="@dimen/elevation_l"
                 android:paddingTop="@dimen/padding_l"
                 android:visibility="invisible">
@@ -171,8 +168,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_l"
-                android:background="#00ff0000"
                 android:drawableLeft="@drawable/ic_chat_black_24"
+                android:background="@color/cTransparent"
                 android:drawablePadding="@dimen/padding_l"
                 android:paddingStart="@dimen/padding_l"
                 android:text="@string/Chatting"
@@ -190,7 +187,6 @@
             android:gravity="center"
             android:padding="@dimen/padding_l"
             android:text="닫기"
-            android:textColor="@color/cBlack"
             android:textSize="@dimen/txt_m"
             android:textStyle="bold" />
 

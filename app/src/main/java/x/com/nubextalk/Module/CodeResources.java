@@ -189,5 +189,13 @@ public class CodeResources {
      */
     public static final int CHAT_ADD = 0;
     public static final int MOVE_TO_CHAT_ROOM = 1;
+
+    /**
+     * ThemeMode Resource
+     */
+    public static final String THEME_MODE = "theme mode";
+    public static final int LIGHT_MODE = 0;
+    public static final int DARK_MODE = 1;
+    public static final int USER_MODE = 2;
 }
 

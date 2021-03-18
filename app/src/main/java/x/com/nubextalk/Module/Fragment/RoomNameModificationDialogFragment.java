@@ -21,16 +21,17 @@ import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.CANCEL;
 import static x.com.nubextalk.Module.CodeResources.CONFIRM;
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.MSG_EMPTY_ROOM_NAME;
 
 public class RoomNameModificationDialogFragment extends DialogFragment {
 
-    private String chatRoomId;
-    private Realm realm1;
+    private String mChatRoomId;
+    private Realm mRealm;
 
     public RoomNameModificationDialogFragment(Realm realm, String rid) {
-        chatRoomId = rid;
-        realm1 = realm;
+        mChatRoomId = rid;
+        mRealm = realm;
     }
 
     @Override
@@ -51,8 +52,8 @@ public class RoomNameModificationDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         EditText roomNameView = getDialog().findViewById(R.id.modified_room_name);
                         String roomName = roomNameView.getText().toString();
-                        if (!roomName.equals("")) {
-                            changeRoomName(chatRoomId, roomName);
+                        if (!roomName.equals(EMPTY)) {
+                            changeRoomName(mChatRoomId, roomName);
                         } else {
                             Toast.makeText(getContext(), MSG_EMPTY_ROOM_NAME, Toast.LENGTH_SHORT).show();
                         }
@@ -69,9 +70,9 @@ public class RoomNameModificationDialogFragment extends DialogFragment {
     }
 
     public void changeRoomName(String chatRoomId, String name) {
-        ChatRoom chatRoom = realm1.where(ChatRoom.class).equalTo("rid", chatRoomId).findFirst();
+        ChatRoom chatRoom = mRealm.where(ChatRoom.class).equalTo("rid", chatRoomId).findFirst();
         if (chatRoom != null) {
-            realm1.executeTransaction(new Realm.Transaction() {
+            mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     chatRoom.setRoomName(name);

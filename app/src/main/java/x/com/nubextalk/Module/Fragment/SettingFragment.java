@@ -37,15 +37,15 @@ import static x.com.nubextalk.Module.CodeResources.*;
 
 public class SettingFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    private ViewGroup rootview;
+    private ViewGroup mRootview;
     private Context mContext;
     private Activity mActivity;
-    private Realm realm;
+    private Realm mRealm;
     private LinearLayout mWrapperApp, mWrapperAccount, mWrapperVesionInfo;
     private IconTextView mWrapperHowToUse;
-    private Config myAccount;
-    private Config alarm;
-    private Config autoLogin;
+    private Config mMyAccount;
+    private Config mAlarm;
+    private Config mAutoLogin;
     @Override
     public void onAttach(@NonNull Context context) {
         mContext = context;
@@ -57,23 +57,23 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        realm               = Realm.getInstance(UtilityManager.getRealmConfig());
-        rootview            = (ViewGroup) inflater.inflate(R.layout.fragment_setting, container, false);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_setting, container, false);
 
-        mWrapperApp           = rootview.findViewById(R.id.wrapperApp);
-        mWrapperAccount       = rootview.findViewById(R.id.wrapperAccount);
-        mWrapperVesionInfo    = rootview.findViewById(R.id.wrapperVesionInfo);
+        mWrapperApp           = mRootview.findViewById(R.id.wrapperApp);
+        mWrapperAccount       = mRootview.findViewById(R.id.wrapperAccount);
+        mWrapperVesionInfo    = mRootview.findViewById(R.id.wrapperVesionInfo);
 
         mActivity.setTitle(TITLE_SETTING);
 
-        mWrapperHowToUse      = rootview.findViewById(R.id.wrapperHowToUse);
+        mWrapperHowToUse      = mRootview.findViewById(R.id.wrapperHowToUse);
 
-        myAccount = Config.getMyAccount(realm);
-        alarm = Config.getAlarm(realm);
-        autoLogin = Config.getAutoLogin(realm);
+        mMyAccount = Config.getMyAccount(mRealm);
+        mAlarm = Config.getAlarm(mRealm);
+        mAutoLogin = Config.getAutoLogin(mRealm);
 
 
-        return rootview;
+        return mRootview;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onDetach() {
-        realm.close();
+        mRealm.close();
         super.onDetach();
     }
 
@@ -106,7 +106,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
         ((IconTextView) l.findViewById(R.id.titleRow)).setText(ALARM);
         SwitchCompat AlarmSwitch = l.findViewById(R.id.switchRow);
-        AlarmSwitch.setChecked(alarm.getExt1().equals("true"));
+        AlarmSwitch.setChecked(mAlarm.getExt1().equals("true"));
         AlarmSwitch.setOnCheckedChangeListener(this);
         AlarmSwitch.setTag(EXE_ALARM);
         l.setOnClickListener(v -> AlarmSwitch.performClick());
@@ -147,13 +147,13 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
                 startActivity(intent);
                 break;
             case EXE_LOGOUT:
-                realm.executeTransaction(realm1 -> {
-                    autoLogin.setExt1("false");
-                    realm1.copyToRealmOrUpdate(autoLogin);
+                mRealm.executeTransaction(realm1 -> {
+                    mAutoLogin.setExt1("false");
+                    realm1.copyToRealmOrUpdate(mAutoLogin);
                 });
                 /** Firebase에서 Token값 삭제 **/
                 FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-                firebaseStoreManager.deleteToken(myAccount.getExt1());
+                firebaseStoreManager.deleteToken(mMyAccount.getExt1());
 
                 /** token삭제 후 재발급 **/
                 Intent tokenIntent = new Intent(mActivity, LoginActivity.class);
@@ -175,18 +175,18 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        realm.executeTransaction(realm1 -> {
+        mRealm.executeTransaction(realm1 -> {
             switch ((int)buttonView.getTag()) {
                 case EXE_ALARM:
                     if(isChecked) {
-                        alarm.setExt1("true");
+                        mAlarm.setExt1("true");
                     }
                     else {
-                        alarm.setExt1("false");
+                        mAlarm.setExt1("false");
                     }
                     break;
             }
-            realm.copyToRealmOrUpdate(alarm);
+            mRealm.copyToRealmOrUpdate(mAlarm);
         });
     }
 }

@@ -50,8 +50,7 @@ import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.SENDING;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Realm realm;
-
+    private Realm mRealm;
     private LayoutInflater mInflater;
     private Context mContext;
     private User mUserData;
@@ -60,12 +59,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private FragmentManager mFragmentManager;
 
     public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog, FragmentManager fragmentManager) {
-        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
-
+        this.mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-        this.mUid = Config.getMyUID(realm);
+        this.mUid = Config.getMyUID(mRealm);
         this.mFragmentManager = fragmentManager;
     }
 
@@ -95,7 +93,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return;
         }
         String uid = chat.getUid();
-        mUserData = realm.where(User.class).equalTo("userId", uid).findFirst();
+        mUserData = mRealm.where(User.class).equalTo("userId", uid).findFirst();
 
         // 시간 형식 나누기
         SimpleDateFormat formatChatTime = new SimpleDateFormat(DATE_FORMAT1);

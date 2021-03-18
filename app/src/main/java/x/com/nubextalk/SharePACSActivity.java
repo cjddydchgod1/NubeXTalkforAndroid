@@ -24,11 +24,8 @@ import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
 
 public class SharePACSActivity extends AppCompatActivity {
 
-    private PACSFriendListFragment friendListFragPACS = new PACSFriendListFragment();
-    private PACSChatListFragment chatListFragPACS = new PACSChatListFragment();
-
-
-    private Bundle bundle;
+    private PACSFriendListFragment mPACSFriendListFrag = new PACSFriendListFragment();
+    private PACSChatListFragment mPACSChatListFrag = new PACSChatListFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +36,7 @@ public class SharePACSActivity extends AppCompatActivity {
          * ImageView에서 받아온 intent값을 bundle로 저장하여 Fragment에게 뿌려준다
          */
         Intent intent = getIntent();
-        bundle = intent.getExtras();
+        Bundle bundle = intent.getExtras();
 
         TabLayout tabLayout = findViewById(R.id.tablayout_PACS);
         ViewPager2 viewPager2 = findViewById(R.id.main_PACS_pager);
@@ -58,6 +55,6 @@ public class SharePACSActivity extends AppCompatActivity {
                     }
                 }).attach();
 
-        friendListFragPACS.setArguments(bundle);
+        mPACSFriendListFrag.setArguments(bundle);
     }
 }

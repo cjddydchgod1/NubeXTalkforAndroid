@@ -114,6 +114,10 @@ public class CodeResources {
      */
     public static final String SENDING = "전송중";
     public static final String EMPTY_IMAGE = "empty image";
+    /**
+     * PACSPagerAdapter
+     */
+    public static final int REFERENCE_ITEM_SIZE = 2;
 
     /**
      * ChatListFragment Resource
@@ -181,11 +185,9 @@ public class CodeResources {
     public static final String MSG_LOGIN_FAIL = "아이디/비밀번호를 확인하세요.";
 
     /**
-     * SharePACSActivity Resource
+     * MainActivity Resource
      */
-    public static final int NON_RADIO = 0;
-    public static final int RADIO = 1;
-
-
+    public static final int CHAT_ADD = 0;
+    public static final int MOVE_TO_CHAT_ROOM = 1;
 }
 

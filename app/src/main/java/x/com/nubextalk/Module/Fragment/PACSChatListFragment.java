@@ -31,21 +31,19 @@ import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.MSG_EMPTY_CHAT_LIST;
-import static x.com.nubextalk.Module.CodeResources.RADIO;
 import static x.com.nubextalk.Module.CodeResources.TITLE_CHAT_LIST;
 
 public class PACSChatListFragment extends Fragment implements ChatListAdapter.OnItemSelectedListener {
-    private ViewGroup rootview;
-    private Realm realm;
-    private RealmResults<ChatRoom> chatRoomResults;
-    private Button confirmBtn;
+    private ViewGroup mRootview;
+    private Realm mRealm;
+    private RealmResults<ChatRoom> mChatRoomList;
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
 
-    private ChatRoom lastChecked;
+    private ChatRoom mLastChecked;
 
-    private String studyId;
-    private String description;
+    private String mStudyId;
+    private String mDescription;
 
     private Context mContext;
     private Activity mActivity;
@@ -62,17 +60,17 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mActivity.setTitle(TITLE_CHAT_LIST);
-        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_chat_list, container, false);
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mRecyclerView = rootview.findViewById(R.id.chat_list_PACS_recyclerview);
-        confirmBtn = rootview.findViewById(R.id.btn_confirm_PACS);
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_chat_list, container, false);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRecyclerView = mRootview.findViewById(R.id.chat_list_PACS_recyclerview);
+        Button confirmBtn = mRootview.findViewById(R.id.btn_confirm_PACS);
 
         /**
          * Chatlist data를 받아온다.
          */
         getData();
 
-        mAdapter = new ChatListAdapter(mActivity, chatRoomResults, RADIO);
+        mAdapter = new ChatListAdapter(mActivity, mChatRoomList, true);
         mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setAdapter(mAdapter);
@@ -83,21 +81,21 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
          * Bundle (studyId, Description) 받아오기
          */
         Bundle bundle = getArguments();
-        studyId = bundle.getString("studyId");
-        description = bundle.getString("description");
+        mStudyId = bundle.getString("studyId");
+        mDescription = bundle.getString("description");
 
         confirmBtn.setOnClickListener(view -> {
-            if (lastChecked != null) {
+            if (mLastChecked != null) {
                 Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                intent.putExtra("rid", lastChecked.getRid());
-                intent.putExtra("studyId", studyId);
-                intent.putExtra("description", description);
+                intent.putExtra("rid", mLastChecked.getRid());
+                intent.putExtra("studyId", mStudyId);
+                intent.putExtra("description", mDescription);
                 startActivity(intent);
             } else {
                 Toast.makeText(mActivity, MSG_EMPTY_CHAT_LIST, Toast.LENGTH_SHORT).show();
             }
         });
-        return rootview;
+        return mRootview;
     }
 
     @Override
@@ -109,18 +107,18 @@ public class PACSChatListFragment extends Fragment implements ChatListAdapter.On
 
     @Override
     public void onItemSelected(ChatRoom chatRoom) {
-        lastChecked = chatRoom;
+        mLastChecked = chatRoom;
     }
 
 
     public void getData() {
         try {
-            chatRoomResults = ChatRoom.getAll(realm);
+            mChatRoomList = ChatRoom.getAll(mRealm);
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {
-            if (realm != null)
-                realm.close();
+            if (mRealm != null)
+                mRealm.close();
         }
     }
 }

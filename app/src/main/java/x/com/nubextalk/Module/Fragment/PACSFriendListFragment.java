@@ -36,22 +36,20 @@ import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.MSG_EMPTY_FRIEND_LIST;
-import static x.com.nubextalk.Module.CodeResources.RADIO;
 import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
 
 public class PACSFriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
-    private ViewGroup rootview;
-    private Realm realm;
+    private ViewGroup mRootview;
+    private Realm mRealm;
     private ArrayList<User> mUserList;
     private FriendListAdapter mAdapter;
-    private AQuery aq;
+    private AQuery mAquery;
     private RecyclerView mRecyclerView;
-    private Button confirmBtn;
 
-    private User lastChecked;
+    private User mLastChecked;
 
-    private String studyId;
-    private String description;
+    private String mStudyId;
+    private String mDescription;
 
     private Context mContext;
     private Activity mActivity;
@@ -68,12 +66,12 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mActivity.setTitle(TITLE_FRIEND_LIST);
-        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_friend_list, container, false);
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mRecyclerView = rootview.findViewById(R.id.friend_list_PACS_recycleview);
-        confirmBtn = rootview.findViewById(R.id.btn_confirm_PACS);
-        aq = new AQuery(mActivity);
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_friend_list, container, false);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRecyclerView = mRootview.findViewById(R.id.friend_list_PACS_recycleview);
+        mAquery = new AQuery(mActivity);
         mUserList = new ArrayList<>();
+        Button confirmBtn = mRootview.findViewById(R.id.btn_confirm_PACS);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
@@ -82,7 +80,7 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
          */
         getData();
 
-        mAdapter = new FriendListAdapter(mActivity, mUserList, aq, RADIO);
+        mAdapter = new FriendListAdapter(mActivity, mUserList, mAquery, true);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -90,33 +88,33 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
          * Bundle (studyId, Description) 받아오기
          */
         Bundle bundle = getArguments();
-        studyId = bundle.getString("studyId");
-        description = bundle.getString("description");
+        mStudyId = bundle.getString("studyId");
+        mDescription = bundle.getString("description");
         confirmBtn.setOnClickListener(view -> {
-            if (lastChecked != null) {
-                User.getChatroom(realm, lastChecked, new User.UserListener() {
+            if (mLastChecked != null) {
+                User.getChatroom(mRealm, mLastChecked, new User.UserListener() {
                     @Override
                     public void onFindPersonalChatRoom(ChatRoom chatRoom) {
                         if (chatRoom == null) {
                             // 새로만든 채팅이 없다면 새로 만든다.
                             ArrayList<User> list = new ArrayList<>();
-                            list.add(lastChecked);
+                            list.add(mLastChecked);
 
                             Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                            new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                            new ChatAddActivity().createNewChat(mRealm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
                                 @Override
                                 public void onCreate(String rid) {
                                     intent.putExtra("rid", rid);
-                                    intent.putExtra("studyId", studyId);
-                                    intent.putExtra("description", description);
+                                    intent.putExtra("studyId", mStudyId);
+                                    intent.putExtra("description", mDescription);
                                     startActivity(intent);
                                 }
                             });
                         } else {
                             Intent intent = new Intent(mActivity, ChatRoomActivity.class);
                             intent.putExtra("rid", chatRoom.getRid());
-                            intent.putExtra("studyId", studyId);
-                            intent.putExtra("description", description);
+                            intent.putExtra("studyId", mStudyId);
+                            intent.putExtra("description", mDescription);
                             startActivity(intent);
                         }
                     }
@@ -127,7 +125,7 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
 
         });
 
-        return rootview;
+        return mRootview;
     }
 
     @Override
@@ -139,17 +137,17 @@ public class PACSFriendListFragment extends Fragment implements FriendListAdapte
 
     @Override
     public void onSelected(User address) {
-        lastChecked = address;
+        mLastChecked = address;
     }
 
     public void getData() {
         try {
-            mUserList.addAll(realm.copyFromRealm(User.getUserlist(realm)));
+            mUserList.addAll(mRealm.copyFromRealm(User.getUserlist(mRealm)));
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {
-            if (realm != null)
-                realm.close();
+            if (mRealm != null)
+                mRealm.close();
         }
     }
 }

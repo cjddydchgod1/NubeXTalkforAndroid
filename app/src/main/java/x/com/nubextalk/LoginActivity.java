@@ -34,35 +34,32 @@ import static x.com.nubextalk.Module.CodeResources.MSG_LOGIN_FAIL;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ApiManager apiManager;
-    private Realm realm;
+    private ApiManager mApiManager;
+    private Realm mRealm;
 
     private EditText mEditId;
     private EditText mEditPassword;
 
-    private Button mSignUpBtn;
-    private Button mSignInBtn;
+    private Intent mIntent;
 
-    private Intent intent;
+    private CheckBox mCheckAutoLogin;
 
-    private CheckBox checkAutoLogin;
-
-    private boolean equalUID;
+    private boolean mEqualUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        apiManager = new ApiManager(this, realm);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mApiManager = new ApiManager(this, mRealm);
 
         mEditId = (EditText) findViewById(R.id.login_id_edit);
         mEditPassword = (EditText) findViewById(R.id.login_password_edit);
 
-        mSignUpBtn = (Button) findViewById(R.id.login_sign_up);
-        mSignInBtn = (Button) findViewById(R.id.login_sign_in);
+        Button mSignUpBtn = (Button) findViewById(R.id.login_sign_up);
+        Button mSignInBtn = (Button) findViewById(R.id.login_sign_in);
 
-        checkAutoLogin = findViewById(R.id.checkAutoLogin);
+        mCheckAutoLogin = findViewById(R.id.checkAutoLogin);
 
         mSignUpBtn.setOnClickListener(this);
         mSignInBtn.setOnClickListener(this);
@@ -70,14 +67,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          * AutoLoginCheck(Ext5) 확인후 자동 로그인
          * SessionID가 만료가 되지 않게 id, pwd를 박아서 다시 로그인하는 방식으로 하였다.
          */
-        intent = new Intent(getApplicationContext(), MainActivity.class);
-        Config myAutoLogin = Config.getAutoLogin(realm);
+        mIntent = new Intent(getApplicationContext(), MainActivity.class);
+        Config myAutoLogin = Config.getAutoLogin(mRealm);
         if (myAutoLogin != null) {
             if (myAutoLogin.getExt1().equals("true")) {
-                apiManager.login(new ApiManager.onLoginApiListener() {
+                mApiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
-                        startActivity(intent);
+                        startActivity(mIntent);
                     }
 
                     @Override
@@ -103,29 +100,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
                 String autoLogin = "false";
-                if (checkAutoLogin.isChecked())
+                if (mCheckAutoLogin.isChecked())
                     autoLogin = "true";
 
                 /** 마지막으로 로그인한 아이디와 일치하는지 확인 **/
-                Config lastLoginID = Config.getLastLoginID(realm);
+                Config lastLoginID = Config.getLastLoginID(mRealm);
                 if (lastLoginID == null)
-                    equalUID = false;
+                    mEqualUid = false;
                 else {
                     if (lastLoginID.getExt1().equals(id))
-                        equalUID = true;
+                        mEqualUid = true;
                     else
-                        equalUID = false;
+                        mEqualUid = false;
                 }
 
-                apiManager.login(id, password, autoLogin, new ApiManager.onLoginApiListener() {
+                mApiManager.login(id, password, autoLogin, new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         /**
                          * 전에 있던 사용자가 그대로 로그인했다면 데이터 유지
                          * 다른 사용자가 로그인했다면 데이터 삭제 및 해당 사용자가 속해있는 ChatRoom을 가져오기
                          */
-                        if (!equalUID) {
-                            realm.executeTransactionAsync(realm1 -> {
+                        if (!mEqualUid) {
+                            mRealm.executeTransactionAsync(realm1 -> {
                                 realm1.where(User.class).findAll().deleteAllFromRealm();
                                 realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
                                 realm1.where(ChatRoomMember.class).findAll().deleteAllFromRealm();
@@ -162,11 +159,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private void updateFirebaseStore(String id) {
         FirebaseStoreManager firebaseStoreManager = new FirebaseStoreManager();
-        firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
+        firebaseStoreManager.updateUser(id, Config.getMyAccount(mRealm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 FirebaseFunctionsManager.getUserAttendingChatRoom(HOSPITAL_ID, id);
-                startActivity(intent);
+                startActivity(mIntent);
             }
         });
     }

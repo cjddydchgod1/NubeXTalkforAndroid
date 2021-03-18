@@ -39,20 +39,19 @@ import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.ICON_ALARM_OFF;
 import static x.com.nubextalk.Module.CodeResources.ICON_FIX_TOP;
 import static x.com.nubextalk.Module.CodeResources.PICTURE;
-import static x.com.nubextalk.Module.CodeResources.RADIO;
 import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
 import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
 import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private RealmResults<ChatRoom> mDataset;
-    private final LayoutInflater mInflater;
-    private Realm realm;
-    private Context context;
+    private LayoutInflater mInflater;
+    private Realm mRealm;
+    private Context mContext;
     private OnItemLongSelectedListener mLongClickListener;
     private OnItemSelectedListener mClickListener;
-    private AQuery aq;
-    private int sel_type;
+    private AQuery mAquery;
+    private boolean mIsRadio;
     private int mLastCheckedPosition = -1;
 
     public interface OnItemSelectedListener {
@@ -71,13 +70,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mLongClickListener = listener;
     }
 
-    public ChatListAdapter(Context context, RealmResults<ChatRoom> mChatList, int sel_type) {
+    public ChatListAdapter(Context context, RealmResults<ChatRoom> mChatList, boolean isRadio) {
         mInflater = LayoutInflater.from(context);
-        this.context = context;
+        this.mContext = context;
         this.mDataset = mChatList;
-        this.aq = new AQuery(context);
-        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        this.sel_type = sel_type;
+        this.mAquery = new AQuery(context);
+        this.mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        this.mIsRadio = isRadio;
         sortChatRoomByDate();
 
     }
@@ -97,7 +96,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ViewItemHolder viewItemHolder = (ViewItemHolder) holder;
             viewItemHolder.bindTo(mCurrent);
 
-            if (sel_type == RADIO)
+            if (mIsRadio)
                 viewItemHolder.setVisible();
             viewItemHolder.radioButton.setChecked(mLastCheckedPosition == position);
         }
@@ -138,7 +137,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     if (mClickListener != null) {
                         int copyLastCheckedPosition = mLastCheckedPosition;
                         mLastCheckedPosition = getAdapterPosition();
-                        if (sel_type == RADIO) {
+                        if (mIsRadio) {
                             notifyItemChanged(copyLastCheckedPosition);
                             notifyItemChanged(mLastCheckedPosition);
                         }
@@ -168,9 +167,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public void bindTo(ChatRoom chatroom) {
             String roomId = chatroom.getRid();
-            int roomMemberCount = ChatRoom.getChatRoomUsers(realm, roomId).size();
+            int roomMemberCount = ChatRoom.getChatRoomUsers(mRealm, roomId).size();
             String roomImgUrl = chatroom.getRoomImg();
-            ChatContent lastContent = realm.where(ChatContent.class) // 이 방식은 나중에 채팅 메세지가 많아지면 별로 좋은 방법이 아니므로 ChatRoom 에 lastContentId 를 넣는건 어떨
+            ChatContent lastContent = mRealm.where(ChatContent.class) // 이 방식은 나중에 채팅 메세지가 많아지면 별로 좋은 방법이 아니므로 ChatRoom 에 lastContentId 를 넣는건 어떨
                     .equalTo("rid", roomId)
                     .sort("sendDate", Sort.DESCENDING).findFirst();
 
@@ -179,12 +178,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             //채팅방 목록 사진 설정
             if (URLUtil.isValidUrl(roomImgUrl)) {
-                aq.view(chatRoomImg).image(roomImgUrl);
+                mAquery.view(chatRoomImg).image(roomImgUrl);
             } else {
                 if (roomMemberCount > 2) {
-                    aq.view(chatRoomImg).image(DEFAULT_GROUP_PROFILE);
+                    mAquery.view(chatRoomImg).image(DEFAULT_GROUP_PROFILE);
                 } else {
-                    aq.view(chatRoomImg).image(DEFAULT_PROFILE);
+                    mAquery.view(chatRoomImg).image(DEFAULT_PROFILE);
                 }
             }
 
@@ -257,22 +256,22 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
          **/
         public void setStatusImg(ChatRoom chatRoom) {
             String rid = chatRoom.getRid();
-            User myAccount = User.getMyAccountInfo(realm);
-            RealmResults<ChatRoomMember> users = ChatRoom.getChatRoomUsers(realm, rid);
+            User myAccount = User.getMyAccountInfo(mRealm);
+            RealmResults<ChatRoomMember> users = ChatRoom.getChatRoomUsers(mRealm, rid);
             if (users.size() == 2) { // 1 대 1 채팅방인 경우
                 for (ChatRoomMember user : users) {
                     if (!user.getUid().equals(myAccount.getUserId())) {
                         // profilestatus
-                        User anotherUser = realm.where(User.class).equalTo("userId", user.getUid()).findFirst();
+                        User anotherUser = mRealm.where(User.class).equalTo("userId", user.getUid()).findFirst();
                         switch (anotherUser.getAppStatus()) {
                             case "1":
-                                aq.view(statusImg).image(STATUS_BUSY);
+                                mAquery.view(statusImg).image(STATUS_BUSY);
                                 break;
                             case "2":
-                                aq.view(statusImg).image(STATUS_OFF);
+                                mAquery.view(statusImg).image(STATUS_OFF);
                                 break;
                             default: // 0과 기본으로 되어있는 설정
-                                aq.view(statusImg).image(STATUS_ON);
+                                mAquery.view(statusImg).image(STATUS_ON);
                                 break;
                         }
                     }
@@ -291,7 +290,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void setUnreadMessage(ChatRoom chatRoom) {
             int unreadMessages = 0;
             RealmResults<ChatContent> chatContents;
-            chatContents = realm.where(ChatContent.class).equalTo("rid", chatRoom.getRid()).findAll();
+            chatContents = mRealm.where(ChatContent.class).equalTo("rid", chatRoom.getRid()).findAll();
 
             for (ChatContent chatContent : chatContents) {
                 if (!chatContent.getIsRead()) {

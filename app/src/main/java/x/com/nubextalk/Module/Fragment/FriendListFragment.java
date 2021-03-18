@@ -74,7 +74,6 @@ import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
 import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
 import static x.com.nubextalk.Module.CodeResources.MODIFICATION;
-import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import static x.com.nubextalk.Module.CodeResources.PATH_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE1;
 import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE2;
@@ -85,38 +84,36 @@ import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
 import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
-    private Realm realm;
-
+    private Realm mRealm;
     private Context mContext;
     private Activity mActivity;
-
-    private ViewGroup rootview;
+    private ViewGroup mRootview;
     private LinearLayout mBottomWrapper;
     private RecyclerView mRecyclerView;
     private FriendListAdapter mAdapter;
     private RealmResults<User> mResults;
-    private ArrayList<User> mUserList; // mResults를 복사
-    private AQuery aq;
-    private ApiManager apiManager;
-    private String myUid; // Uid
+    private ArrayList<User> mUserList;
+    private AQuery mAquery;
+    private ApiManager mApiManager;
+    private String mMyUid;
     private String mHid = HOSPITAL_ID;
-    private User myProfile;
+    private User mMyProfile;
 
     /* bottomSheet */
     // 프로필 이름, 이미지, 상태
-    private TextView profileName;
-    private ImageView profileImage;
-    private ImageView profileStatus;
+    private TextView mProfileName;
+    private ImageView mProfileImage;
+    private ImageView mProfileStatus;
     // 수정 버튼
-    private EditText modifyName;
-    private TextView modifyNameButton;
-    private TextView modifyImageButton;
+    private EditText mEditName;
+    private TextView mMdoifyNameBtn;
+    private TextView mModifyImageBtn;
     // 상태레이아웃
-    private LinearLayout statusLayout;
+    private LinearLayout mStatusLayout;
     // 채팅 버튼
-    private Button chatButton;
+    private Button mChatBtn;
     //
-    private LinearLayout exitWrapper;
+    private LinearLayout mExitWrapper;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -130,18 +127,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        apiManager = new ApiManager(mActivity, realm);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mApiManager = new ApiManager(mActivity, mRealm);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
-        mRecyclerView = rootview.findViewById(R.id.friendRecycleview);
-        mBottomWrapper = rootview.findViewById(R.id.bottomWrapper);
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
+        mRecyclerView = mRootview.findViewById(R.id.friendRecycleview);
+        mBottomWrapper = mRootview.findViewById(R.id.bottomWrapper);
         mUserList = new ArrayList<>();
-        aq = new AQuery(mActivity);
+        mAquery = new AQuery(mActivity);
 
         mActivity.setTitle(TITLE_FRIEND_LIST);
 
@@ -149,18 +146,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          * bottomSheet
          */
         // 프로필 이름, 이미지, 상태
-        profileName = mBottomWrapper.findViewById(R.id.profileName);
-        profileImage = mBottomWrapper.findViewById(R.id.profileImage);
-        profileStatus = mBottomWrapper.findViewById(R.id.profileStatus);
+        mProfileName = mBottomWrapper.findViewById(R.id.profileName);
+        mProfileImage = mBottomWrapper.findViewById(R.id.profileImage);
+        mProfileStatus = mBottomWrapper.findViewById(R.id.profileStatus);
         // 수정 버튼
-        modifyName = mBottomWrapper.findViewById(R.id.modifyName);
-        modifyNameButton = mBottomWrapper.findViewById(R.id.modifyButton);
-        modifyImageButton = mBottomWrapper.findViewById(R.id.modifyImage);
+        mEditName = mBottomWrapper.findViewById(R.id.modifyName);
+        mMdoifyNameBtn = mBottomWrapper.findViewById(R.id.modifyButton);
+        mModifyImageBtn = mBottomWrapper.findViewById(R.id.modifyImage);
         // 상태레이아웃
-        statusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
+        mStatusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
         // 채팅 버튼
-        chatButton = mBottomWrapper.findViewById(R.id.chatButton);
-        exitWrapper = rootview.findViewById(R.id.wrapper);
+        mChatBtn = mBottomWrapper.findViewById(R.id.chatButton);
+        mExitWrapper = mRootview.findViewById(R.id.wrapper);
         /**
          * recyclerview 디자인
          */
@@ -176,7 +173,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         mRecyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(mActivity, R.anim.layout_animation_fall_down));
         mRecyclerView.scheduleLayoutAnimation();
-        return rootview;
+        return mRootview;
     }
 
     @Override
@@ -191,9 +188,9 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
     @Override
     public void onDetach() {
-        if (realm != null) {
-            realm.close();
-            realm = null;
+        if (mRealm != null) {
+            mRealm.close();
+            mRealm = null;
         }
         mContext = null;
         mActivity = null;
@@ -204,7 +201,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.
          */
-        apiManager.getEmployeeList(new ApiManager.onApiListener() {
+        mApiManager.getEmployeeList(new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
                 /**
@@ -225,12 +222,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     for (int i = 0; i < len; i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                        User user = realm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
+                        User user = mRealm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
                         if (user == null) {
                             user = new User();
                             user.setCode(jsonObject.getString("code"));
                         } else {
-                            user = realm.copyFromRealm(user);
+                            user = mRealm.copyFromRealm(user);
                         }
                         user.setUserId(jsonObject.getString("userid"));
                         user.setLastName(jsonObject.getString("lastname"));
@@ -248,7 +245,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     /**
                      * ArrayList -> Realm
                      */
-                    realm.executeTransaction(realm1 -> {
+                    mRealm.executeTransaction(realm1 -> {
                         realm1.copyToRealmOrUpdate(mUserList);
                     });
                     processData();
@@ -264,8 +261,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
      */
     public void processData() {
         for (User user : mUserList) {
-            if (user.getUserId().equals(Config.getMyUID(realm))) {
-                myProfile = user;
+            if (user.getUserId().equals(Config.getMyUID(mRealm))) {
+                mMyProfile = user;
                 mUserList.remove(user);
                 break;
             }
@@ -274,7 +271,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(mActivity, mUserList, aq, NON_RADIO);
+        mAdapter = new FriendListAdapter(mActivity, mUserList, mAquery, false);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -282,32 +279,32 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     public void setMyProfile() {
-        myUid = myProfile.getUserId();
-        TextView myProfileName = rootview.findViewById(R.id.my_profileName);
-        ImageView myProfileImage = rootview.findViewById(R.id.my_profileImage);
-        ImageView myProfileStatus = rootview.findViewById(R.id.my_profileStatus);
+        mMyUid = mMyProfile.getUserId();
+        TextView myProfileName = mRootview.findViewById(R.id.my_profileName);
+        ImageView myProfileImage = mRootview.findViewById(R.id.my_profileImage);
+        ImageView myProfileStatus = mRootview.findViewById(R.id.my_profileStatus);
         /**
          * profileImage valid check
          */
-        if (URLUtil.isValidUrl(myProfile.getAppImagePath())) {
-            aq.view(myProfileImage).image(myProfile.getAppImagePath());
+        if (URLUtil.isValidUrl(mMyProfile.getAppImagePath())) {
+            mAquery.view(myProfileImage).image(mMyProfile.getAppImagePath());
         } else {
-            aq.view(myProfileImage).image(DEFAULT_PROFILE);
+            mAquery.view(myProfileImage).image(DEFAULT_PROFILE);
         }
-        myProfileName.setText(myProfile.getAppName());
-        switch (myProfile.getAppStatus()) {
+        myProfileName.setText(mMyProfile.getAppName());
+        switch (mMyProfile.getAppStatus()) {
             case "1":
-                aq.view(myProfileStatus).image(STATUS_BUSY);
+                mAquery.view(myProfileStatus).image(STATUS_BUSY);
                 break;
             case "2":
-                aq.view(myProfileStatus).image(STATUS_OFF);
+                mAquery.view(myProfileStatus).image(STATUS_OFF);
                 break;
             default:
-                aq.view(myProfileStatus).image(STATUS_ON);
+                mAquery.view(myProfileStatus).image(STATUS_ON);
                 break;
         }
-        rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
-            onSelected(myProfile);
+        mRootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
+            onSelected(mMyProfile);
         });
     }
 
@@ -354,12 +351,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mUserList.clear();
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
-            mResults = realm.where(User.class).findAll();
-            mUserList.addAll(realm.copyFromRealm(mResults));
+            mResults = mRealm.where(User.class).findAll();
+            mUserList.addAll(mRealm.copyFromRealm(mResults));
         }
         // 문자 입력을 할때..
         else {
-            mUserList.addAll(realm.where(User.class).contains("appName", query).findAll());
+            mUserList.addAll(mRealm.where(User.class).contains("appName", query).findAll());
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
 
@@ -379,53 +376,53 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * 데이터 초기화
          */
-        profileName.setText(user.getAppName());
+        mProfileName.setText(user.getAppName());
         switch (user.getAppStatus()) {
             case "1":
-                aq.view(profileStatus).image(STATUS_BUSY);
+                mAquery.view(mProfileStatus).image(STATUS_BUSY);
                 break;
             case "2":
-                aq.view(profileStatus).image(STATUS_OFF);
+                mAquery.view(mProfileStatus).image(STATUS_OFF);
                 break;
             default: // 0과 기본으로 되어있는 설정
-                aq.view(profileStatus).image(STATUS_ON);
+                mAquery.view(mProfileStatus).image(STATUS_ON);
                 break;
         }
 
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
-            aq.view(profileImage).image(user.getAppImagePath());
+            mAquery.view(mProfileImage).image(user.getAppImagePath());
         } else {
-            aq.view(profileImage).image(DEFAULT_PROFILE);
+            mAquery.view(mProfileImage).image(DEFAULT_PROFILE);
         }
         /**
          * 임시로 userId로 primaryKey를 사용하고 있지만, 추후에 code로 변경해야 한다.
          * if(user.getCode().equals(myUid))
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if (user.getUserId().equals(myUid)) {
-            modifyImageButton.setVisibility(View.VISIBLE);
-            chatButton.setVisibility((View.GONE));
-            profileStatus.setClickable(true);
+        if (user.getUserId().equals(mMyUid)) {
+            mModifyImageBtn.setVisibility(View.VISIBLE);
+            mChatBtn.setVisibility((View.GONE));
+            mProfileStatus.setClickable(true);
         } else {
-            modifyImageButton.setVisibility(View.GONE);
-            chatButton.setVisibility(View.VISIBLE);
-            profileStatus.setClickable(false);
+            mModifyImageBtn.setVisibility(View.GONE);
+            mChatBtn.setVisibility(View.VISIBLE);
+            mProfileStatus.setClickable(false);
         }
-        statusLayout.setVisibility(View.INVISIBLE);
-        modifyName.setVisibility(View.GONE);
-        profileName.setVisibility(View.VISIBLE);
-        modifyNameButton.setText(MODIFICATION);
+        mStatusLayout.setVisibility(View.INVISIBLE);
+        mEditName.setVisibility(View.GONE);
+        mProfileName.setVisibility(View.VISIBLE);
+        mMdoifyNameBtn.setText(MODIFICATION);
 
         // 해당 exitWrapper클릭시 onBackPressed() 수행
-        exitWrapper.setVisibility(View.VISIBLE);
+        mExitWrapper.setVisibility(View.VISIBLE);
 
         // Nickname 변경
-        modifyNameButton.setOnClickListener(v -> {
+        mMdoifyNameBtn.setOnClickListener(v -> {
             changeOpponentNickName(user);
         });
 
         // 프로필 사진 변경 (myProfile만 가능)
-        modifyImageButton.setOnClickListener(v -> {
+        mModifyImageBtn.setOnClickListener(v -> {
             if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             } else {
@@ -434,19 +431,19 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         });
 
         // 프로필 Status 변경
-        profileStatus.setOnClickListener(v -> {
+        mProfileStatus.setOnClickListener(v -> {
             changeMyStatus(user);
         });
 
         // 1대1채팅 버튼
-        chatButton.setOnClickListener(v -> {
+        mChatBtn.setOnClickListener(v -> {
             /**
              * 1. 대화할 uid를 가지고 있는 rid를 모두 찾는다.
              * 2. rid중에서 memberCount값이 2인것을 찾는다.
              * 3. 해당 rid값으로 intent로 넘겨준다.
              */
 
-            User.getChatroom(realm, user, new User.UserListener() {
+            User.getChatroom(mRealm, user, new User.UserListener() {
                 @Override
                 public void onFindPersonalChatRoom(ChatRoom chatRoom) {
                     if (chatRoom == null) {
@@ -454,7 +451,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         ArrayList<User> list = new ArrayList<>();
                         list.add(user);
                         Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                        new ChatAddActivity().createNewChat(realm, mContext, list, EMPTY, new ChatAddActivity.onNewChatCreatedListener() {
+                        new ChatAddActivity().createNewChat(mRealm, mContext, list, EMPTY, new ChatAddActivity.onNewChatCreatedListener() {
                             @Override
                             public void onCreate(String rid) {
                                 intent.putExtra("rid", rid);
@@ -478,7 +475,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mBottomWrapper.findViewById(R.id.mClose).setOnClickListener(v -> {
             onBackPressed();
         });
-        exitWrapper.setOnTouchListener(new View.OnTouchListener() {
+        mExitWrapper.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
@@ -502,7 +499,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             new AnimManager(
                     AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
             ).start(AnimManager.TOGETHER);
-            exitWrapper.setVisibility(View.GONE);
+            mExitWrapper.setVisibility(View.GONE);
             return true;
         } else {
             return false;
@@ -510,32 +507,32 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     public void changeOpponentNickName(User user) {
-        String buttonName = modifyNameButton.getText().toString();
+        String buttonName = mMdoifyNameBtn.getText().toString();
         if (buttonName.equals(MODIFICATION)) { // 수정버튼을 눌렀을 경우
-            modifyNameButton.setText(COMPLETE);
-            profileName.setVisibility(View.GONE);
-            modifyName.setVisibility(View.VISIBLE);
-            modifyName.setText(profileName.getText().toString());
+            mMdoifyNameBtn.setText(COMPLETE);
+            mProfileName.setVisibility(View.GONE);
+            mEditName.setVisibility(View.VISIBLE);
+            mEditName.setText(mProfileName.getText().toString());
         } else { // 완료버튼을 눌렀을 경우
-            updateNickname(user, modifyName.getText().toString());
+            updateNickname(user, mEditName.getText().toString());
             refreshFragment();
         }
     }
 
     public void changeMyStatus(User user) {
         // chatButton은 숨기고, status를 선택하는 Layout등장
-        chatButton.setVisibility(View.INVISIBLE);
-        statusLayout.setVisibility(View.VISIBLE);
+        mChatBtn.setVisibility(View.INVISIBLE);
+        mStatusLayout.setVisibility(View.VISIBLE);
         // status를 클릭
-        LinearLayout working = statusLayout.findViewById(R.id.working_status);
-        LinearLayout leaving = statusLayout.findViewById(R.id.leaving_status);
-        LinearLayout vacation = statusLayout.findViewById(R.id.vacation_status);
+        LinearLayout working = mStatusLayout.findViewById(R.id.working_status);
+        LinearLayout leaving = mStatusLayout.findViewById(R.id.leaving_status);
+        LinearLayout vacation = mStatusLayout.findViewById(R.id.vacation_status);
         LinearLayout.OnClickListener onClickListener = new LinearLayout.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chatButton.setVisibility(View.VISIBLE);
-                statusLayout.setVisibility(View.INVISIBLE);
-                realm.executeTransaction(realm1 -> {
+                mChatBtn.setVisibility(View.VISIBLE);
+                mStatusLayout.setVisibility(View.INVISIBLE);
+                mRealm.executeTransaction(realm1 -> {
                     switch (v.getId()) {
                         case R.id.working_status:
                             user.setAppStatus("0");
@@ -548,7 +545,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                             break;
                     }
                 });
-                apiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
+                mApiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
                         refreshFragment();
@@ -584,7 +581,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      * 해당 이미지값을 Storage에 올린다.
                      */
 
-                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri, PATH_STORAGE1 + mHid + PATH_STORAGE2 + myUid);
+                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri, PATH_STORAGE1 + mHid + PATH_STORAGE2 + mMyUid);
                     Task<Uri> urlTask = uploadTask
                             .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                                 @Override
@@ -592,7 +589,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if (!task.isSuccessful()) {
                                         throw task.getException();
                                     }
-                                    return FirebaseStorageManager.downloadFile(PATH_STORAGE1 + mHid + PATH_STORAGE2 + myUid);
+                                    return FirebaseStorageManager.downloadFile(PATH_STORAGE1 + mHid + PATH_STORAGE2 + mMyUid);
                                 }
                             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override
@@ -600,10 +597,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                                     if (task.isSuccessful()) {
                                         Uri imgUri = task.getResult();
                                         if (imgUri != null) {
-                                            realm.executeTransaction(realm1 -> {
-                                                myProfile.setAppImagePath(imgUri.toString());
+                                            mRealm.executeTransaction(realm1 -> {
+                                                mMyProfile.setAppImagePath(imgUri.toString());
                                             });
-                                            apiManager.setEmployeeAppInfo(myProfile, new ApiManager.onApiListener() {
+                                            mApiManager.setEmployeeAppInfo(mMyProfile, new ApiManager.onApiListener() {
                                                 @Override
                                                 public void onSuccess(Response response, String body) {
                                                     refreshFragment();
@@ -627,7 +624,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     public void updateNickname(User user, String name) {
-        realm.executeTransaction(new Realm.Transaction() {
+        mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 user.setAppNickName(name);

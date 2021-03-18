@@ -31,10 +31,10 @@ import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
 
 public class PACSReferenceFragment extends Fragment implements PacsWebView.onJavaScriptListener {
 
-    private Realm realm;
+    private Realm mRealm;
     private ApiManager mApiManager;
 
-    private ViewGroup rootview;
+    private ViewGroup mRootview;
     private PacsWebView mPacsWebView;
 
     private Context mContext;
@@ -52,21 +52,21 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mApiManager = new ApiManager(mContext, realm);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mApiManager = new ApiManager(mContext, mRealm);
 
         mActivity.setTitle(TITLE_PACS);
 
-        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
-        mPacsWebView = rootview.findViewById(R.id.webView);
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
+        mPacsWebView = mRootview.findViewById(R.id.webView);
         /* 쿠키 생성 후 넣기 */
         try {
-            mPacsWebView.init(realm);
+            mPacsWebView.init(mRealm);
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {
-            if (realm != null)
-                realm.close();
+            if (mRealm != null)
+                mRealm.close();
         }
         mPacsWebView.setJavaScriptListener(this);
 
@@ -81,7 +81,7 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         } else {
             mPacsWebView.loadUrl(PATH_PACS_HOME);
         }
-        return rootview;
+        return mRootview;
     }
 
     @Override

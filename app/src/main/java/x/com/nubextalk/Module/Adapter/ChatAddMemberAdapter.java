@@ -29,16 +29,16 @@ import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
 import static x.com.nubextalk.Module.CodeResources.ICON_MINUS;
 
 public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final LayoutInflater mInflater;
-    public ArrayList<ChatAddActivity.ChatAddActivityUser> userList;
-    private Context context;
-    private AQuery aq;
+    private Context mContext;
+    private AQuery mAquery;
+    private LayoutInflater mInflater;
+    private ArrayList<ChatAddActivity.ChatAddActivityUser> mUserList;
 
     public ChatAddMemberAdapter(Context context, ArrayList<ChatAddActivity.ChatAddActivityUser> userList) {
         this.mInflater = LayoutInflater.from(context);
-        this.userList = userList;
-        this.context = context;
-        this.aq = new AQuery(context);
+        this.mUserList = userList;
+        this.mContext = context;
+        this.mAquery = new AQuery(context);
     }
 
     @NonNull
@@ -54,18 +54,18 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (holder instanceof ViewItemHolder) {
             ViewItemHolder mHolder = (ViewItemHolder) holder;
 
-            User user = userList.get(position).getUser();
+            User user = mUserList.get(position).getUser();
 
             mHolder.profileName.setText(user.getAppName());
 
-            if (URLUtil.isValidUrl(userList.get(position).getUser().getAppImagePath())) {
-                aq.view(mHolder.profileImage).image(user.getAppImagePath());
+            if (URLUtil.isValidUrl(mUserList.get(position).getUser().getAppImagePath())) {
+                mAquery.view(mHolder.profileImage).image(user.getAppImagePath());
             } else {
-                aq.view(mHolder.profileImage).image(DEFAULT_PROFILE);
+                mAquery.view(mHolder.profileImage).image(DEFAULT_PROFILE);
             }
 
             //기존 채팅방에서 가져온 사용자인 경우 아이템 삭제 버튼 사라짐
-            if (userList.get(position).getIsAlreadyChatRoomUser()) {
+            if (mUserList.get(position).getIsAlreadyChatRoomUser()) {
                 mHolder.deleteItemButton.setVisibility(View.GONE);
             } else {
                 mHolder.deleteItemButton.setVisibility(View.VISIBLE);
@@ -79,17 +79,17 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void addItem(@NonNull ChatAddActivity.ChatAddActivityUser chatRoomUserStatus) {
 
         //userList 아이템에 있는지 비교, 존재하면 아이템 중복 추가 방지
-        for (ChatAddActivity.ChatAddActivityUser chatRoomUserStatus1 : userList) {
+        for (ChatAddActivity.ChatAddActivityUser chatRoomUserStatus1 : mUserList) {
             if (chatRoomUserStatus1.getUser().getUserId().equals(chatRoomUserStatus.getUser().getUserId())) {
                 return;
             }
         }
-        userList.add(chatRoomUserStatus);
+        mUserList.add(chatRoomUserStatus);
         notifyDataSetChanged();
     }
 
     public void deleteItem(int position) {
-        userList.remove(position);
+        mUserList.remove(position);
         notifyDataSetChanged();
     }
 
@@ -109,10 +109,10 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemCount() {
-        return userList.size();
+        return mUserList.size();
     }
 
     public ArrayList<ChatAddActivity.ChatAddActivityUser> getItemList() {
-        return userList;
+        return mUserList;
     }
 }

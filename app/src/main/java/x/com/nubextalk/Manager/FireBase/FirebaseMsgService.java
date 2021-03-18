@@ -50,7 +50,7 @@ import static x.com.nubextalk.Module.CodeResources.MSG_ROOM_CREATED;
  * - 참고 : https://firebase.google.com/docs/cloud-messaging/android/client?authuser=0
  */
 public class FirebaseMsgService extends FirebaseMessagingService {
-    private Realm realm;
+    private Realm mRealm;
     private Context mContext;
 
     @Override
@@ -95,7 +95,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mContext = this;
 
         Map<String, String> data = remoteMessage.getData();
@@ -116,7 +116,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 uid = data.get("senderId");
 
                 Log.d("USERID", uid);
-                userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
+                userInfo = mRealm.where(User.class).equalTo("userId", uid).findFirst();
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
                 sysContent.append(MSG_ROOM_CREATED);
@@ -131,7 +131,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
 
-                ChatContent.createChat(realm, payload);
+                ChatContent.createChat(mRealm, payload);
                 break;
 
             case CODE_SYSTEM_MEMBER_ADD:
@@ -140,14 +140,14 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 rid = data.get("chatRoomId");
                 uid = data.get("senderId");
-                userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
+                userInfo = mRealm.where(User.class).equalTo("userId", uid).findFirst();
                 String[] memberId = data.get("newAddedUserId").split(",");
 
                 sysContent = new StringBuilder();
 
                 sysContent.append(userInfo.getAppName()).append(MSG_MEMBER_ADD1);
                 for (String id : memberId) {
-                    User addUser = realm.where(User.class).equalTo("userId", id).findFirst();
+                    User addUser = mRealm.where(User.class).equalTo("userId", id).findFirst();
                     if (addUser != null) {
                         sysContent.append(addUser.getAppName()).append(MSG_MEMBER_ADD2);
                     }
@@ -164,8 +164,8 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
 
-                ChatRoomMember.addChatRoomMember(realm, rid, memberId);
-                ChatContent.createChat(realm, payload);
+                ChatRoomMember.addChatRoomMember(mRealm, rid, memberId);
+                ChatContent.createChat(mRealm, payload);
                 break;
 
             case CODE_SYSTEM_MEMBER_EXIT:
@@ -175,7 +175,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 rid = data.get("chatRoomId");
                 uid = data.get("senderId");
 
-                userInfo = realm.where(User.class).equalTo("userId", uid).findFirst();
+                userInfo = mRealm.where(User.class).equalTo("userId", uid).findFirst();
 
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
@@ -190,8 +190,8 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
 
-                ChatRoomMember.deleteChatRoomMember(realm, rid, uid);
-                ChatContent.createChat(realm, payload);
+                ChatRoomMember.deleteChatRoomMember(mRealm, rid, uid);
+                ChatContent.createChat(mRealm, payload);
                 break;
 
             case CODE_CHAT_CONTENT_CREATED:
@@ -214,7 +214,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                     payload.put("content", data.get("content"));
                 }
 
-                if (realm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
+                if (mRealm.where(ChatRoom.class).equalTo("rid", rid).findAll().isEmpty()) {
                     FirebaseFunctionsManager.getChatRoom(HOSPITAL_ID, rid) //Firebase Functions 함수의 getChatRoom 함수 호출을 통해 FireStore 에 있는 채팅방 데이터 불러옴
                             .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
                                 @Override
@@ -260,8 +260,8 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                                 }
                             });
                 } else { // 기존 realm 에 채팅방이 있는 경우에는 ChatContent 만 생성
-                    ChatContent.createChat(realm, payload);
-                    if (!Config.getMyUID(realm).equals(uid)) {
+                    ChatContent.createChat(mRealm, payload);
+                    if (!Config.getMyUID(mRealm).equals(uid)) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -292,6 +292,6 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 break;
         }
-        realm.close();
+        mRealm.close();
     }
 }

@@ -28,7 +28,8 @@ import x.com.nubextalk.Manager.ImageManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 
-import static x.com.nubextalk.Module.CodeResources.COMPLETE_DOWNLOAD;
+import static x.com.nubextalk.Module.CodeResources.ICON_DOWNLOAD;
+import static x.com.nubextalk.Module.CodeResources.MSG_COMPLETE_DOWNLOAD;
 
 public class ChatImageViewActivity extends Activity implements View.OnClickListener {
     private Realm mRealm;
@@ -52,7 +53,7 @@ public class ChatImageViewActivity extends Activity implements View.OnClickListe
         mTouchImageView = (TouchImageView) findViewById(R.id.touch_image_view);
         mDownloadButton = (IconButton) findViewById(R.id.download_button);
 
-        mDownloadButton.setText("{fas-download 35dp #000000}");
+        mDownloadButton.setText(ICON_DOWNLOAD);
 
         Intent intent = getIntent();
         mCid = intent.getStringExtra("cid");
@@ -111,7 +112,7 @@ public class ChatImageViewActivity extends Activity implements View.OnClickListe
             new Thread(futureTask).start();
             try {
                 if ((Boolean) futureTask.get())
-                    mAquery.toast(COMPLETE_DOWNLOAD);
+                    mAquery.toast(MSG_COMPLETE_DOWNLOAD);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -5,21 +5,17 @@
 
 package x.com.nubextalk;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import io.realm.Realm;
 import okhttp3.Response;
@@ -32,6 +28,9 @@ import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.PACS.ApiManager;
+
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+import static x.com.nubextalk.Module.CodeResources.MSG_LOGIN_FAIL;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -49,6 +48,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private CheckBox checkAutoLogin;
 
     private boolean equalUID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +72,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
          */
         intent = new Intent(getApplicationContext(), MainActivity.class);
         Config myAutoLogin = Config.getAutoLogin(realm);
-        if(myAutoLogin != null) {
-            if(myAutoLogin.getExt1().equals("true")) {
+        if (myAutoLogin != null) {
+            if (myAutoLogin.getExt1().equals("true")) {
                 apiManager.login(new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onFail() {
-                        Toast.makeText(LoginActivity.this, "자동 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, MSG_LOGIN_FAIL, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -103,29 +103,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String id = String.valueOf(mEditId.getText());
                 String password = String.valueOf(mEditPassword.getText());
                 String autoLogin = "false";
-                if(checkAutoLogin.isChecked())
+                if (checkAutoLogin.isChecked())
                     autoLogin = "true";
 
                 /** 마지막으로 로그인한 아이디와 일치하는지 확인 **/
                 Config lastLoginID = Config.getLastLoginID(realm);
-                if(lastLoginID == null)
+                if (lastLoginID == null)
                     equalUID = false;
                 else {
-                    if(lastLoginID.getExt1().equals(id))
+                    if (lastLoginID.getExt1().equals(id))
                         equalUID = true;
                     else
                         equalUID = false;
                 }
 
-                apiManager.login(id, password, autoLogin,new ApiManager.onLoginApiListener() { // lee777 , tech1!
+                apiManager.login(id, password, autoLogin, new ApiManager.onLoginApiListener() {
                     @Override
                     public void onSuccess(Response response, String body) {
-                        Log.d("RESUlT onSuccess", response.toString());
                         /**
                          * 전에 있던 사용자가 그대로 로그인했다면 데이터 유지
                          * 다른 사용자가 로그인했다면 데이터 삭제 및 해당 사용자가 속해있는 ChatRoom을 가져오기
                          */
-                        if(!equalUID) {
+                        if (!equalUID) {
                             realm.executeTransactionAsync(realm1 -> {
                                 realm1.where(User.class).findAll().deleteAllFromRealm();
                                 realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
@@ -151,7 +150,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onFail() {
-                        Toast.makeText(activity, "아이디/비밀번호를 확인하세요.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, MSG_LOGIN_FAIL, Toast.LENGTH_SHORT).show();
                     }
                 });
                 break;
@@ -166,7 +165,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         firebaseStoreManager.updateUser(id, Config.getMyAccount(realm).getExt4()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                FirebaseFunctionsManager.getUserAttendingChatRoom("w34qjptO0cYSJdAwScFQ", id);
+                FirebaseFunctionsManager.getUserAttendingChatRoom(HOSPITAL_ID, id);
                 startActivity(intent);
             }
         });

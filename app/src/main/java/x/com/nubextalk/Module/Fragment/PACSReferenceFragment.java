@@ -9,28 +9,25 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import io.realm.Realm;
 import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.PACS.PacsWebView;
 import x.com.nubextalk.R;
 import x.com.nubextalk.SharePACSActivity;
+
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_HOME;
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_VIEWER;
+import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
 
 public class PACSReferenceFragment extends Fragment implements PacsWebView.onJavaScriptListener {
 
@@ -58,7 +55,7 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         mApiManager = new ApiManager(mContext, realm);
 
-        mActivity.setTitle(getString(R.string.PACSReference));
+        mActivity.setTitle(TITLE_PACS);
 
         rootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
         mPacsWebView = rootview.findViewById(R.id.webView);
@@ -80,9 +77,9 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         }
 
         if (UtilityManager.checkString(studyId)) {
-            mPacsWebView.loadUrl("/mobile/app/?studyId=" + studyId);
+            mPacsWebView.loadUrl(PATH_PACS_VIEWER + studyId);
         } else {
-            mPacsWebView.loadUrl("/mobile/app/");
+            mPacsWebView.loadUrl(PATH_PACS_HOME);
         }
         return rootview;
     }

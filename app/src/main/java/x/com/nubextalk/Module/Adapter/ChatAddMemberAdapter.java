@@ -25,6 +25,9 @@ import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
+import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
+import static x.com.nubextalk.Module.CodeResources.ICON_MINUS;
+
 public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final LayoutInflater mInflater;
     public ArrayList<ChatAddActivity.ChatAddActivityUser> userList;
@@ -58,7 +61,7 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (URLUtil.isValidUrl(userList.get(position).getUser().getAppImagePath())) {
                 aq.view(mHolder.profileImage).image(user.getAppImagePath());
             } else {
-                aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+                aq.view(mHolder.profileImage).image(DEFAULT_PROFILE);
             }
 
             //기존 채팅방에서 가져온 사용자인 경우 아이템 삭제 버튼 사라짐
@@ -100,7 +103,7 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
             profileName = itemView.findViewById(R.id.new_chat_added_profile_name);
             profileImage = itemView.findViewById(R.id.new_chat_added_profile_img);
             deleteItemButton = itemView.findViewById(R.id.new_chat_added_delete_btn);
-            deleteItemButton.setText("{fas-times 10dp #ffffff}");
+            deleteItemButton.setText(ICON_MINUS);
         }
     }
 

@@ -14,12 +14,13 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.HashMap;
 import java.util.Map;
 
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+
 
 public class FirebaseStoreManager {
     private FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
-    private final String hid = "w34qjptO0cYSJdAwScFQ";
+    private final String hid = HOSPITAL_ID;
     private DocumentReference hospital = fireStore.collection("hospital").document(hid);
-    private String TAG = "FirebaseStoreManager";
 
     public Task<Void> updateUser(String userid, String token) {
         Map<String, Object> userToken = new HashMap<>();
@@ -31,10 +32,5 @@ public class FirebaseStoreManager {
         Map<String, Object> delToken = new HashMap<>();
         delToken.put("fcm", FieldValue.delete());
         return hospital.collection("users").document(userid).update(delToken);
-    }
-    public void addChatContent(){ /*send chat*/ };
-
-    public Task getReference(String documentPath){
-        return hospital.collection(documentPath).get();
     }
 }

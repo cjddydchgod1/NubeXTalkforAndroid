@@ -5,11 +5,7 @@
 
 package x.com.nubextalk.Model;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-
-import java.util.Iterator;
 
 import io.realm.Realm;
 import io.realm.RealmObject;

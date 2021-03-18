@@ -5,30 +5,24 @@
 
 package x.com.nubextalk.Model;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
-import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.R;
+
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT4;
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
 
 
 public class ChatRoom extends RealmObject {
@@ -126,32 +120,6 @@ public class ChatRoom extends RealmObject {
         this.isGroupChat = isGroupChat;
     }
 
-    /**
-     * Data 초기화 함수
-     *
-     * @param realm
-     */
-    public static void init(Context context, Realm realm) {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_chat_room.json")); //json 파일 추가
-            RealmList<ChatRoom> list = new RealmList<>();
-            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
-                String rid = it.next();
-                jsonObject.getJSONObject(rid).put("rid", rid);
-                jsonArray.put(jsonObject.getJSONObject(rid));
-            }
-
-            realm.executeTransaction(realm1 -> {
-                realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(ChatRoom.class, jsonArray);
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static RealmResults<ChatRoom> getAll(Realm realm) {
         return realm.where(ChatRoom.class).findAll();
     }
@@ -181,7 +149,7 @@ public class ChatRoom extends RealmObject {
         String roomName = data.get("title") == null ? "" : data.get("title").toString();
         String roomImg = data.get("roomImgUrl") == null ? "" : data.get("roomImgUrl").toString();
         Date updatedDate = data.get("updatedDate") == null
-                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
+                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), DATE_FORMAT4);
         String notificationId = data.get("notificationId") == null
                 ? String.valueOf(newDate.hashCode()) : data.get("notificationId").toString();
         Boolean isGroupChat = data.get("isGroupChat") == null ? false : (Boolean) data.get("isGroupChat");
@@ -197,7 +165,7 @@ public class ChatRoom extends RealmObject {
                 }
             }
         } else { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
-            roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
+            roomImg = String.valueOf(R.drawable.ic_people_gray_24);
             isGroupChat = true;
         }
 
@@ -216,9 +184,9 @@ public class ChatRoom extends RealmObject {
                 }
             }
 
-            FirebaseFunctionsManager.checkIfOneOnOneChatRoomExists(
+            FirebaseFunctionsManager.getPersonalChatRoomId(
 
-                    "w34qjptO0cYSJdAwScFQ", myAccount.getUserId(), anotherUserId,
+                    HOSPITAL_ID, myAccount.getUserId(), anotherUserId,
                     new FirebaseFunctionsManager.OnCompleteListener() {
                         @Override
                         public void onComplete(String result) {

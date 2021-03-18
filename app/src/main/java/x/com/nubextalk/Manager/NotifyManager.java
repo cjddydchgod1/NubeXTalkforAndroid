@@ -24,10 +24,11 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
-import static x.com.nubextalk.Module.CodeResources.NOTIFICATION_CHANNEL_DESCRIPTION;
-import static x.com.nubextalk.Module.CodeResources.NOTIFICATION_CHANNEL_ID;
-import static x.com.nubextalk.Module.CodeResources.NOTIFICATION_CHANNEL_NAME;
-import static x.com.nubextalk.Module.CodeResources.NOTIFICATION_GROUP;
+import static x.com.nubextalk.Module.CodeResources.DESCRIPTION_NOTIFICATION_CHANNEL;
+import static x.com.nubextalk.Module.CodeResources.ID_NOTIFICATION_CHANNEL;
+import static x.com.nubextalk.Module.CodeResources.ID_NOTIFICATION_GROUP;
+import static x.com.nubextalk.Module.CodeResources.NAME_NOTIFICATION_CHANNEL;
+import static x.com.nubextalk.Module.CodeResources.PICTURE;
 import static x.com.nubextalk.Module.CodeResources.TAG;
 
 public class NotifyManager {
@@ -63,11 +64,11 @@ public class NotifyManager {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String name = NOTIFICATION_CHANNEL_NAME;
-            String description = NOTIFICATION_CHANNEL_DESCRIPTION;
+            String name = NAME_NOTIFICATION_CHANNEL;
+            String description = DESCRIPTION_NOTIFICATION_CHANNEL;
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
 
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel(ID_NOTIFICATION_CHANNEL, name, importance);
             channel.setDescription(description);
 
             mNotificationManager.createNotificationChannel(channel);
@@ -75,22 +76,22 @@ public class NotifyManager {
     }
 
     private NotificationCompat.Builder createBuilder() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, ID_NOTIFICATION_CHANNEL);
         Intent intent = new Intent(mContext, ChatRoomActivity.class);
 
         intent.putExtra("rid", mChatContent.getRid());
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, new Random().nextInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Bitmap largeIcon = new ImageManager(mContext).getImageFromURL(mUser.getAppImagePath());
         builder.setContentTitle(mChatRoom.getRoomName())
-                .setSmallIcon(R.drawable.nube_x_logo)
+                .setSmallIcon(R.drawable.ic_nube_x_logo)
                 .setLargeIcon(largeIcon)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .setChannelId(ID_NOTIFICATION_CHANNEL)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .setGroup(NOTIFICATION_GROUP);
+                .setGroup(ID_NOTIFICATION_GROUP);
         if (mChatContent.getType() == 1) {
-            builder.setContentText("사진");
+            builder.setContentText(PICTURE);
         } else {
             builder.setContentText(mChatContent.getContent());
         }
@@ -98,10 +99,10 @@ public class NotifyManager {
     }
 
     private NotificationCompat.Builder createSummaryBuilder() {
-        NotificationCompat.Builder summaryBuilder = new NotificationCompat.Builder(mContext, NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder summaryBuilder = new NotificationCompat.Builder(mContext, ID_NOTIFICATION_CHANNEL);
         summaryBuilder.setContentTitle(TAG)
-                .setSmallIcon(R.drawable.nube_x_logo)
-                .setGroup(NOTIFICATION_GROUP)
+                .setSmallIcon(R.drawable.ic_nube_x_logo)
+                .setGroup(ID_NOTIFICATION_GROUP)
                 .setGroupSummary(true)
                 .setAutoCancel(true)
                 .setNotificationSilent();

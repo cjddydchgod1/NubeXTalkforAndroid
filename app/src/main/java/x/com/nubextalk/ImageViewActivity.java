@@ -5,22 +5,18 @@
 
 package x.com.nubextalk;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatRoom;
-import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.PACS.PacsWebView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.webkit.CookieManager;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_HOME;
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_VIEWER;
 
 public class ImageViewActivity extends AppCompatActivity implements PacsWebView.onJavaScriptListener {
 
@@ -53,29 +49,28 @@ public class ImageViewActivity extends AppCompatActivity implements PacsWebView.
 
         String studyId = getIntent().getStringExtra("studyId");
         rid = getIntent().getStringExtra("rid");
-        if(UtilityManager.checkString(studyId)){
-            mPacsWebView.loadUrl("/mobile/app/?studyId="+studyId);
-        }
-        else{
-            mPacsWebView.loadUrl("/mobile/app/");
+        if (UtilityManager.checkString(studyId)) {
+            mPacsWebView.loadUrl(PATH_PACS_VIEWER + studyId);
+        } else {
+            mPacsWebView.loadUrl(PATH_PACS_HOME);
         }
     }
 
     @Override
     public void onCall(String func, String... arg) {
-        switch (func){
+        switch (func) {
             case "shareApp":
-                if(UtilityManager.checkString(rid)) {
+                if (UtilityManager.checkString(rid)) {
                     Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                    intent.putExtra("studyId",arg[0]);
-                    intent.putExtra("description",arg[1]);
-                    intent.putExtra("rid",rid);
+                    intent.putExtra("studyId", arg[0]);
+                    intent.putExtra("description", arg[1]);
+                    intent.putExtra("rid", rid);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(ImageViewActivity.this, SharePACSActivity.class);
                     Bundle bundle = new Bundle();
-                    intent.putExtra("studyId",arg[0]);
-                    intent.putExtra("description",arg[1]);
+                    intent.putExtra("studyId", arg[0]);
+                    intent.putExtra("description", arg[1]);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }

@@ -8,9 +8,7 @@ package x.com.nubextalk;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -53,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction2;
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
-    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +66,11 @@ public class MainActivity extends AppCompatActivity {
         initBottomNavigation();
 
         // Begin fragment transaction
-        String requestChatList = getIntent().getStringExtra("requestChatList");
+        int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction2 = fragmentManager.beginTransaction();
 
-        if (UtilityManager.checkString(requestChatList)) {
+        if (requestChatList == RESULT_OK) {
             fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
             bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
@@ -88,11 +85,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d("NEWINTENT", "main activity new intent");
 
-        String requestChatList = intent.getStringExtra("requestChatList");
+        int requestChatList = intent.getIntExtra("requestChatList", RESULT_CANCELED);
         fragmentTransaction = fragmentManager.beginTransaction();
-        if (UtilityManager.checkString(requestChatList)) {
+        if (requestChatList == RESULT_OK) {
             fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
             bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
@@ -127,10 +123,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-    }
-
-    public void startChatAddActivity(Intent intent) {
-        startActivityForResult(intent, CHAT_ADD);
     }
 
     public void startChatRoomActivity(Intent intent) {

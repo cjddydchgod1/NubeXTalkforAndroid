@@ -5,15 +5,14 @@
 
 package x.com.nubextalk;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Switch;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -25,8 +24,8 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 
 public class RegisterActivity extends AppCompatActivity {
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch sslInput;
+
+    private SwitchCompat sslInput;
     private EditText nameInput;
     private EditText hostInput;
     private EditText portInput;

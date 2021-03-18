@@ -30,8 +30,7 @@ public class PACSPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         int index = getRealPosition(position);
         Fragment fragment;
-        Log.e("adapter", Integer.toString(position));
-        switch(index){
+        switch (index) {
             case 1:
                 fragment = new PACSChatListFragment();
                 fragment.setArguments(bundle);
@@ -49,6 +48,6 @@ public class PACSPagerAdapter extends FragmentStateAdapter {
     }
 
     private int getRealPosition(int pos) {
-        return pos%REFERENCE_ITEM_SIZE;
+        return pos % REFERENCE_ITEM_SIZE;
     }
 }

@@ -6,14 +6,12 @@
 package x.com.nubextalk.Model;
 
 import android.content.Context;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.UUID;
-
-import androidx.annotation.NonNull;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -21,7 +19,6 @@ import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.UtilityManager;
 
 public class Config extends RealmObject {
-//    @NonNull
     @PrimaryKey
     @NonNull
     private String CODENAME;
@@ -33,12 +30,6 @@ public class Config extends RealmObject {
     private String ext4;
     private String ext5;
 
-//    public String getOid() {
-//        return oid;
-//    }
-//    public void setOid(String oid) {
-//        this.oid = oid;
-//    }
     @NonNull
     public String getCODENAME() {
         return CODENAME;

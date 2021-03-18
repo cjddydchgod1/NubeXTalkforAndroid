@@ -21,9 +21,14 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.realm.Realm;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
+
+import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
+import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
+import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
 
 public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final LayoutInflater mInflater;
@@ -63,26 +68,26 @@ public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (user.getAppName() != null) {
             mHolder.profileName.setText(user.getAppName());
         } else {
-            mHolder.profileName.setText("");
+            mHolder.profileName.setText(EMPTY);
         }
 
         //사진 설정
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
             aq.view(mHolder.profileImage).image(user.getAppImagePath());
         } else {
-            aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            aq.view(mHolder.profileImage).image(DEFAULT_PROFILE);
         }
 
         //상태 설정
         switch (user.getAppStatus()) {
             case "1":
-                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                aq.view(mHolder.profileStatus).image(STATUS_BUSY);
                 break;
             case "2":
-                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                aq.view(mHolder.profileStatus).image(STATUS_OFF);
                 break;
             default: // 0과 기본으로 되어있는 설정
-                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                aq.view(mHolder.profileStatus).image(STATUS_ON);
                 break;
         }
 

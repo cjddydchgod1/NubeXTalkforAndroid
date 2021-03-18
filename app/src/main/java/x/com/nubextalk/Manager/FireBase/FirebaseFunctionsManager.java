@@ -5,11 +5,8 @@
 
 package x.com.nubextalk.Manager.FireBase;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -27,6 +24,16 @@ import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 
+import static x.com.nubextalk.Module.CodeResources.FIREBASE_LOC;
+import static x.com.nubextalk.Module.CodeResources.FUNCTION_CREATE_CHAT_ROOM;
+import static x.com.nubextalk.Module.CodeResources.FUNCTION_EXIT_CHAT_ROOM;
+import static x.com.nubextalk.Module.CodeResources.FUNCTION_GET_CHAT_ROOM;
+import static x.com.nubextalk.Module.CodeResources.FUNCTION_GET_PERSONAL_CHAT_ROOM_ID;
+import static x.com.nubextalk.Module.CodeResources.FUNCTION_GET_USER_IN_CHAT_ROOMS_ID;
+import static x.com.nubextalk.Module.CodeResources.FUNCTION_NOTIFY_TO_CHAT_ROOM_ADDED_USER;
+import static x.com.nubextalk.Module.CodeResources.FUNTION_CREATE_CHAT;
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+
 /**
  * FireBase Functions 함수 기능 부분
  * - 각 Functions Name이 Firebase Function에 등록된 함수와 매칭되어야함
@@ -35,35 +42,11 @@ import x.com.nubextalk.Model.ChatRoom;
  */
 public class FirebaseFunctionsManager {
 
-    public static final String FUNTION_TEST = "executeTest";
-    public static final String FUNCTION_CREATE_CHAT_ROOM = "createChatRoom";
-    public static final String FUNTION_CREATE_CHAT = "createChat";
-    public static final String FUNCTION_GET_CHAT_ROOM = "getChatRoom";
-
-
     /**
      * Interface
      **/
     public interface OnCompleteListener {
         void onComplete(String result);
-    }
-
-    /**
-     * EXECUTE TEST
-     */
-    public static Task<HttpsCallableResult> executeTest(String token) {
-        return executeTest(token, null);
-    }
-
-    public static Task<HttpsCallableResult> executeTest(String token, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("token", token);
-
-        return functions
-                .getHttpsCallable(FUNTION_TEST)
-                .call(params);
     }
 
     /**
@@ -95,6 +78,7 @@ public class FirebaseFunctionsManager {
 
     /**
      * Firebase Functions 통해 FireStore 에 채팅 메세지 생성 후 채팅방 유저들에게 FCM 메세지 보냄
+     *
      * @param data
      * @return
      */
@@ -103,10 +87,9 @@ public class FirebaseFunctionsManager {
     }
 
     public static Task<HttpsCallableResult> createChat(@NonNull Map data, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance("asia-northeast3");
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
-//        params.put("hospitalId", data.get("hid"));
-        params.put("hospitalId", "w34qjptO0cYSJdAwScFQ");
+        params.put("hospitalId", HOSPITAL_ID);
         params.put("chatRoomId", data.get("rid"));
         params.put("chatContentId", data.get("cid"));
         params.put("senderId", data.get("uid"));
@@ -159,7 +142,7 @@ public class FirebaseFunctionsManager {
         params.put("hospitalId", hospitalId);
         params.put("userId", userId);
 
-        return functions.getHttpsCallable("getUserAttendingChatRoom")
+        return functions.getHttpsCallable(FUNCTION_GET_USER_IN_CHAT_ROOMS_ID)
                 .call(params).addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<HttpsCallableResult>() {
                     @Override
                     public void onComplete(@NonNull Task<HttpsCallableResult> task) {
@@ -179,7 +162,7 @@ public class FirebaseFunctionsManager {
 
                                 for (String rid : chatRoomIdList) {
 //                                    Log.d("login test", "chatroom id: " + rid);
-                                    getChatRoom("w34qjptO0cYSJdAwScFQ", rid)
+                                    getChatRoom(HOSPITAL_ID, rid)
                                             .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<HttpsCallableResult>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<HttpsCallableResult> task) {
@@ -241,7 +224,7 @@ public class FirebaseFunctionsManager {
         params.put("senderId", data.get("senderId"));
 
         return functions
-                .getHttpsCallable("notifyToChatRoomAddedUser")
+                .getHttpsCallable(FUNCTION_NOTIFY_TO_CHAT_ROOM_ADDED_USER)
                 .call(params);
     }
 
@@ -264,7 +247,7 @@ public class FirebaseFunctionsManager {
         params.put("roomMemberId", userId);
         params.put("chatRoomId", chatRoomId);
         return functions
-                .getHttpsCallable("exitChatRoom")
+                .getHttpsCallable(FUNCTION_EXIT_CHAT_ROOM)
                 .call(params);
     }
 
@@ -277,12 +260,12 @@ public class FirebaseFunctionsManager {
      * @param anotherUserId
      * @return
      */
-    public static Task<HttpsCallableResult> checkIfOneOnOneChatRoomExists(
+    public static Task<HttpsCallableResult> getPersonalChatRoomId(
             @NonNull String hospitalId, @NonNull String myUserId, @NonNull String anotherUserId) {
-        return checkIfOneOnOneChatRoomExists(hospitalId, myUserId, anotherUserId, null);
+        return getPersonalChatRoomId(hospitalId, myUserId, anotherUserId, null);
     }
 
-    public static Task<HttpsCallableResult> checkIfOneOnOneChatRoomExists(
+    public static Task<HttpsCallableResult> getPersonalChatRoomId(
             @NonNull String hospitalId, @NonNull String myUserId,
             @NonNull String anotherUserId, OnCompleteListener onCompleteListener) {
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
@@ -291,7 +274,7 @@ public class FirebaseFunctionsManager {
         params.put("myUserId", myUserId);
         params.put("anotherUserId", anotherUserId);
         return functions
-                .getHttpsCallable("checkIfOneOnOneChatRoomExists")
+                .getHttpsCallable(FUNCTION_GET_PERSONAL_CHAT_ROOM_ID)
                 .call(params)
                 .addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<HttpsCallableResult>() {
                     @Override

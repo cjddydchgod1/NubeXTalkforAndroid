@@ -43,6 +43,10 @@ import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAddMemberAdapter;
 import x.com.nubextalk.Module.Adapter.ChatAddSearchAdapter;
 
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+import static x.com.nubextalk.Module.CodeResources.MSG_INVITE_MEMBER;
+
 public class ChatAddActivity extends AppCompatActivity implements
         ChatAddSearchAdapter.OnItemSelectedListener, View.OnClickListener {
     private ArrayList<User> userList = new ArrayList<User>();
@@ -57,7 +61,6 @@ public class ChatAddActivity extends AppCompatActivity implements
     private RecyclerView selectedMemberView;
     private Realm realm;
     private String chatRoomId = null;
-    private String hospitalId;
     private Context mContext;
 
 
@@ -71,9 +74,8 @@ public class ChatAddActivity extends AppCompatActivity implements
         if (intent.hasExtra("rid")) {
             chatRoomId = intent.getExtras().getString("rid");
         }
-
         mContext = this;
-        hospitalId = "w34qjptO0cYSJdAwScFQ";
+
         realm = Realm.getInstance(UtilityManager.getRealmConfig());
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         userNameInput = findViewById(R.id.chat_add_chat_user_input);
@@ -97,7 +99,6 @@ public class ChatAddActivity extends AppCompatActivity implements
 
         //선택된 사용자 표시 리싸이클러뷰 설정
         selectedMemberView = findViewById(R.id.chat_added_member_view);
-//        selectedMemberAdapter = new ChatAddMemberAdapter(this, addedUserList);
         selectedMemberAdapter = new ChatAddMemberAdapter(this, chatAddActivityUserArrayList);
 
         selectedMemberView.
@@ -142,7 +143,6 @@ public class ChatAddActivity extends AppCompatActivity implements
                 if (user != null) {
                     chatAddActivityUserArrayList.add(new ChatAddActivityUser(user, true));
                 }
-
             }
             removeExistUserItem(userList);
         }
@@ -186,7 +186,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         selectedMemberView.scrollToPosition(selectedMemberAdapter.getItemCount() - 1);
 
         //사용자 아이템을 클릭한 뒤 사용자 검색창 초기화 및 키보드 숨기기
-        userNameInput.setText("");
+        userNameInput.setText(EMPTY);
         imm.hideSoftInputFromWindow(realmMemberSearchView.getWindowToken(), 0);
     }
 
@@ -259,8 +259,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                                         }
                                     }
 
-                                    inviteChatUser(realm, hospitalId, chatRoomId, userArrayList);
-                                    Toast.makeText(mContext, "대화 상대가 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                    inviteChatUser(realm, HOSPITAL_ID, chatRoomId, userArrayList);
                                     onBackPressed();
 
                                 } else { // 기존 1:1 채팅방에서 새로운 대화상대를 초대하는 경우 새로운 단체 채팅방 생성
@@ -299,9 +298,8 @@ public class ChatAddActivity extends AppCompatActivity implements
      */
     public static void createNewChat(Realm realm, Context context, ArrayList<User> userList, String roomName,
                                      onNewChatCreatedListener onNewChatCreatedListener) {
-        String hospital = "w34qjptO0cYSJdAwScFQ";
         Map<String, Object> data = new HashMap<>();
-        data.put("hospital", hospital);
+        data.put("hospital", HOSPITAL_ID);
         final String[] rid = {null};
 
         ArrayList<String> userIdList = new ArrayList<>();
@@ -323,6 +321,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
     /**
      * 유저 리스트를 입력받아 유저들의 이름 시퀀스 문자열을 반환해주는 함수
+     *
      * @param userArrayList
      * @return
      */
@@ -340,6 +339,7 @@ public class ChatAddActivity extends AppCompatActivity implements
 
     /**
      * 기존 채팅방 유저가 있는 경우 유저 검색 리스트에 기존 채팅방 유저가 나오지 않도록 데이터 제거 해주는 함수
+     *
      * @param userList
      */
     public void removeExistUserItem(ArrayList<User> userList) {
@@ -386,7 +386,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                 chat.put("cid", cid);
                 chat.put("uid", uid);
                 chat.put("rid", rid);
-                chat.put("content", "상대방을 초대중 입니다.");
+                chat.put("content", MSG_INVITE_MEMBER);
                 chat.put("type", "9");
 
                 ChatContent.createChat(realm, chat);

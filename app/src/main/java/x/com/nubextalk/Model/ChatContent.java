@@ -17,6 +17,8 @@ import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.DateManager;
 
 import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT3;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT4;
 
 public class ChatContent extends RealmObject {
     @NonNull
@@ -155,7 +157,7 @@ public class ChatContent extends RealmObject {
         String rid = data.get("rid").toString();
         String content = data.get("content").toString();
         Integer type = Integer.parseInt(data.get("type").toString());
-        Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString(DATE_FINAL,"yyyy-MM-dd HH:mm:ss") : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
+        Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString(DATE_FINAL,DATE_FORMAT3) : DateManager.convertDatebyString(data.get("sendDate").toString(), DATE_FORMAT4);
         Boolean isFirst = data.get("isFirst") != null && Boolean.parseBoolean(data.get("isFirst").toString());
         Boolean isRead = data.get("isRead") == null ? Config.getMyAccount(realm).getExt1().equals(uid) : Boolean.parseBoolean(data.get("isRead").toString());
 

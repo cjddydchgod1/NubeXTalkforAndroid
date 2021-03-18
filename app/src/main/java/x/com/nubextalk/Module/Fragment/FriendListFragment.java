@@ -6,15 +6,12 @@
 package x.com.nubextalk.Module.Fragment;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +27,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,7 +51,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -70,11 +65,24 @@ import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
-import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.R;
 
 import static android.app.Activity.RESULT_OK;
+import static x.com.nubextalk.Module.CodeResources.COMPLETE;
+import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+import static x.com.nubextalk.Module.CodeResources.MODIFICATION;
+import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
+import static x.com.nubextalk.Module.CodeResources.PATH_IMAGE;
+import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE1;
+import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE2;
+import static x.com.nubextalk.Module.CodeResources.SEARCH;
+import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
+import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
+import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
+import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm realm;
@@ -91,8 +99,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private AQuery aq;
     private ApiManager apiManager;
     private String myUid; // Uid
-    private String mHid = "w34qjptO0cYSJdAwScFQ";
-    private String TAG = "FriendListFragment";
+    private String mHid = HOSPITAL_ID;
     private User myProfile;
 
     /* bottomSheet */
@@ -114,7 +121,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     @Override
     public void onAttach(@NonNull Context context) {
         mContext = context;
-        if(context instanceof Activity)
+        if (context instanceof Activity)
             mActivity = (Activity) context;
         super.onAttach(context);
     }
@@ -123,20 +130,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        realm           = Realm.getInstance(UtilityManager.getRealmConfig());
-        apiManager      = new ApiManager(mActivity, realm);
+        realm = Realm.getInstance(UtilityManager.getRealmConfig());
+        apiManager = new ApiManager(mActivity, realm);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        rootview        = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
-        mRecyclerView   = rootview.findViewById(R.id.friendRecycleview);
-        mBottomWrapper  = rootview.findViewById(R.id.bottomWrapper);
-        mUserList       = new ArrayList<>();
-        aq              = new AQuery(mActivity);
+        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_friend_list, container, false);
+        mRecyclerView = rootview.findViewById(R.id.friendRecycleview);
+        mBottomWrapper = rootview.findViewById(R.id.bottomWrapper);
+        mUserList = new ArrayList<>();
+        aq = new AQuery(mActivity);
 
-        mActivity.setTitle(getString(R.string.frinedList));
+        mActivity.setTitle(TITLE_FRIEND_LIST);
 
         /**
          * bottomSheet
@@ -184,7 +191,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
     @Override
     public void onDetach() {
-        if(realm != null) {
+        if (realm != null) {
             realm.close();
             realm = null;
         }
@@ -203,7 +210,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 /**
                  * userlist -> realm 저장
                  */
-                try{
+                try {
                     /**
                      * String(body) -> JSONArray
                      */
@@ -215,11 +222,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                      */
                     int len = jsonArray.length();
 
-                    for(int i=0; i<len; i++) {
+                    for (int i = 0; i < len; i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                         User user = realm.where(User.class).equalTo("code", jsonObject.getString("code")).findFirst();
-                        if(user == null) {
+                        if (user == null) {
                             user = new User();
                             user.setCode(jsonObject.getString("code"));
                         } else {
@@ -234,7 +241,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         user.setAppStatus(jsonObject.getString("app_STATUS"));
                         user.setAppName(jsonObject.getString("app_NAME"));
                         user.setAppFcmKey(jsonObject.getString("app_FCM_KEY"));
-                        if(!UtilityManager.checkString(user.getAppNickName()))
+                        if (!UtilityManager.checkString(user.getAppNickName()))
                             user.setAppNickName(jsonObject.getString("lastname"));
                         mUserList.add(user);
                     }
@@ -256,8 +263,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
      * 나의 유저정보는 뺀다.
      */
     public void processData() {
-        for(User user : mUserList) {
-            if(user.getUserId().equals(Config.getMyUID(realm))) {
+        for (User user : mUserList) {
+            if (user.getUserId().equals(Config.getMyUID(realm))) {
                 myProfile = user;
                 mUserList.remove(user);
                 break;
@@ -267,7 +274,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * Adapter 설정
          */
-        mAdapter = new FriendListAdapter(mActivity ,mUserList, aq, NON_RADIO);
+        mAdapter = new FriendListAdapter(mActivity, mUserList, aq, NON_RADIO);
         mAdapter.setOnItemSelectedListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -282,23 +289,23 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         /**
          * profileImage valid check
          */
-        if(URLUtil.isValidUrl(myProfile.getAppImagePath())){
+        if (URLUtil.isValidUrl(myProfile.getAppImagePath())) {
             aq.view(myProfileImage).image(myProfile.getAppImagePath());
         } else {
-            aq.view(myProfileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            aq.view(myProfileImage).image(DEFAULT_PROFILE);
         }
         myProfileName.setText(myProfile.getAppName());
-        switch(myProfile.getAppStatus()) {
-            case "1" :
-                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+        switch (myProfile.getAppStatus()) {
+            case "1":
+                aq.view(myProfileStatus).image(STATUS_BUSY);
                 break;
-            case "2" :
-                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+            case "2":
+                aq.view(myProfileStatus).image(STATUS_OFF);
                 break;
-            default :
-                aq.view(myProfileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+            default:
+                aq.view(myProfileStatus).image(STATUS_ON);
                 break;
-            }
+        }
         rootview.findViewById(R.id.profileConstraintLayout).setOnClickListener(v -> {
             onSelected(myProfile);
         });
@@ -309,18 +316,18 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_toolbar, menu);
-        MenuItem searchItem = menu.findItem(R.id.toolbar_search);
+        MenuItem searchItem = menu.findItem(SEARCH);
         SearchView searchView = (SearchView) searchItem.getActionView();
         // 바로 검색이 가능하게끔
         searchView.onActionViewExpanded();
 
         //Change searchView widgets color
         SearchView.SearchAutoComplete searchAutoComplete =
-                (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+                (SearchView.SearchAutoComplete) searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setHintTextColor(getResources().getColor(R.color.cWhite, null));
         searchAutoComplete.setTextColor(getResources().getColor(R.color.cWhite, null));
 
-        ImageView clearButton = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        ImageView clearButton = (ImageView) searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         clearButton.setColorFilter(getResources().getColor(R.color.cWhite, null));
 
         /**
@@ -341,23 +348,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             }
         });
     }
+
     public void search(String query) {
         // 문자 입력시마다 리스트를 지우고 새로 뿌려준다.
         mUserList.clear();
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (query.length() == 0) {
-            Log.i(TAG, "notInput Alldata");
             mResults = realm.where(User.class).findAll();
             mUserList.addAll(realm.copyFromRealm(mResults));
         }
         // 문자 입력을 할때..
-        else
-        {
-            Log.i(TAG, "Input data");
+        else {
             mUserList.addAll(realm.where(User.class).contains("appName", query).findAll());
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
-        Log.i(TAG, "Notify");
 
         mAdapter.notifyDataSetChanged();
     }
@@ -371,35 +375,34 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
 
-    @SuppressLint("ClickableViewAccessibility")
     protected void initBottomsheet(User user) {
         /**
          * 데이터 초기화
          */
         profileName.setText(user.getAppName());
-        switch(user.getAppStatus()) {
-            case "1" :
-                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+        switch (user.getAppStatus()) {
+            case "1":
+                aq.view(profileStatus).image(STATUS_BUSY);
                 break;
-            case "2" :
-                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+            case "2":
+                aq.view(profileStatus).image(STATUS_OFF);
                 break;
-            default : // 0과 기본으로 되어있는 설정
-                aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+            default: // 0과 기본으로 되어있는 설정
+                aq.view(profileStatus).image(STATUS_ON);
                 break;
         }
 
-        if(URLUtil.isValidUrl(user.getAppImagePath())){
+        if (URLUtil.isValidUrl(user.getAppImagePath())) {
             aq.view(profileImage).image(user.getAppImagePath());
         } else {
-            aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            aq.view(profileImage).image(DEFAULT_PROFILE);
         }
         /**
          * 임시로 userId로 primaryKey를 사용하고 있지만, 추후에 code로 변경해야 한다.
          * if(user.getCode().equals(myUid))
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if(user.getUserId().equals(myUid)){
+        if (user.getUserId().equals(myUid)) {
             modifyImageButton.setVisibility(View.VISIBLE);
             chatButton.setVisibility((View.GONE));
             profileStatus.setClickable(true);
@@ -411,7 +414,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         statusLayout.setVisibility(View.INVISIBLE);
         modifyName.setVisibility(View.GONE);
         profileName.setVisibility(View.VISIBLE);
-        modifyNameButton.setText("수정");
+        modifyNameButton.setText(MODIFICATION);
 
         // 해당 exitWrapper클릭시 onBackPressed() 수행
         exitWrapper.setVisibility(View.VISIBLE);
@@ -423,7 +426,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // 프로필 사진 변경 (myProfile만 가능)
         modifyImageButton.setOnClickListener(v -> {
-            if(ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             } else {
                 startGallery();
@@ -446,12 +449,12 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             User.getChatroom(realm, user, new User.UserListener() {
                 @Override
                 public void onFindPersonalChatRoom(ChatRoom chatRoom) {
-                     if(chatRoom==null){
+                    if (chatRoom == null) {
                         // 새로만든 채팅이 없다면 새로 만든다.
                         ArrayList<User> list = new ArrayList<>();
                         list.add(user);
                         Intent intent = new Intent(mActivity, ChatRoomActivity.class);
-                        new ChatAddActivity().createNewChat(realm, mContext, list, "", new ChatAddActivity.onNewChatCreatedListener() {
+                        new ChatAddActivity().createNewChat(realm, mContext, list, EMPTY, new ChatAddActivity.onNewChatCreatedListener() {
                             @Override
                             public void onCreate(String rid) {
                                 intent.putExtra("rid", rid);
@@ -459,11 +462,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                             }
                         });
 
-                     } else {
+                    } else {
                         Intent intent = new Intent(mActivity, ChatRoomActivity.class);
                         intent.putExtra("rid", chatRoom.getRid());
                         ((MainActivity) mActivity).startChatRoomActivity(intent);
-                     }
+                    }
                 }
             });
 
@@ -478,7 +481,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         exitWrapper.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+                if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
                     onBackPressed();
                 }
                 return true;
@@ -495,7 +498,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
     // bottomsheet 닫기버튼
     public boolean onBackPressed() {
-        if(mBottomWrapper.getTranslationY() == 0) {
+        if (mBottomWrapper.getTranslationY() == 0) {
             new AnimManager(
                     AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
             ).start(AnimManager.TOGETHER);
@@ -505,10 +508,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             return false;
         }
     }
+
     public void changeOpponentNickName(User user) {
         String buttonName = modifyNameButton.getText().toString();
-        if(buttonName.equals("수정")) { // 수정버튼을 눌렀을 경우
-            modifyNameButton.setText("완료");
+        if (buttonName.equals(MODIFICATION)) { // 수정버튼을 눌렀을 경우
+            modifyNameButton.setText(COMPLETE);
             profileName.setVisibility(View.GONE);
             modifyName.setVisibility(View.VISIBLE);
             modifyName.setText(profileName.getText().toString());
@@ -533,13 +537,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 statusLayout.setVisibility(View.INVISIBLE);
                 realm.executeTransaction(realm1 -> {
                     switch (v.getId()) {
-                        case R.id.working_status :
+                        case R.id.working_status:
                             user.setAppStatus("0");
                             break;
-                        case R.id.leaving_status :
+                        case R.id.leaving_status:
                             user.setAppStatus("1");
                             break;
-                        case R.id.vacation_status :
+                        case R.id.vacation_status:
                             user.setAppStatus("2");
                             break;
                     }
@@ -548,7 +552,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                     @Override
                     public void onSuccess(Response response, String body) {
                         refreshFragment();
-                        Log.d("setEmplyee", body);
                     }
                 });
             }
@@ -562,7 +565,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private void startGallery() {
         // 갤러리를 들어가기 위한 intent
         Intent cameraIntent = new Intent(Intent.ACTION_PICK);
-        cameraIntent.setType("image/*");
+        cameraIntent.setType(PATH_IMAGE);
         if (cameraIntent.resolveActivity(mActivity.getPackageManager()) != null) {
             // 갤러리 실행
             startActivityForResult(cameraIntent, 1);
@@ -572,42 +575,42 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     // Gallery 실행 후 결과
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == 1) {
-            if(resultCode == RESULT_OK) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
                 try {
                     Uri imgUri = data.getData();
                     /* Uri값의 이미지값을 불러온다.
                      * 이미지값을 저장한다.
                      * 해당 이미지값을 Storage에 올린다.
                      */
-                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri,"hospital/"+mHid+"/users/"+myUid);
+
+                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri, PATH_STORAGE1 + mHid + PATH_STORAGE2 + myUid);
                     Task<Uri> urlTask = uploadTask
                             .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                                 @Override
                                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                                    if(!task.isSuccessful()) {
+                                    if (!task.isSuccessful()) {
                                         throw task.getException();
                                     }
-                                    return FirebaseStorageManager.downloadFile("hospital/"+mHid+"/users/"+myUid);
+                                    return FirebaseStorageManager.downloadFile(PATH_STORAGE1 + mHid + PATH_STORAGE2 + myUid);
                                 }
                             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
-                                    if(task.isSuccessful()) {
+                                    if (task.isSuccessful()) {
                                         Uri imgUri = task.getResult();
-                                        if (imgUri != null){
+                                        if (imgUri != null) {
                                             realm.executeTransaction(realm1 -> {
                                                 myProfile.setAppImagePath(imgUri.toString());
                                             });
                                             apiManager.setEmployeeAppInfo(myProfile, new ApiManager.onApiListener() {
-                                                    @Override
-                                                    public void onSuccess(Response response, String body) {
-                                                        refreshFragment();
-                                                    }
-                                                });
-                                         }
-                                     else
-                                         Log.i("FriendListFragment", "uploadProfileImgFail");
+                                                @Override
+                                                public void onSuccess(Response response, String body) {
+                                                    refreshFragment();
+                                                }
+                                            });
+                                        } else {
+                                        }
                                     }
                                 }
                             });

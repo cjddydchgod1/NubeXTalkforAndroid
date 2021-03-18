@@ -9,7 +9,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,6 +18,10 @@ import androidx.fragment.app.DialogFragment;
 import io.realm.Realm;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.R;
+
+import static x.com.nubextalk.Module.CodeResources.CANCEL;
+import static x.com.nubextalk.Module.CodeResources.CONFIRM;
+import static x.com.nubextalk.Module.CodeResources.MSG_EMPTY_ROOM_NAME;
 
 public class RoomNameModificationDialogFragment extends DialogFragment {
 
@@ -41,22 +44,21 @@ public class RoomNameModificationDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.dialog_change_roomname, null))
+        builder.setView(inflater.inflate(R.layout.fragment_dialog_change_roomname, null))
 
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                .setPositiveButton(CONFIRM, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         EditText roomNameView = getDialog().findViewById(R.id.modified_room_name);
                         String roomName = roomNameView.getText().toString();
                         if (!roomName.equals("")) {
-                            Log.d("dialog", "roomname: " + roomName);
                             changeRoomName(chatRoomId, roomName);
                         } else {
-                            Toast.makeText(getContext(), "채팅방 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), MSG_EMPTY_ROOM_NAME, Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
-                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                .setNegativeButton(CANCEL, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();

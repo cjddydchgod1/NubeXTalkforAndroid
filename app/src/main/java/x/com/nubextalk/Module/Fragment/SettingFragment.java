@@ -6,8 +6,6 @@
 package x.com.nubextalk.Module.Fragment;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,7 +25,6 @@ import com.joanzapata.iconify.widget.IconTextView;
 
 import io.realm.Realm;
 import x.com.nubextalk.HowToUseActivity;
-import x.com.nubextalk.LoadingActivity;
 import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.FcmTokenRefreshService;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
@@ -67,7 +64,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         mWrapperAccount       = rootview.findViewById(R.id.wrapperAccount);
         mWrapperVesionInfo    = rootview.findViewById(R.id.wrapperVesionInfo);
 
-        mActivity.setTitle(getString(R.string.settingFragment));
+        mActivity.setTitle(TITLE_SETTING);
 
         mWrapperHowToUse      = rootview.findViewById(R.id.wrapperHowToUse);
 
@@ -107,7 +104,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         /** APP **/
 
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_switch, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("알람 받기");
+        ((IconTextView) l.findViewById(R.id.titleRow)).setText(ALARM);
         SwitchCompat AlarmSwitch = l.findViewById(R.id.switchRow);
         AlarmSwitch.setChecked(alarm.getExt1().equals("true"));
         AlarmSwitch.setOnCheckedChangeListener(this);
@@ -117,26 +114,26 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
 
         /** dark mode **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("테마설정");
-        l.setTag(EXE_SCREENMODE);
+        ((IconTextView) l.findViewById(R.id.titleRow)).setText(SETTING_THEME);
+        l.setTag(EXE_THEME);
         l.setOnClickListener(this);
         mWrapperApp.addView(l);
 
         /** USER **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("로그아웃");
+        ((IconTextView) l.findViewById(R.id.titleRow)).setText(LOGOUT);
         l.setTag(EXE_LOGOUT);
         l.setOnClickListener(this);
         mWrapperAccount.addView(l);
 
         /** How to use **/
-        mWrapperHowToUse.setTag(EXE_HOWTOUSE);
+        mWrapperHowToUse.setTag(EXE_HOW_TO_USE);
         mWrapperHowToUse.setOnClickListener(this);
 
         /** Version info **/
         l = (RelativeLayout) inflater.inflate(R.layout.item_settings_simple, null, false);
-        ((IconTextView) l.findViewById(R.id.titleRow)).setText("Nube X Talk 1.0.0");
-        l.setTag(EXE_VERSIONINFO);
+        ((IconTextView) l.findViewById(R.id.titleRow)).setText(VERSION);
+        l.setTag(EXE_VERSION_INFO);
         l.setOnClickListener(this);
         mWrapperVesionInfo.addView(l);
     }
@@ -145,7 +142,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
     public void onClick(View view) {
         Intent intent;
         switch ((int) view.getTag()) {
-            case EXE_SCREENMODE:
+            case EXE_THEME:
                 intent = new Intent(mActivity, ThemeModeActivity.class);
                 startActivity(intent);
                 break;
@@ -166,11 +163,11 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
                 intent = new Intent(mActivity, LoginActivity.class);
                 startActivity(intent);
                 break;
-            case EXE_HOWTOUSE:
+            case EXE_HOW_TO_USE:
                 intent = new Intent(mActivity, HowToUseActivity.class);
                 startActivity(intent);
                 break;
-            case EXE_VERSIONINFO:
+            case EXE_VERSION_INFO:
                 break;
         }
 

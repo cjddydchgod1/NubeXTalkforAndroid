@@ -31,7 +31,7 @@
                     android:id="@+id/my_profileImage"
                     android:layout_width="@dimen/profile_image_m"
                     android:layout_height="@dimen/profile_image_m"
-                    android:src="@drawable/baseline_account_circle_white_24dp"
+                    android:src="@drawable/ic_default_profile_white_24"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,7 +40,7 @@
                     android:layout_width="@dimen/status_m"
                     android:layout_height="@dimen/status_m"
                     android:layout_gravity="right|bottom"
-                    android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+                    android:src="@drawable/ic_status_on" />
             </FrameLayout>
 
             <TextView

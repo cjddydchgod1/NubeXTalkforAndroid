@@ -5,30 +5,24 @@
 
 package x.com.nubextalk.Model;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
-import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.R;
+
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT4;
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
 
 
 public class ChatRoom extends RealmObject {
@@ -126,32 +120,6 @@ public class ChatRoom extends RealmObject {
         this.isGroupChat = isGroupChat;
     }
 
-    /**
-     * Data 초기화 함수
-     *
-     * @param realm
-     */
-    public static void init(Context context, Realm realm) {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(UtilityManager.loadJson(context, "example_chat_room.json")); //json 파일 추가
-            RealmList<ChatRoom> list = new RealmList<>();
-            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
-                String rid = it.next();
-                jsonObject.getJSONObject(rid).put("rid", rid);
-                jsonArray.put(jsonObject.getJSONObject(rid));
-            }
-
-            realm.executeTransaction(realm1 -> {
-                realm1.where(ChatRoom.class).findAll().deleteAllFromRealm();
-                realm1.createOrUpdateAllFromJson(ChatRoom.class, jsonArray);
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static RealmResults<ChatRoom> getAll(Realm realm) {
         return realm.where(ChatRoom.class).findAll();
     }
@@ -171,17 +139,17 @@ public class ChatRoom extends RealmObject {
         User myAccount = (User) User.getMyAccountInfo(realm);
 
         // userList 에 자신의 아이디 추가
-        if (!userList.contains(myAccount.getUserId())) {
-            userList.add(myAccount.getUserId());
+        if (!userList.contains(myAccount.getUid())) {
+            userList.add(myAccount.getUid());
         }
 
         // 채팅방 데이터 필드 초기화
         Date newDate = new Date();
-        final String[] rid = {data.get("rid") == null ? myAccount.getUserId().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString()};
+        final String[] rid = {data.get("rid") == null ? myAccount.getUid().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString()};
         String roomName = data.get("title") == null ? "" : data.get("title").toString();
         String roomImg = data.get("roomImgUrl") == null ? "" : data.get("roomImgUrl").toString();
         Date updatedDate = data.get("updatedDate") == null
-                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
+                ? newDate : DateManager.convertDatebyString(data.get("updatedDate").toString(), DATE_FORMAT4);
         String notificationId = data.get("notificationId") == null
                 ? String.valueOf(newDate.hashCode()) : data.get("notificationId").toString();
         Boolean isGroupChat = data.get("isGroupChat") == null ? false : (Boolean) data.get("isGroupChat");
@@ -189,15 +157,15 @@ public class ChatRoom extends RealmObject {
         int memberCount = userList.size();
         if (memberCount < 3) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
             for (String userId : userList) {
-                if (!userId.equals(myAccount.getUserId())) {
-                    User user = realm.where(User.class).equalTo("userId", userId).findFirst();
+                if (!userId.equals(myAccount.getUid())) {
+                    User user = realm.where(User.class).equalTo("uid", userId).findFirst();
                     roomName = user.getAppName();
                     roomImg = user.getAppImagePath();
                     isGroupChat = false;
                 }
             }
         } else { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
-            roomImg = String.valueOf(R.drawable.ic_twotone_group_24);
+            roomImg = String.valueOf(R.drawable.ic_people_gray_24);
             isGroupChat = true;
         }
 
@@ -205,10 +173,20 @@ public class ChatRoom extends RealmObject {
         String finalRoomImg = roomImg;
         Boolean finalIsGroupChat = isGroupChat;
 
+
         // realm 로컬 채팅방 생성
         if (memberCount == 2) { // 1:1 채팅방 생성인 경우 FireStore 에 기존 채팅방 존재 여부 확인
-            FirebaseFunctionsManager.checkIfOneOnOneChatRoomExists(
-                    "w34qjptO0cYSJdAwScFQ", myAccount.getUserId(), userList.get(0),
+
+            String anotherUserId = null;
+            for (String userId : userList) {
+                if (!userId.equals(myAccount.getUid())) {
+                    anotherUserId = userId;
+                }
+            }
+
+            FirebaseFunctionsManager.getPersonalChatRoomId(
+
+                    HOSPITAL_ID, myAccount.getUid(), anotherUserId,
                     new FirebaseFunctionsManager.OnCompleteListener() {
                         @Override
                         public void onComplete(String result) {
@@ -237,10 +215,10 @@ public class ChatRoom extends RealmObject {
                                         ChatRoomMember.addChatRoomMember(realm, rid[0], uid, new ChatRoomMember.OnChatRoomMemberListener() {
                                             @Override
                                             public void onCreate() {
-                                                onChatRoomCreatedListener.onCreate(chatRoom);
                                             }
                                         });
                                     }
+                                    onChatRoomCreatedListener.onCreate(chatRoom);
 
                                 }
                             });
@@ -267,10 +245,10 @@ public class ChatRoom extends RealmObject {
                         ChatRoomMember.addChatRoomMember(realm, rid[0], uid, new ChatRoomMember.OnChatRoomMemberListener() {
                             @Override
                             public void onCreate() {
-                                onChatRoomCreatedListener.onCreate(chatRoom);
                             }
                         });
                     }
+                    onChatRoomCreatedListener.onCreate(chatRoom);
                 }
             });
         }

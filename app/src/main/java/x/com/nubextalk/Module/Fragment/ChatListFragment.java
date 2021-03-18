@@ -11,17 +11,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RadioButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -34,24 +32,31 @@ import x.com.nubextalk.Manager.FireBase.FirebaseFunctionsManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.User;
-import static x.com.nubextalk.Module.CodeResources.RADIO;
-import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
 import x.com.nubextalk.Module.Adapter.ChatListAdapter;
 import x.com.nubextalk.R;
 
+import static x.com.nubextalk.Module.CodeResources.ADD_MEMBER;
+import static x.com.nubextalk.Module.CodeResources.ALARM;
+import static x.com.nubextalk.Module.CodeResources.ALARM_OFF;
+import static x.com.nubextalk.Module.CodeResources.ALARM_ON;
+import static x.com.nubextalk.Module.CodeResources.EXIT;
+import static x.com.nubextalk.Module.CodeResources.FIX_TOP;
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+import static x.com.nubextalk.Module.CodeResources.RENAME_TITLE;
+import static x.com.nubextalk.Module.CodeResources.TITLE_CHAT_LIST;
+import static x.com.nubextalk.Module.CodeResources.TITLE_CHAT_SETTING;
+
 public class ChatListFragment extends Fragment implements ChatListAdapter.OnItemLongSelectedListener,
         ChatListAdapter.OnItemSelectedListener {
-    private Realm realm;
-    private RealmResults<ChatRoom> chatRoomResults;
+    private Realm mRealm;
+    private RealmResults<ChatRoom> mChatRoomList;
     private Context mContext;
     private Activity mActivity;
 
-    private String hospitalId;
+    private String mHid;
 
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
-
-    private FloatingActionButton fab_sub1;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -64,27 +69,28 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
-        mActivity.setTitle(getString(R.string.chatList));
-        hospitalId = "w34qjptO0cYSJdAwScFQ";
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
-        chatRoomResults = ChatRoom.getAll(realm);
+        ViewGroup rootView  = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
+        mActivity.setTitle(TITLE_CHAT_LIST);
+        mHid                = HOSPITAL_ID;
+        mRealm              = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRecyclerView       = rootView.findViewById(R.id.fragment_chat_list_view);
+        mChatRoomList       = ChatRoom.getAll(mRealm);
+        FloatingActionButton fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
 
-        mAdapter = new ChatListAdapter(getActivity(), chatRoomResults, NON_RADIO);
+        mAdapter = new ChatListAdapter(getActivity(), mChatRoomList, false);
         mAdapter.setItemLongSelectedListener(this);
         mAdapter.setItemSelectedListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
 
-        realm.addChangeListener(new RealmChangeListener<Realm>() {
+        mRealm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm realm) {
                 refreshChatList();
             }
         });
 
-        fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
+
         fab_sub1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,10 +104,10 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (realm != null) {
-            realm.removeAllChangeListeners();
-            realm.close();
-            realm = null;
+        if (mRealm != null) {
+            mRealm.removeAllChangeListeners();
+            mRealm.close();
+            mRealm = null;
         }
     }
 
@@ -113,12 +119,12 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         boolean fixTop = chatRoom.getSettingFixTop();
         boolean alarm = chatRoom.getSettingAlarm();
 
-        String[] menuArray = new String[]{"알림", "대화상대 추가", "상단 고정", "채팅방 이름 편집", "나가기"};
-        menuArray[0] = alarm ? menuArray[0].concat(" 해제") : menuArray[0].concat(" 켜기");
-        menuArray[2] = fixTop ? menuArray[2].concat(" 해제") : "상단 고정";
+        String[] menuArray = new String[]{ALARM, ADD_MEMBER, FIX_TOP, RENAME_TITLE, EXIT};
+        menuArray[0] = alarm ? menuArray[0].concat(ALARM_OFF) : menuArray[0].concat(ALARM_ON);
+        menuArray[2] = fixTop ? menuArray[2].concat(ALARM_OFF) : FIX_TOP;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("채팅방 설정")
+        builder.setTitle(TITLE_CHAT_SETTING)
                 .setItems(menuArray, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int pos) {
@@ -155,18 +161,18 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     }
 
     private void openDialog(String chatRoomId) {
-        DialogFragment dialogFragment = new RoomNameModificationDialogFragment(realm, chatRoomId);
+        DialogFragment dialogFragment = new RoomNameModificationDialogFragment(mRealm, chatRoomId);
         dialogFragment.setTargetFragment(this, 0);
         dialogFragment.show(getParentFragmentManager(), "Change RoomName");
     }
 
     public void exitChatRoom(ChatRoom chatRoom) {
         if (chatRoom.getIsGroupChat()) {
-            User me = (User) User.getMyAccountInfo(realm);
-            ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
-            FirebaseFunctionsManager.exitChatRoom(hospitalId, me.getUserId(), chatRoom.getRid());
+            User me = (User) User.getMyAccountInfo(mRealm);
+            ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
+            FirebaseFunctionsManager.exitChatRoom(mHid, me.getUid(), chatRoom.getRid());
         } else {
-            ChatRoom.deleteChatRoom(realm, chatRoom.getRid());
+            ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
         }
     }
 
@@ -176,7 +182,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
      * @param chatRoom
      */
     public void updateChatRoomFixTop(ChatRoom chatRoom) {
-        realm.executeTransaction(new Realm.Transaction() {
+        mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 boolean fixTop = chatRoom.getSettingFixTop();
@@ -192,7 +198,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
      * @param chatRoom
      */
     public void updateChatRoomAlarm(ChatRoom chatRoom) {
-        realm.executeTransaction(new Realm.Transaction() {
+        mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 boolean alarm = chatRoom.getSettingAlarm();

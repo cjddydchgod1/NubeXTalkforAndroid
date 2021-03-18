@@ -9,14 +9,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class KeyboardManager extends View {
 
     private boolean mShownKeyboard;
     private OnShownKeyboardListener mOnShownSoftKeyboard;
-    private OnHiddenKeyboardListener onHiddenSoftKeyboard;
+    private OnHiddenKeyboardListener mOnHiddenSoftKeyboard;
 
     public KeyboardManager(Context context) {
         this(context, null);
@@ -45,8 +44,8 @@ public class KeyboardManager extends View {
     }
 
     public void onHiddenSoftKeyboard() {
-        if (onHiddenSoftKeyboard != null)
-            onHiddenSoftKeyboard.onHiddenSoftKeyboard();
+        if (mOnHiddenSoftKeyboard != null)
+            mOnHiddenSoftKeyboard.onHiddenSoftKeyboard();
     }
 
     public void onShownSoftKeyboard() {
@@ -59,7 +58,7 @@ public class KeyboardManager extends View {
     }
 
     public void setOnHiddenKeyboard(OnHiddenKeyboardListener listener) {
-        onHiddenSoftKeyboard = listener;
+        mOnHiddenSoftKeyboard = listener;
     }
 
 

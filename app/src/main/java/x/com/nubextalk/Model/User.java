@@ -5,11 +5,7 @@
 
 package x.com.nubextalk.Model;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-
-import java.util.Iterator;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -22,7 +18,7 @@ public class User extends RealmObject {
     @PrimaryKey
     private String code; // user id(고유)
     @NonNull
-    private String userId; // id(로그인)
+    private String uid; // id(로그인)
     private String lastName; // ??
     private String typeCode; // 직책번호
     private String typeCodeName; // 직책
@@ -44,12 +40,12 @@ public class User extends RealmObject {
     }
 
     @NonNull
-    public String getUserId() {
-        return userId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUserId(@NonNull String userId) {
-        this.userId = userId;
+    public void setUid(@NonNull String uid) {
+        this.uid = uid;
     }
 
     public String getLastName() {
@@ -131,11 +127,11 @@ public class User extends RealmObject {
     }
 
     public static User getMyAccountInfo(Realm realm) {
-        return realm.where(User.class).equalTo("userId", Config.getMyAccount(realm).getExt1()).findFirst();
+        return realm.where(User.class).equalTo("uid", Config.getMyAccount(realm).getExt1()).findFirst();
     }
 
     public static RealmResults<User> getUserlist(Realm realm) {
-        return realm.where(User.class).notEqualTo("userId", Config.getMyAccount(realm).getExt1()).findAll();
+        return realm.where(User.class).notEqualTo("uid", Config.getMyAccount(realm).getExt1()).findAll();
     }
 
     public interface UserListener {
@@ -143,7 +139,7 @@ public class User extends RealmObject {
     }
 
     public static void getChatroom(Realm realm, User user, UserListener userListener) {
-        RealmResults<ChatRoomMember> chatList = realm.where(ChatRoomMember.class).equalTo("uid", user.getUserId()).findAll();
+        RealmResults<ChatRoomMember> chatList = realm.where(ChatRoomMember.class).equalTo("uid", user.getUid()).findAll();
         ChatRoom chatRoom = null;
 
         if (chatList.size() != 0) {

@@ -14,7 +14,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import static x.com.nubextalk.Module.CodeResources.*;
+import static x.com.nubextalk.Module.CodeResources.THEME_MODE;
+import static x.com.nubextalk.Module.CodeResources.LIGHT_MODE;
+import static x.com.nubextalk.Module.CodeResources.DARK_MODE;
+import static x.com.nubextalk.Module.CodeResources.USER_MODE;
 import x.com.nubextalk.Model.Config;
 
 public class ThemeModeActivity extends AppCompatActivity {

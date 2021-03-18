@@ -5,15 +5,14 @@
 
 package x.com.nubextalk;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Switch;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -25,23 +24,23 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 
 public class RegisterActivity extends AppCompatActivity {
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch sslInput;
-    private EditText nameInput;
-    private EditText hostInput;
-    private EditText portInput;
-    private Realm realm;
+
+    private SwitchCompat mSslSwitch;
+    private EditText mEditName;
+    private EditText mEditHost;
+    private EditText mEditPort;
+    private Realm mRealm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        nameInput = findViewById(R.id.editTextHospitalName);
-        sslInput = findViewById(R.id.editTextSSL);
-        hostInput = findViewById(R.id.editTextHost);
-        portInput = findViewById(R.id.editTextPort);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mEditName = findViewById(R.id.editTextHospitalName);
+        mSslSwitch = findViewById(R.id.editTextSSL);
+        mEditHost = findViewById(R.id.editTextHost);
+        mEditPort = findViewById(R.id.editTextPort);
 
         Button registerButton = findViewById(R.id.buttonRegister);
         final RegisterActivity activity = this;
@@ -49,14 +48,14 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                realm.executeTransaction(new Realm.Transaction() {
+                mRealm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
                         Config serverInfo = Config.getServerInfo(realm);
-                        String ssl = sslInput.isChecked() ? "https://" : "http://";
-                        String host = hostInput.getText().toString().equals("") ? "121.166.85.235" : hostInput.getText().toString();
-                        String port = portInput.getText().toString().equals("") ? "" : ":".concat(portInput.getText().toString());
-                        String name = nameInput.getText().toString().equals("") ? "" : nameInput.getText().toString();
+                        String ssl = mSslSwitch.isChecked() ? "https://" : "http://";
+                        String host = mEditHost.getText().toString().equals("") ? "121.166.85.235" : mEditHost.getText().toString();
+                        String port = mEditPort.getText().toString().equals("") ? "" : ":".concat(mEditPort.getText().toString());
+                        String name = mEditName.getText().toString().equals("") ? "" : mEditName.getText().toString();
                         if (serverInfo == null) {
                             serverInfo = new Config();
                             serverInfo.setCODENAME("ServerInfo");
@@ -70,7 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     }
                 });
-                clearModels(realm);
+                clearModels(mRealm);
                 startActivity(new Intent(activity, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });

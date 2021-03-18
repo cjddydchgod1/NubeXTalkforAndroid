@@ -8,9 +8,7 @@ package x.com.nubextalk;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -33,6 +31,9 @@ import x.com.nubextalk.Module.Fragment.FriendListFragment;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.SettingFragment;
 
+import static x.com.nubextalk.Module.CodeResources.CHAT_ADD;
+import static x.com.nubextalk.Module.CodeResources.MOVE_TO_CHAT_ROOM;
+
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
  * ex:)
@@ -42,18 +43,15 @@ import x.com.nubextalk.Module.Fragment.SettingFragment;
  * ....
  */
 public class MainActivity extends AppCompatActivity {
-    private static final int CHAT_ADD = 0;
-    private static final int MOVE_TO_CHAT_ROOM = 1;
-    private FriendListFragment friendListFrag = new FriendListFragment();
-    private ChatListFragment chatListFrag = new ChatListFragment();
-    private PACSReferenceFragment pacsReferenceFrag = new PACSReferenceFragment();
-    private SettingFragment settingFrag = new SettingFragment();
-    private FragmentManager fragmentManager = getSupportFragmentManager();
-    private FragmentTransaction fragmentTransaction;
-    private FragmentTransaction fragmentTransaction2;
-    private Toolbar toolbar;
-    private BottomNavigationView bottomNavigationView;
-    private String token;
+
+    private FriendListFragment mFriendListFrag = new FriendListFragment();
+    private ChatListFragment mChatListFrag = new ChatListFragment();
+    private PACSReferenceFragment mPacsReferenceFrag = new PACSReferenceFragment();
+    private SettingFragment mSettingFrag = new SettingFragment();
+    private FragmentManager mFragManager = getSupportFragmentManager();
+    private FragmentTransaction mFragTransaction;
+    private FragmentTransaction mFragTransaction2;
+    private BottomNavigationView mBottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,43 +59,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Setting toolbar
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Setting bottom navigation
-        bottomNavigationView = findViewById(R.id.bottom_nav);
+        mBottomNavigationView = findViewById(R.id.bottom_nav);
         initBottomNavigation();
 
         // Begin fragment transaction
-        String requestChatList = getIntent().getStringExtra("requestChatList");
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction2 = fragmentManager.beginTransaction();
+        int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
+        mFragTransaction = mFragManager.beginTransaction();
+        mFragTransaction2 = mFragManager.beginTransaction();
 
-        if (UtilityManager.checkString(requestChatList)) {
-            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
-            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        if (requestChatList == RESULT_OK) {
+            mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
+            mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
-            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
-            bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+            mFragTransaction.replace(R.id.main_frame_layout, mFriendListFrag).commitAllowingStateLoss();
+            mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
         if (UtilityManager.isTablet(this)) {
-            fragmentTransaction2.replace(R.id.tablet_main_side, pacsReferenceFrag).commitAllowingStateLoss();
+            mFragTransaction2.replace(R.id.tablet_main_side, mPacsReferenceFrag).commitAllowingStateLoss();
         }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d("NEWINTENT", "main activity new intent");
 
-        String requestChatList = intent.getStringExtra("requestChatList");
-        fragmentTransaction = fragmentManager.beginTransaction();
-        if (UtilityManager.checkString(requestChatList)) {
-            fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
-            bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        int requestChatList = intent.getIntExtra("requestChatList", RESULT_CANCELED);
+        mFragTransaction = mFragManager.beginTransaction();
+        if (requestChatList == RESULT_OK) {
+            mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
+            mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
-            fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
-            bottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+            mFragTransaction.replace(R.id.main_frame_layout, mFriendListFrag).commitAllowingStateLoss();
+            mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
     }
 
@@ -106,31 +103,27 @@ public class MainActivity extends AppCompatActivity {
      **/
     private void initBottomNavigation() {
         //네비게이션 버튼 해당 프래그먼트로 전환
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                fragmentTransaction = fragmentManager.beginTransaction();
+                mFragTransaction = mFragManager.beginTransaction();
                 switch (item.getItemId()) {
                     case R.id.nav_friend_list:
-                        fragmentTransaction.replace(R.id.main_frame_layout, friendListFrag).commitAllowingStateLoss();
+                        mFragTransaction.replace(R.id.main_frame_layout, mFriendListFrag).commitAllowingStateLoss();
                         return true;
                     case R.id.nav_chat_list:
-                        fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
+                        mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
                         return true;
                     case R.id.nav_calendar:
-                        fragmentTransaction.replace(R.id.main_frame_layout, pacsReferenceFrag).commitAllowingStateLoss();
+                        mFragTransaction.replace(R.id.main_frame_layout, mPacsReferenceFrag).commitAllowingStateLoss();
                         return true;
                     case R.id.nav_setting:
-                        fragmentTransaction.replace(R.id.main_frame_layout, settingFrag).commitAllowingStateLoss();
+                        mFragTransaction.replace(R.id.main_frame_layout, mSettingFrag).commitAllowingStateLoss();
                         return true;
                 }
                 return false;
             }
         });
-    }
-
-    public void startChatAddActivity(Intent intent) {
-        startActivityForResult(intent, CHAT_ADD);
     }
 
     public void startChatRoomActivity(Intent intent) {
@@ -155,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK) {
             if (requestCode == MOVE_TO_CHAT_ROOM) {
-                fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.main_frame_layout, chatListFrag).commitAllowingStateLoss();
-                bottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+                mFragTransaction = mFragManager.beginTransaction();
+                mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
+                mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
             }
         }
     }

@@ -31,7 +31,7 @@
                     android:id="@+id/my_profileImage"
                     android:layout_width="@dimen/profile_image_m"
                     android:layout_height="@dimen/profile_image_m"
-                    android:src="@drawable/baseline_account_circle_white_24dp"
+                    android:src="@drawable/ic_default_profile_white_24"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,7 +40,7 @@
                     android:layout_width="@dimen/status_m"
                     android:layout_height="@dimen/status_m"
                     android:layout_gravity="right|bottom"
-                    android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+                    android:src="@drawable/ic_status_on" />
             </FrameLayout>
 
             <TextView
@@ -122,14 +122,14 @@
                         android:id="@+id/profileImage"
                         android:layout_width="@dimen/profile_image_l"
                         android:layout_height="@dimen/profile_image_l"
-                        android:src="@drawable/baseline_account_circle_black_24dp" />
+                        android:src="@drawable/ic_default_profile_black_24" />
 
                     <ImageView
                         android:id="@+id/profileStatus"
                         android:layout_width="@dimen/status_l"
                         android:layout_height="@dimen/status_l"
                         android:layout_gravity="right|bottom"
-                        android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+                        android:src="@drawable/ic_status_on" />
                 </FrameLayout>
 
                 <TextView
@@ -204,7 +204,7 @@
                         <ImageView
                             android:layout_width="@dimen/status_l"
                             android:layout_height="@dimen/status_l"
-                            android:src="@drawable/baseline_fiber_manual_record_teal_a400_24dp" />
+                            android:src="@drawable/ic_status_on" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -220,7 +220,7 @@
                         <ImageView
                             android:layout_width="@dimen/status_l"
                             android:layout_height="@dimen/status_l"
-                            android:src="@drawable/baseline_fiber_manual_record_yellow_50_24dp" />
+                            android:src="@drawable/ic_status_busy" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -236,7 +236,7 @@
                         <ImageView
                             android:layout_width="@dimen/status_l"
                             android:layout_height="@dimen/status_l"
-                            android:src="@drawable/baseline_fiber_manual_record_red_800_24dp" />
+                            android:src="@drawable/ic_status_off" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_l"
                     android:background="#00ff0000"
-                    android:drawableLeft="@drawable/outline_chat_black_24dp"
+                    android:drawableLeft="@drawable/ic_chat_black_24"
                     android:drawablePadding="@dimen/padding_l"
                     android:paddingStart="@dimen/padding_l"
                     android:text="@string/Chatting"

@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
-import io.realm.RealmResults;
 
 public class ChatRoomMember extends RealmObject {
     @NonNull
@@ -48,7 +47,7 @@ public class ChatRoomMember extends RealmObject {
                 ChatRoomMember chatRoomMember = new ChatRoomMember();
                 ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                 int memberCount = chatRoom.getMemeberCount();
-                User user = realm.where(User.class).equalTo("userId", uid).findFirst();
+                User user = realm.where(User.class).equalTo("uid", uid).findFirst();
 
                 if (user != null && realm.where(ChatRoomMember.class)
                         .equalTo("rid", rid)
@@ -78,7 +77,7 @@ public class ChatRoomMember extends RealmObject {
                 int memberCount = chatRoom.getMemeberCount();
 
                 for (String id : uid) {
-                    User user = realm.where(User.class).equalTo("userId", id).findFirst();
+                    User user = realm.where(User.class).equalTo("uid", id).findFirst();
                     if (user != null && realm.where(ChatRoomMember.class)
                             .equalTo("rid", rid)
                             .and()

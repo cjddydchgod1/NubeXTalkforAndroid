@@ -10,7 +10,6 @@ package x.com.nubextalk.Module.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,29 +32,25 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import x.com.nubextalk.ChatImageViewActivity;
-import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
-import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
-import x.com.nubextalk.Module.Fragment.PACSFriendListFragment;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
-import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_1;
-import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_2;
-import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT_3;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT1;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT2;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT3;
 import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.SENDING;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Realm realm;
-
+    private Realm mRealm;
     private LayoutInflater mInflater;
     private Context mContext;
     private User mUserData;
@@ -64,12 +59,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private FragmentManager mFragmentManager;
 
     public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog, FragmentManager fragmentManager) {
-        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
-
+        this.mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-        this.mUid = Config.getMyUID(realm);
+        this.mUid = Config.getMyUID(mRealm);
         this.mFragmentManager = fragmentManager;
     }
 
@@ -99,16 +93,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return;
         }
         String uid = chat.getUid();
-        mUserData = realm.where(User.class).equalTo("userId", uid).findFirst();
+        mUserData = mRealm.where(User.class).equalTo("uid", uid).findFirst();
 
         // 시간 형식 나누기
-        SimpleDateFormat formatChatTime = new SimpleDateFormat(DATE_FORMAT_1);
-        SimpleDateFormat formatChatDate = new SimpleDateFormat(DATE_FORMAT_2);
+        SimpleDateFormat formatChatTime = new SimpleDateFormat(DATE_FORMAT1);
+        SimpleDateFormat formatChatDate = new SimpleDateFormat(DATE_FORMAT2);
 
         String sendDate;
         String sendTime;
 
-        if (DateManager.convertDate(chat.getSendDate(), DATE_FORMAT_3).equals(DATE_FINAL)) {
+        if (DateManager.convertDate(chat.getSendDate(), DATE_FORMAT3).equals(DATE_FINAL)) {
             sendTime = SENDING;
             sendDate = EMPTY;
         } else {
@@ -247,7 +241,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         } else {
                             Intent intent = new Intent(mContext, ImageViewActivity.class);
                             intent.putExtra("studyId", chat.getExt1());
-                            Log.d("PACS", chat.getExt1());
                             mContext.startActivity(intent);
                         }
                     }
@@ -281,7 +274,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         } else {
                             Intent intent = new Intent(mContext, ImageViewActivity.class);
                             intent.putExtra("studyId", chat.getExt1());
-                            Log.d("PACS", chat.getExt1());
                             mContext.startActivity(intent);
                         }
                     }

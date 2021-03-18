@@ -137,7 +137,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         if (mRid != null) {
             RealmResults<ChatRoomMember> chatRoomMembers = ChatRoom.getChatRoomUsers(mRealm, mRid);
             for (ChatRoomMember chatRoomMember : chatRoomMembers) {
-                User user = mRealm.where(User.class).equalTo("userId", chatRoomMember.getUid()).findFirst();
+                User user = mRealm.where(User.class).equalTo("uid", chatRoomMember.getUid()).findFirst();
                 if (user != null) {
                     mAddUserList.add(new ChatAddActivityUser(user, true));
                 }
@@ -159,7 +159,7 @@ public class ChatAddActivity extends AppCompatActivity implements
             mRealmSearchAdapter.deleteAllItem();
 
             for (User user : users) {
-                if (!user.getUserId().contentEquals(Config.getMyAccount(mRealm).getExt1())) {
+                if (!user.getUid().contentEquals(Config.getMyAccount(mRealm).getExt1())) {
                     userArrayList.add(user);
                 }
             }
@@ -297,12 +297,12 @@ public class ChatAddActivity extends AppCompatActivity implements
     public static void createNewChat(Realm realm, Context context, ArrayList<User> userList, String roomName,
                                      onNewChatCreatedListener onNewChatCreatedListener) {
         Map<String, Object> data = new HashMap<>();
-        data.put("hospital", HOSPITAL_ID);
+        data.put("hid", HOSPITAL_ID);
         final String[] rid = {null};
 
         ArrayList<String> userIdList = new ArrayList<>();
         for (User user : userList) {
-            userIdList.add(user.getUserId());
+            userIdList.add(user.getUid());
         }
 
         data.put("title", roomName);
@@ -345,7 +345,7 @@ public class ChatAddActivity extends AppCompatActivity implements
         for (ChatRoomMember chatRoomMember : chatRoomMembers) {
             Iterator<User> userIterator = userList.iterator();
             while (userIterator.hasNext()) {
-                if (chatRoomMember.getUid().equals(userIterator.next().getUserId())) {
+                if (chatRoomMember.getUid().equals(userIterator.next().getUid())) {
                     userIterator.remove();
                 }
             }
@@ -375,15 +375,15 @@ public class ChatAddActivity extends AppCompatActivity implements
                     fs.collection("hospital").document(hid)
                             .collection("chatRoom").document(rid)
                             .collection("chatRoomMember")
-                            .document(user.getUserId()).set(data);
+                            .document(user.getUid()).set(data);
                 }
 
-                String uid = User.getMyAccountInfo(realm).getUserId();
+                String uid = User.getMyAccountInfo(realm).getUid();
                 Map<String, Object> chat = new HashMap<>();
                 String cid = uid.concat(String.valueOf(new Date().getTime()));
-                chat.put("cid", cid);
-                chat.put("uid", uid);
                 chat.put("rid", rid);
+                chat.put("uid", uid);
+                chat.put("cid", cid);
                 chat.put("content", MSG_INVITE_MEMBER);
                 chat.put("type", "9");
 
@@ -393,14 +393,14 @@ public class ChatAddActivity extends AppCompatActivity implements
                 JSONArray jsonArray = new JSONArray();
 
                 for (User user : userList) {
-                    jsonArray.put(user.getUserId());
+                    jsonArray.put(user.getUid());
                 }
 
-                data.put("chatContentId", cid);
-                data.put("hospitalId", hid);
-                data.put("senderId", uid);
+                data.put("hid", hid);
+                data.put("rid", rid);
+                data.put("uid", uid);
+                data.put("cid", cid);
                 data.put("membersId", jsonArray);
-                data.put("chatRoomId", rid);
 
                 FirebaseFunctionsManager.notifyToChatRoomAddedUser(data);
 
@@ -409,7 +409,7 @@ public class ChatAddActivity extends AppCompatActivity implements
                 RealmResults<ChatRoomMember> realmResults = ChatRoom.getChatRoomUsers(realm, rid);
 
                 for (ChatRoomMember chatRoomMember : realmResults) {
-                    User user = realm.where(User.class).equalTo("userId", chatRoomMember.getUid()).findFirst();
+                    User user = realm.where(User.class).equalTo("uid", chatRoomMember.getUid()).findFirst();
                     if (user != null) {
                         userArrayList.add(user);
                     }

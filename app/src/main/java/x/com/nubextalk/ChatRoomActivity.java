@@ -61,6 +61,7 @@ import x.com.nubextalk.Module.Adapter.ChatAdapter;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.RoomNameModificationDialogFragment;
 
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
 import static x.com.nubextalk.Module.CodeResources.ICON_SEND_CHAT;
@@ -354,9 +355,10 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
                 Map<String, Object> chat = new HashMap<>();
                 String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
-                chat.put("cid", cid);
-                chat.put("uid", mUid);
+                chat.put("hid", mHid);
                 chat.put("rid", mRid);
+                chat.put("uid", mUid);
+                chat.put("cid", cid);
                 chat.put("content", EMPTY_IMAGE);
                 chat.put("type", "1");
 
@@ -370,11 +372,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     for (ChatRoomMember member : chatRoomMember) {
                         chatRoomMemberJsonArray.put(member.getUid());
                     }
-                    chatRoomData.put("hospital", mHid);
-                    chatRoomData.put("chatRoomId", mRid);
-                    chatRoomData.put("senderId", mUid);
-                    chatRoomData.put("members", chatRoomMemberJsonArray);
+                    chatRoomData.put("hid", mHid);
+                    chatRoomData.put("rid", mRid);
+                    chatRoomData.put("uid", mUid);
                     chatRoomData.put("title", chatRoom.getRoomName());
+                    chatRoomData.put("members", chatRoomMemberJsonArray);
                     chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
                     chatRoomData.put("notificationId", chatRoom.getNotificationId());
                     FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
@@ -397,9 +399,10 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
                 Map<String, Object> chat = new HashMap<>();
                 String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
-                chat.put("cid", cid);
-                chat.put("uid", mUid);
+                chat.put("hid", mHid);
                 chat.put("rid", mRid);
+                chat.put("uid", mUid);
+                chat.put("cid", cid);
                 chat.put("content", EMPTY_IMAGE);
                 chat.put("type", "1");
 
@@ -412,11 +415,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     for (ChatRoomMember member : chatRoomMember) {
                         chatRoomMemberJsonArray.put(member.getUid());
                     }
-                    chatRoomData.put("hospital", mHid);
-                    chatRoomData.put("chatRoomId", mRid);
-                    chatRoomData.put("senderId", mUid);
-                    chatRoomData.put("members", chatRoomMemberJsonArray);
+                    chatRoomData.put("hid", mHid);
+                    chatRoomData.put("rid", mRid);
+                    chatRoomData.put("uid", mUid);
                     chatRoomData.put("title", chatRoom.getRoomName());
+                    chatRoomData.put("members", chatRoomMemberJsonArray);
                     chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
                     chatRoomData.put("notificationId", chatRoom.getNotificationId());
                     FirebaseFunctionsManager.createChatRoom(chatRoomData).addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
@@ -446,7 +449,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         subMenu.clear();
         int menuId = 0;
         for (ChatRoomMember member : chatRoomMembers) {
-            String userName = mRealm.where(User.class).equalTo("userId", member.getUid()).findFirst().getAppName();
+            String userName = mRealm.where(User.class).equalTo("uid", member.getUid()).findFirst().getAppName();
             subMenu.add(0, menuId++, 0, userName);
         }
         SwitchCompat fixTopSwitch = (SwitchCompat) MenuItemCompat.getActionView(menu.findItem(R.id.nav_setting_fix_top)).findViewById(R.id.drawer_switch);
@@ -534,11 +537,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-//            Log.d("camera", "permission error");
         } else {
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(intent, 2);
-//            Log.d("camera", "goto intent");
         }
     }
 
@@ -567,9 +568,10 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
             Map<String, Object> chat = new HashMap<>();
             String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
-            chat.put("cid", cid);
-            chat.put("uid", mUid);
+            chat.put("hid", mHid);
             chat.put("rid", mRid);
+            chat.put("uid", mUid);
+            chat.put("cid", cid);
             chat.put("content", content);
             chat.put("type", "0");
 
@@ -583,11 +585,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 for (ChatRoomMember member : chatRoomMember) {
                     chatRoomMemberJsonArray.put(member.getUid());
                 }
-                chatRoomData.put("hospital", mHid);
-                chatRoomData.put("chatRoomId", mRid);
-                chatRoomData.put("senderId", mUid);
-                chatRoomData.put("members", chatRoomMemberJsonArray);
+                chatRoomData.put("hid", mHid);
+                chatRoomData.put("rid", mRid);
+                chatRoomData.put("uid", mUid);
                 chatRoomData.put("title", chatRoom.getRoomName());
+                chatRoomData.put("members", chatRoomMemberJsonArray);
                 chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
                 chatRoomData.put("notificationId", chatRoom.getNotificationId());
                 FirebaseFunctionsManager.createChatRoom(chatRoomData)
@@ -602,7 +604,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 ChatContent.createChat(mRealm, chat);
                 FirebaseFunctionsManager.createChat(chat);
             }
-            mEditChat.setText("");
+            mEditChat.setText(EMPTY);
         }
     }
 
@@ -613,9 +615,10 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
         Map<String, Object> chat = new HashMap<>();
         String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
-        chat.put("cid", cid);
-        chat.put("uid", mUid);
+        chat.put("hid", mHid);
         chat.put("rid", mRid);
+        chat.put("uid", mUid);
+        chat.put("cid", cid);
         chat.put("ext1", studyId);
         chat.put("content", description);
         chat.put("type", "2");
@@ -630,11 +633,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             for (ChatRoomMember member : chatRoomMember) {
                 chatRoomMemberJsonArray.put(member.getUid());
             }
-            chatRoomData.put("hospital", mHid);
-            chatRoomData.put("senderId", mUid);
-            chatRoomData.put("chatRoomId", mRid);
-            chatRoomData.put("members", chatRoomMemberJsonArray);
+            chatRoomData.put("hid", mHid);
+            chatRoomData.put("uid", mUid);
+            chatRoomData.put("rid", mRid);
             chatRoomData.put("title", chatRoom.getRoomName());
+            chatRoomData.put("members", chatRoomMemberJsonArray);
             chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
             chatRoomData.put("notificationId", chatRoom.getNotificationId());
             FirebaseFunctionsManager.createChatRoom(chatRoomData)
@@ -658,12 +661,13 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
         Map<String, Object> chat = new HashMap<>();
         String cid = mUid.concat(String.valueOf(date.getTime())); //cid는 자신의 userId + 시간 으로 설정
-        chat.put("cid", cid);
-        chat.put("uid", mUid);
+        chat.put("hid", mHid);
         chat.put("rid", mRid);
-        chat.put("ext1", studyId);
+        chat.put("uid", mUid);
+        chat.put("cid", cid);
         chat.put("content", description);
         chat.put("type", "2");
+        chat.put("ext1", studyId);
 
         //채팅방이 realm에만 생성되있는 경우, firestore 서버 에도 채팅방 생성한 다음 채팅메세지 서버에 추가
         if (realm.where(ChatContent.class).equalTo("rid", mRid).findAll().isEmpty()) {
@@ -675,11 +679,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             for (ChatRoomMember member : chatRoomMember) {
                 chatRoomMemberJsonArray.put(member.getUid());
             }
-            chatRoomData.put("hospital", mHid);
-            chatRoomData.put("senderId", mUid);
-            chatRoomData.put("chatRoomId", mRid);
-            chatRoomData.put("members", chatRoomMemberJsonArray);
+            chatRoomData.put("hid", mHid);
+            chatRoomData.put("rid", mRid);
+            chatRoomData.put("uid", mUid);
             chatRoomData.put("title", chatRoom.getRoomName());
+            chatRoomData.put("members", chatRoomMemberJsonArray);
             chatRoomData.put("roomImgUrl", chatRoom.getRoomImg());
             chatRoomData.put("notificationId", chatRoom.getNotificationId());
             FirebaseFunctionsManager.createChatRoom(chatRoomData)

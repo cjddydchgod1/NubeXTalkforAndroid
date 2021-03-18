@@ -49,7 +49,7 @@ public class NotifyManager {
     public void notify(String chatContentId) {
         mChatContent = mRealm.where(ChatContent.class).equalTo("cid", chatContentId).findFirst();
         mChatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mChatContent.getRid()).findFirst();
-        mUser = mRealm.where(User.class).equalTo("userId", mChatContent.getUid()).findFirst();
+        mUser = mRealm.where(User.class).equalTo("uid", mChatContent.getUid()).findFirst();
 
         createNotificationChannel();
 

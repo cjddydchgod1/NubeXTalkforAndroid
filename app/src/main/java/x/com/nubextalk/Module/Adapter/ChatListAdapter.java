@@ -260,9 +260,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             RealmResults<ChatRoomMember> users = ChatRoom.getChatRoomUsers(mRealm, rid);
             if (users.size() == 2) { // 1 대 1 채팅방인 경우
                 for (ChatRoomMember user : users) {
-                    if (!user.getUid().equals(myAccount.getUserId())) {
+                    if (!user.getUid().equals(myAccount.getUid())) {
                         // profilestatus
-                        User anotherUser = mRealm.where(User.class).equalTo("userId", user.getUid()).findFirst();
+                        User anotherUser = mRealm.where(User.class).equalTo("uid", user.getUid()).findFirst();
                         switch (anotherUser.getAppStatus()) {
                             case "1":
                                 mAquery.view(statusImg).image(STATUS_BUSY);

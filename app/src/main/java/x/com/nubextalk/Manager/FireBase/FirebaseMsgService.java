@@ -113,20 +113,19 @@ public class FirebaseMsgService extends FirebaseMessagingService {
             case CODE_SYSTEM_ROOM_CREATED:
                 payload = new HashMap<>();
 
-                uid = data.get("senderId");
+                uid = data.get("uid");
 
-                Log.d("USERID", uid);
-                userInfo = mRealm.where(User.class).equalTo("userId", uid).findFirst();
+                userInfo = mRealm.where(User.class).equalTo("uid", uid).findFirst();
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
                 sysContent.append(MSG_ROOM_CREATED);
 
 
                 payload.put("uid", "system");
-                payload.put("cid", data.get("chatContentId"));
-                payload.put("rid", data.get("chatRoomId"));
+                payload.put("rid", data.get("rid"));
+                payload.put("cid", data.get("cid"));
                 payload.put("content", sysContent.toString());
-                payload.put("type", data.get("contentType"));
+                payload.put("type", data.get("type"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
@@ -138,16 +137,16 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 payload = new HashMap<>();
 
-                rid = data.get("chatRoomId");
-                uid = data.get("senderId");
-                userInfo = mRealm.where(User.class).equalTo("userId", uid).findFirst();
+                rid = data.get("rid");
+                uid = data.get("uid");
+                userInfo = mRealm.where(User.class).equalTo("uid", uid).findFirst();
                 String[] memberId = data.get("newAddedUserId").split(",");
 
                 sysContent = new StringBuilder();
 
                 sysContent.append(userInfo.getAppName()).append(MSG_MEMBER_ADD1);
                 for (String id : memberId) {
-                    User addUser = mRealm.where(User.class).equalTo("userId", id).findFirst();
+                    User addUser = mRealm.where(User.class).equalTo("uid", id).findFirst();
                     if (addUser != null) {
                         sysContent.append(addUser.getAppName()).append(MSG_MEMBER_ADD2);
                     }
@@ -156,10 +155,10 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
 
                 payload.put("uid", "system");
-                payload.put("cid", data.get("chatContentId"));
-                payload.put("rid", data.get("chatRoomId"));
+                payload.put("cid", data.get("cid"));
+                payload.put("rid", data.get("rid"));
                 payload.put("content", sysContent.toString());
-                payload.put("type", data.get("contentType"));
+                payload.put("type", data.get("type"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
@@ -172,20 +171,20 @@ public class FirebaseMsgService extends FirebaseMessagingService {
 
                 payload = new HashMap<>();
 
-                rid = data.get("chatRoomId");
-                uid = data.get("senderId");
+                rid = data.get("rid");
+                uid = data.get("uid");
 
-                userInfo = mRealm.where(User.class).equalTo("userId", uid).findFirst();
+                userInfo = mRealm.where(User.class).equalTo("uid", uid).findFirst();
 
                 sysContent = new StringBuilder();
                 sysContent.append(userInfo.getAppName());
                 sysContent.append(MSG_MEMBER_EXIT);
 
+                payload.put("rid", data.get("rid"));
                 payload.put("uid", "system");
-                payload.put("cid", data.get("chatContentId"));
-                payload.put("rid", data.get("chatRoomId"));
+                payload.put("cid", data.get("cid"));
                 payload.put("content", sysContent.toString());
-                payload.put("type", data.get("contentType"));
+                payload.put("type", data.get("type"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("isRead", "true");
@@ -197,18 +196,18 @@ public class FirebaseMsgService extends FirebaseMessagingService {
             case CODE_CHAT_CONTENT_CREATED:
                 payload = new HashMap<>();
 
-                cid = data.get("chatContentId");
-                rid = data.get("chatRoomId");
-                uid = data.get("senderId");
+                rid = data.get("rid");
+                uid = data.get("uid");
+                cid = data.get("cid");
 
-                payload.put("uid", data.get("senderId"));
-                payload.put("cid", data.get("chatContentId"));
-                payload.put("rid", data.get("chatRoomId"));
-                payload.put("type", data.get("contentType"));
+                payload.put("rid", data.get("rid"));
+                payload.put("uid", data.get("uid"));
+                payload.put("cid", data.get("cid"));
+                payload.put("type", data.get("type"));
                 payload.put("sendDate", data.get("sendDate"));
                 payload.put("isFirst", data.get("isFirst"));
                 payload.put("ext1", data.get("ext1"));
-                if (data.get("contentType").equals("1")) {
+                if (data.get("type").equals("1")) {
                     payload.put("content", EMPTY_IMAGE);
                 } else {
                     payload.put("content", data.get("content"));
@@ -272,7 +271,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                         }).start();
                     }
                 }
-                if (data.get("contentType").equals("1")) {
+                if (data.get("type").equals("1")) {
                     ImageManager imageManager = new ImageManager(this);
                     new Thread(new Runnable() {
                         @Override
@@ -280,7 +279,7 @@ public class FirebaseMsgService extends FirebaseMessagingService {
                             Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
 
                             String url = data.get("content");
-                            String name = "thumb_" + data.get("chatContentId") + "(" + data.get("sendDate") + ").jpg";
+                            String name = "thumb_" + data.get("cid") + "(" + data.get("sendDate") + ").jpg";
 
                             String path = imageManager.saveUrlToCache(url, name);
                             payload.put("content", path);

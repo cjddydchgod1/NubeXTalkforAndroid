@@ -170,7 +170,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         if (chatRoom.getIsGroupChat()) {
             User me = (User) User.getMyAccountInfo(mRealm);
             ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
-            FirebaseFunctionsManager.exitChatRoom(mHid, me.getUserId(), chatRoom.getRid());
+            FirebaseFunctionsManager.exitChatRoom(mHid, me.getUid(), chatRoom.getRid());
         } else {
             ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
         }

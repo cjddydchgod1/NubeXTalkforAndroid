@@ -152,9 +152,9 @@ public class ChatContent extends RealmObject {
      * @param data  채팅 메세지 생성을 위한 데이터 Map
      */
     public static void createChat(Realm realm, Map data) {
-        String cid = data.get("cid").toString();
-        String uid = data.get("uid").toString();
         String rid = data.get("rid").toString();
+        String uid = data.get("uid").toString();
+        String cid = data.get("cid").toString();
         String content = data.get("content").toString();
         Integer type = Integer.parseInt(data.get("type").toString());
         Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString(DATE_FINAL,DATE_FORMAT3) : DateManager.convertDatebyString(data.get("sendDate").toString(), DATE_FORMAT4);
@@ -169,9 +169,9 @@ public class ChatContent extends RealmObject {
             @Override
             public void execute(Realm realm) {
                 ChatContent chatContent = new ChatContent();
-                chatContent.setCid(cid);
                 chatContent.setRid(rid);
                 chatContent.setUid(uid);
+                chatContent.setCid(cid);
                 chatContent.setContent(content);
                 chatContent.setType(type);
                 chatContent.setSendDate(sendDate);

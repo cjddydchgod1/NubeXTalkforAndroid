@@ -93,7 +93,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return;
         }
         String uid = chat.getUid();
-        mUserData = mRealm.where(User.class).equalTo("userId", uid).findFirst();
+        mUserData = mRealm.where(User.class).equalTo("uid", uid).findFirst();
 
         // 시간 형식 나누기
         SimpleDateFormat formatChatTime = new SimpleDateFormat(DATE_FORMAT1);

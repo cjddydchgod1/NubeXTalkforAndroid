@@ -139,13 +139,13 @@ public class ChatRoom extends RealmObject {
         User myAccount = (User) User.getMyAccountInfo(realm);
 
         // userList 에 자신의 아이디 추가
-        if (!userList.contains(myAccount.getUserId())) {
-            userList.add(myAccount.getUserId());
+        if (!userList.contains(myAccount.getUid())) {
+            userList.add(myAccount.getUid());
         }
 
         // 채팅방 데이터 필드 초기화
         Date newDate = new Date();
-        final String[] rid = {data.get("rid") == null ? myAccount.getUserId().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString()};
+        final String[] rid = {data.get("rid") == null ? myAccount.getUid().concat(String.valueOf(newDate.getTime())) : data.get("rid").toString()};
         String roomName = data.get("title") == null ? "" : data.get("title").toString();
         String roomImg = data.get("roomImgUrl") == null ? "" : data.get("roomImgUrl").toString();
         Date updatedDate = data.get("updatedDate") == null
@@ -157,8 +157,8 @@ public class ChatRoom extends RealmObject {
         int memberCount = userList.size();
         if (memberCount < 3) { //1:1 채팅방일 때 채팅방 이름, 사진 상대방 유저로 설정
             for (String userId : userList) {
-                if (!userId.equals(myAccount.getUserId())) {
-                    User user = realm.where(User.class).equalTo("userId", userId).findFirst();
+                if (!userId.equals(myAccount.getUid())) {
+                    User user = realm.where(User.class).equalTo("uid", userId).findFirst();
                     roomName = user.getAppName();
                     roomImg = user.getAppImagePath();
                     isGroupChat = false;
@@ -179,14 +179,14 @@ public class ChatRoom extends RealmObject {
 
             String anotherUserId = null;
             for (String userId : userList) {
-                if (!userId.equals(myAccount.getUserId())) {
+                if (!userId.equals(myAccount.getUid())) {
                     anotherUserId = userId;
                 }
             }
 
             FirebaseFunctionsManager.getPersonalChatRoomId(
 
-                    HOSPITAL_ID, myAccount.getUserId(), anotherUserId,
+                    HOSPITAL_ID, myAccount.getUid(), anotherUserId,
                     new FirebaseFunctionsManager.OnCompleteListener() {
                         @Override
                         public void onComplete(String result) {

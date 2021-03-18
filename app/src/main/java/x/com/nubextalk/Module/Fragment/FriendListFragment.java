@@ -229,7 +229,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                         } else {
                             user = mRealm.copyFromRealm(user);
                         }
-                        user.setUserId(jsonObject.getString("userid"));
+                        user.setUid(jsonObject.getString("userid"));
                         user.setLastName(jsonObject.getString("lastname"));
                         user.setTypeCode(jsonObject.getString("typecode"));
                         user.setTypeCodeName(jsonObject.getString("typecodename"));
@@ -261,7 +261,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
      */
     public void processData() {
         for (User user : mUserList) {
-            if (user.getUserId().equals(Config.getMyUID(mRealm))) {
+            if (user.getUid().equals(Config.getMyUID(mRealm))) {
                 mMyProfile = user;
                 mUserList.remove(user);
                 break;
@@ -279,7 +279,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     }
 
     public void setMyProfile() {
-        mMyUid = mMyProfile.getUserId();
+        mMyUid = mMyProfile.getUid();
         TextView myProfileName = mRootview.findViewById(R.id.my_profileName);
         ImageView myProfileImage = mRootview.findViewById(R.id.my_profileImage);
         ImageView myProfileStatus = mRootview.findViewById(R.id.my_profileStatus);
@@ -399,7 +399,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          * if(user.getCode().equals(myUid))
          */
         // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
-        if (user.getUserId().equals(mMyUid)) {
+        if (user.getUid().equals(mMyUid)) {
             mModifyImageBtn.setVisibility(View.VISIBLE);
             mChatBtn.setVisibility((View.GONE));
             mProfileStatus.setClickable(true);

@@ -80,7 +80,7 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         //userList 아이템에 있는지 비교, 존재하면 아이템 중복 추가 방지
         for (ChatAddActivity.ChatAddActivityUser chatRoomUserStatus1 : mUserList) {
-            if (chatRoomUserStatus1.getUser().getUserId().equals(chatRoomUserStatus.getUser().getUserId())) {
+            if (chatRoomUserStatus1.getUser().getUid().equals(chatRoomUserStatus.getUser().getUid())) {
                 return;
             }
         }

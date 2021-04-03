@@ -77,6 +77,7 @@ public class ChatRoomMember extends RealmObject {
                 int memberCount = chatRoom.getMemeberCount();
 
                 for (String id : uid) {
+                    memberCount = chatRoom.getMemeberCount();
                     User user = realm.where(User.class).equalTo("uid", id).findFirst();
                     if (user != null && realm.where(ChatRoomMember.class)
                             .equalTo("rid", rid)

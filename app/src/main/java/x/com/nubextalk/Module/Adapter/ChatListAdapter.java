@@ -213,7 +213,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             setStatusImg(chatroom);
 
             //채팅방 멤버수 설정
-            memberCount.setText(String.valueOf(chatroom.getMemeberCount()));
+            memberCount.setText(String.valueOf(roomMemberCount));
+
 
             //채팅방 목록 알림 및 상단고정 아이콘 설정
             setNotify(chatroom);

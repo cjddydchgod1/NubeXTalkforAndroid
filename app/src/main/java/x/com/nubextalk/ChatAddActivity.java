@@ -59,6 +59,7 @@ public class ChatAddActivity extends AppCompatActivity implements
     private Realm mRealm;
     private String mRid;
     private Context mContext;
+    private Button mConfirmBtn;
 
 
     @Override
@@ -78,10 +79,10 @@ public class ChatAddActivity extends AppCompatActivity implements
         mUserNameInput = findViewById(R.id.chat_add_chat_user_input);
         mUserNameInput.setSingleLine(true);
         mUserNameInput.addTextChangedListener(textWatcher);
-        Button confirmBtn = findViewById(R.id.chat_add_confirm_btn);
+        mConfirmBtn = findViewById(R.id.chat_add_confirm_btn);
         Button cancelBtn = findViewById(R.id.chat_add_cancel_btn);
 
-        confirmBtn.setOnClickListener(this);
+        mConfirmBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
 
         initUserList(); //리싸이클러뷰에 사용될 사용자 데이터 리스트 초기화
@@ -192,6 +193,8 @@ public class ChatAddActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chat_add_confirm_btn:
+                mConfirmBtn.setClickable(false); //중복 채팅방 생성 방지
+
                 ArrayList<ChatAddActivityUser> selectedUser = mSelectedMemberAdapter.getItemList();
                 ArrayList<User> userArrayList = new ArrayList<>();
 

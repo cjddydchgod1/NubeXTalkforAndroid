@@ -443,6 +443,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
              * 3. 해당 rid값으로 intent로 넘겨준다.
              */
 
+            mChatBtn.setClickable(false); //중복 채팅방 생성 방지
+
             User.getChatroom(mRealm, user, new User.UserListener() {
                 @Override
                 public void onFindPersonalChatRoom(ChatRoom chatRoom) {

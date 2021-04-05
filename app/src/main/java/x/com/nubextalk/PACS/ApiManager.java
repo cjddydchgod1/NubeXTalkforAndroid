@@ -11,7 +11,6 @@ import io.realm.Realm;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
@@ -57,8 +56,9 @@ public class ApiManager {
      */
     public void login(onLoginApiListener listener){
         Config myAccount = Config.getMyAccount(realm);
+        Config myAutoLogin = Config.getAutoLogin(realm);
         if (myAccount != null) {
-            login(myAccount.getExt1(), myAccount.getExt2(), myAccount.getExt5(), listener);
+            login(myAccount.getExt1(), myAccount.getExt2(), myAutoLogin.getExt1(), listener);
         }
     }
 
@@ -68,7 +68,7 @@ public class ApiManager {
      * @param pwd
      * @param listener
      */
-    public void login(String id, String pwd, String check, onLoginApiListener listener) {
+    public void login(String id, String pwd, String autoLogin, onLoginApiListener listener) {
         RequestBody formBody = new FormBody.Builder()
                 .add("userid", id)
                 .add("password", pwd)
@@ -92,7 +92,9 @@ public class ApiManager {
                                     realm.executeTransaction(new Realm.Transaction() {
                                         @Override
                                         public void execute(Realm realm) {
+
                                             Config myAccount = Config.getMyAccount(realm);
+
                                             if(myAccount == null){
                                                 myAccount = new Config();
                                                 myAccount.setCODENAME("MyAccount");
@@ -101,14 +103,37 @@ public class ApiManager {
                                             myAccount.setExt1(id);
                                             myAccount.setExt2(pwd);
                                             myAccount.setExt3(cookie.toUpperCase());
-                                            myAccount.setExt5(check);
                                             realm.copyToRealmOrUpdate(myAccount);
 
-                                            if (listener != null) {
-                                                listener.onSuccess(response, body);
+
+                                            /** 자동 로그인 설정 **/
+                                            Config myAutoLogin = Config.getAutoLogin(realm);
+                                            if(myAutoLogin == null){
+                                                myAutoLogin = new Config();
+                                                myAutoLogin.setCODENAME("AutoLogin");
+                                                myAutoLogin.setCODE("AutoLogin");
                                             }
+                                            myAutoLogin.setExt1(autoLogin);
+                                            realm.copyToRealmOrUpdate(myAutoLogin);
+
+
+                                            /** 마지막 로그인한 ID 기억 **/
+                                            Config lastLoginID = Config.getLastLoginID(realm);
+                                            if(lastLoginID == null){
+                                                lastLoginID = new Config();
+                                                lastLoginID.setCODENAME("LastLoginID");
+                                                lastLoginID.setCODE("LastLoginID");
+                                            }
+                                            lastLoginID.setExt1(id);
+
+
+                                            realm.copyToRealmOrUpdate(lastLoginID);
+
                                         }
                                     });
+                                    if (listener != null) {
+                                        listener.onSuccess(response, body);
+                                    }
                                 }
                             } catch (Exception e){
                                 if(listener != null){
@@ -164,7 +189,7 @@ public class ApiManager {
         RequestBody formBody  = new FormBody.Builder()
                 .add("code", user.getCode() == null ? "" : user.getCode())
                 .add("employtype", user.getTypeCode() == null ? "" : user.getTypeCode())
-                .add("userid", user.getUserId() == null ? "" : user.getUserId())
+                .add("userid", user.getUid() == null ? "" : user.getUid())
                 .add("removed", user.getRemoved() == null ? "0" : user.getRemoved())
                 .build();
 

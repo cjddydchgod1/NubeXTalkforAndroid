@@ -5,8 +5,6 @@
 
 package x.com.nubextalk.Model;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import java.util.Date;
@@ -17,6 +15,10 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.DateManager;
+
+import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT3;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT4;
 
 public class ChatContent extends RealmObject {
     @NonNull
@@ -150,12 +152,12 @@ public class ChatContent extends RealmObject {
      * @param data  채팅 메세지 생성을 위한 데이터 Map
      */
     public static void createChat(Realm realm, Map data) {
-        String cid = data.get("cid").toString();
-        String uid = data.get("uid").toString();
         String rid = data.get("rid").toString();
+        String uid = data.get("uid").toString();
+        String cid = data.get("cid").toString();
         String content = data.get("content").toString();
         Integer type = Integer.parseInt(data.get("type").toString());
-        Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString("9999-12-31 23:59:59", "yyyy-MM-dd HH:mm:ss") : DateManager.convertDatebyString(data.get("sendDate").toString(), "yyyy-MM-dd'T'HH:mm:ss");
+        Date sendDate = data.get("sendDate") == null ? DateManager.convertDatebyString(DATE_FINAL,DATE_FORMAT3) : DateManager.convertDatebyString(data.get("sendDate").toString(), DATE_FORMAT4);
         Boolean isFirst = data.get("isFirst") != null && Boolean.parseBoolean(data.get("isFirst").toString());
         Boolean isRead = data.get("isRead") == null ? Config.getMyAccount(realm).getExt1().equals(uid) : Boolean.parseBoolean(data.get("isRead").toString());
 
@@ -167,9 +169,9 @@ public class ChatContent extends RealmObject {
             @Override
             public void execute(Realm realm) {
                 ChatContent chatContent = new ChatContent();
-                chatContent.setCid(cid);
                 chatContent.setRid(rid);
                 chatContent.setUid(uid);
+                chatContent.setCid(cid);
                 chatContent.setContent(content);
                 chatContent.setType(type);
                 chatContent.setSendDate(sendDate);

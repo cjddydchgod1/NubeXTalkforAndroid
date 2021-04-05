@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ThemeModeActivity"
+    android:background="@color/cBackground">
+
+    <RadioGroup
+        android:id="@+id/radioGroupTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/rgt_btn3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="라이트 모드" />
+
+        <RadioButton
+            android:id="@+id/rgt_btn2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="다크 모드" />
+
+        <RadioButton
+            android:id="@+id/rgt_btn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="사용자 설정" />
+
+    </RadioGroup>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

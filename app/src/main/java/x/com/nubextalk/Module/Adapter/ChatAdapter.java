@@ -9,7 +9,7 @@ package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
@@ -28,32 +31,40 @@ import java.text.SimpleDateFormat;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import x.com.nubextalk.ChatImageViewActivity;
 import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.DateManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
+import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.R;
 
+import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT1;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT2;
+import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT3;
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
+import static x.com.nubextalk.Module.CodeResources.SENDING;
+
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    String FINAL_DATE = "9999-12-31 23:59:59";
-
-    private Realm realm;
-
+    private Realm mRealm;
     private LayoutInflater mInflater;
     private Context mContext;
     private User mUserData;
     private RealmResults<ChatContent> mChatData;
     private String mUid;
+    private FragmentManager mFragmentManager;
 
-    public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog) {
-        this.realm = Realm.getInstance(UtilityManager.getRealmConfig());
-
+    public ChatAdapter(Context context, RealmResults<ChatContent> mChatLog, FragmentManager fragmentManager) {
+        this.mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mChatData = mChatLog;
-        this.mUid = Config.getMyUID(realm);
+        this.mUid = Config.getMyUID(mRealm);
+        this.mFragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -77,22 +88,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatContent chat = mChatData.get(position);
-        if (chat.getContent() == null) {
+        String preSenderId = (position > 0) ? mChatData.get(position - 1).getUid() : mUid;
+        if (chat == null) {
             return;
         }
         String uid = chat.getUid();
-        mUserData = realm.where(User.class).equalTo("userId", uid).findFirst();
+        mUserData = mRealm.where(User.class).equalTo("uid", uid).findFirst();
 
         // 시간 형식 나누기
-        SimpleDateFormat formatChatTime = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat formatChatDate = new SimpleDateFormat("yyyy.MM.dd (E)");
+        SimpleDateFormat formatChatTime = new SimpleDateFormat(DATE_FORMAT1);
+        SimpleDateFormat formatChatDate = new SimpleDateFormat(DATE_FORMAT2);
 
         String sendDate;
         String sendTime;
 
-        if (DateManager.convertDate(chat.getSendDate(), "yyyy-MM-dd HH:mm:ss").equals(FINAL_DATE)) {
-            sendTime = "전송중";
-            sendDate = "";
+        if (DateManager.convertDate(chat.getSendDate(), DATE_FORMAT3).equals(DATE_FINAL)) {
+            sendTime = SENDING;
+            sendDate = EMPTY;
         } else {
             sendTime = formatChatTime.format(chat.getSendDate());
             sendDate = formatChatDate.format(chat.getSendDate());
@@ -108,7 +120,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             // 아이디가 같은 경우 즉, 자신이 보낸 메세시의 경우 우측 하단에 표시
-            if (chat.getUid().equals(this.mUid)) {
+            if (chat.getUid().equals(mUid)) {
                 cvHolder.my_chat_text.setText(chat.getContent());
                 cvHolder.myTime.setText(sendTime);
 
@@ -127,8 +139,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cvHolder.other_chat_text.setText(chat.getContent());
                 cvHolder.otherTime.setText(sendTime);
 
-                cvHolder.profileImage.setVisibility(View.VISIBLE);
-                cvHolder.profileName.setVisibility(View.VISIBLE);
+                if (chat.getUid().equals(preSenderId)) {
+                    cvHolder.profileImage.setVisibility(View.GONE);
+                    cvHolder.profileName.setVisibility(View.GONE);
+                } else {
+                    cvHolder.profileImage.setVisibility(View.VISIBLE);
+                    cvHolder.profileName.setVisibility(View.VISIBLE);
+                }
                 cvHolder.other_chat_text.setVisibility(View.VISIBLE);
                 cvHolder.otherTime.setVisibility(View.VISIBLE);
 
@@ -143,11 +160,26 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             } else {
                 cmvHolder.date.setVisibility(View.GONE);
             }
+
             if (chat.getUid().equals(mUid)) {
                 cmvHolder.aq.id(R.id.my_chat_image).image(chat.getContent());
+
                 cmvHolder.myTime.setText(sendTime);
-                cmvHolder.myChatImg.setVisibility(View.VISIBLE);
                 cmvHolder.myTime.setVisibility(View.VISIBLE);
+                cmvHolder.myChatImg.setVisibility(View.VISIBLE);
+
+                if (!chat.getContent().equals(EMPTY_IMAGE)) {
+                    cmvHolder.myChatImg.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(mContext, ChatImageViewActivity.class);
+                            intent.putExtra("cid", chat.getCid());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            mContext.startActivity(intent);
+                        }
+                    });
+                }
+
                 cmvHolder.profileImage.setVisibility(View.GONE);
                 cmvHolder.profileName.setVisibility(View.GONE);
                 cmvHolder.otherTime.setVisibility(View.GONE);
@@ -156,13 +188,31 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
                 cmvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
-                cmvHolder.profileName.setText(mUserData.getAppName());
                 cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
+
+                cmvHolder.profileName.setText(mUserData.getAppName());
                 cmvHolder.otherTime.setText(sendTime);
-                cmvHolder.profileImage.setVisibility(View.VISIBLE);
-                cmvHolder.profileName.setVisibility(View.VISIBLE);
+                if (chat.getUid().equals(preSenderId)) {
+                    cmvHolder.profileImage.setVisibility(View.GONE);
+                    cmvHolder.profileName.setVisibility(View.GONE);
+
+                } else {
+                    cmvHolder.profileImage.setVisibility(View.VISIBLE);
+                    cmvHolder.profileName.setVisibility(View.VISIBLE);
+                }
                 cmvHolder.otherTime.setVisibility(View.VISIBLE);
                 cmvHolder.otherChatImg.setVisibility(View.VISIBLE);
+                cmvHolder.otherChatImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(mContext, ChatImageViewActivity.class);
+                        intent.putExtra("cid", chat.getCid());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                    }
+                });
+
+
                 cmvHolder.myChatImg.setVisibility(View.GONE);
                 cmvHolder.myTime.setVisibility(View.GONE);
             }
@@ -177,13 +227,22 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chat.getUid().equals(mUid)) {
                 cpvHolder.myTime.setText(sendTime);
                 cpvHolder.myPacsDescription.setText(chat.getContent());
-                cpvHolder.myPacsButton.setOnClickListener(new View.OnClickListener(){
+                cpvHolder.myChatPacs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(mContext, ImageViewActivity.class);
-                        intent.putExtra("studyId",chat.getExt1());
-                        Log.d("PACS",chat.getExt1());
-                        mContext.startActivity(intent);
+                        if (UtilityManager.isTablet(mContext)) {
+                            Fragment fragment = new PACSReferenceFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", chat.getExt1());
+
+                            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                            fragment.setArguments(bundle);
+                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                        } else {
+                            Intent intent = new Intent(mContext, ImageViewActivity.class);
+                            intent.putExtra("studyId", chat.getExt1());
+                            mContext.startActivity(intent);
+                        }
                     }
                 });
 
@@ -201,22 +260,35 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 cpvHolder.profileName.setText(mUserData.getAppName());
                 cpvHolder.otherTime.setText(sendTime);
                 cpvHolder.otherPacsDescription.setText(chat.getContent());
-                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener(){
+                cpvHolder.otherChatPacs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(mContext, ImageViewActivity.class);
-                        intent.putExtra("studyId",chat.getExt1());
-                        Log.d("PACS",chat.getExt1());
-                        mContext.startActivity(intent);
+                        if (UtilityManager.isTablet(mContext)) {
+                            Fragment fragment = new PACSReferenceFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", chat.getExt1());
+
+                            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                            fragment.setArguments(bundle);
+                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                        } else {
+                            Intent intent = new Intent(mContext, ImageViewActivity.class);
+                            intent.putExtra("studyId", chat.getExt1());
+                            mContext.startActivity(intent);
+                        }
                     }
                 });
 
 
-                cpvHolder.profileImage.setVisibility(View.VISIBLE);
-                cpvHolder.profileName.setVisibility(View.VISIBLE);
+                if (chat.getUid().equals(preSenderId)) {
+                    cpvHolder.profileImage.setVisibility(View.GONE);
+                    cpvHolder.profileName.setVisibility(View.GONE);
+                } else {
+                    cpvHolder.profileImage.setVisibility(View.VISIBLE);
+                    cpvHolder.profileName.setVisibility(View.VISIBLE);
+                }
                 cpvHolder.otherTime.setVisibility(View.VISIBLE);
                 cpvHolder.otherChatPacs.setVisibility(View.VISIBLE);
-
 
 
                 cpvHolder.myChatPacs.setVisibility(View.GONE);

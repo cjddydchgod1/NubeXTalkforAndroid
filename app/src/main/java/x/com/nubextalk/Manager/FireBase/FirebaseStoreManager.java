@@ -7,29 +7,30 @@ package x.com.nubextalk.Manager.FireBase;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
+
 
 public class FirebaseStoreManager {
-    private FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
-    private final String hid = "w34qjptO0cYSJdAwScFQ";
-    private DocumentReference hospital = fireStore.collection("hospital").document(hid);
-    private String TAG = "FirebaseStoreManager";
+    private final DocumentReference mHospital = FirebaseFirestore.getInstance()
+            .collection("hospital").document(HOSPITAL_ID);
 
-    public Task<Void> updateUser(String userid, String token) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("uid", userid);
-        data.put("fcm", token);
-        return hospital.collection("users").document(userid).set(data);
+    public Task<Void> updateUser(String uid, String token) {
+        Map<String, Object> userToken = new HashMap<>();
+        userToken.put("uid", uid);
+        userToken.put("fcm", token);
+        return mHospital.collection("users").document(uid).set(userToken, SetOptions.merge());
     }
 
-    public void addChatContent(){ /*send chat*/ };
-
-    public Task getReference(String documentPath){
-        return hospital.collection(documentPath).get();
+    public Task<Void> deleteToken(String uid) {
+        Map<String, Object> delToken = new HashMap<>();
+        delToken.put("fcm", FieldValue.delete());
+        return mHospital.collection("users").document(uid).update(delToken);
     }
 }

@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
-import io.realm.RealmResults;
 
 public class ChatRoomMember extends RealmObject {
     @NonNull
@@ -35,23 +34,36 @@ public class ChatRoomMember extends RealmObject {
         this.uid = uid;
     }
 
-    public static void addChatRoomMember(Realm realm, String rid, String uid) {
-        realm.executeTransaction(new Realm.Transaction() {
+    public interface OnChatRoomMemberListener {
+        void onCreate();
+
+    }
+
+    public static void addChatRoomMember(Realm realm, String rid, String uid, OnChatRoomMemberListener onChatRoomMemberListener) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 //기존 채팅방 멤버인지 확인
-                if (!realm.where(ChatRoomMember.class).
-                        equalTo("rid", rid).
-                        and().
-                        equalTo("uid", uid).findAll().isEmpty()) {
-                    ChatRoomMember chatRoomMember = new ChatRoomMember();
-                    ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                ChatRoomMember chatRoomMember = new ChatRoomMember();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                int memberCount = chatRoom.getMemeberCount();
+                User user = realm.where(User.class).equalTo("uid", uid).findFirst();
+
+                if (user != null && realm.where(ChatRoomMember.class)
+                        .equalTo("rid", rid)
+                        .and()
+                        .equalTo("uid", uid).findAll().isEmpty()) {
                     chatRoomMember.setRid(rid);
                     chatRoomMember.setUid(uid);
-                    chatRoom.setMemeberCount(chatRoom.getMemeberCount() + 1);
-                    realm.copyToRealmOrUpdate(chatRoom);
+                    chatRoom.setMemeberCount(memberCount + 1);
                     realm.copyToRealm(chatRoomMember);
+                    realm.copyToRealmOrUpdate(chatRoom);
                 }
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                onChatRoomMemberListener.onCreate();
             }
         });
     }
@@ -60,16 +72,27 @@ public class ChatRoomMember extends RealmObject {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                for (String id : uid) {
-                    ChatRoomMember chatRoomMember = new ChatRoomMember();
-                    ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
-                    chatRoomMember.setRid(rid);
-                    chatRoomMember.setUid(id);
-                    chatRoom.setMemeberCount(chatRoom.getMemeberCount() + 1);
-                    realm.copyToRealmOrUpdate(chatRoom);
-                    realm.copyToRealm(chatRoomMember);
-                }
+                ChatRoomMember chatRoomMember = new ChatRoomMember();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                int memberCount = chatRoom.getMemeberCount();
 
+                for (String id : uid) {
+                    memberCount = chatRoom.getMemeberCount();
+                    User user = realm.where(User.class).equalTo("uid", id).findFirst();
+                    if (user != null && realm.where(ChatRoomMember.class)
+                            .equalTo("rid", rid)
+                            .and()
+                            .equalTo("uid", id).findAll().isEmpty()) {
+                        chatRoomMember.setRid(rid);
+                        chatRoomMember.setUid(id);
+                        chatRoom.setMemeberCount(memberCount + 1);
+                        realm.copyToRealm(chatRoomMember);
+                        realm.copyToRealmOrUpdate(chatRoom);
+                    }
+
+                }
+                chatRoom.setMemeberCount(memberCount);
+                realm.copyToRealmOrUpdate(chatRoom);
             }
         });
     }
@@ -80,7 +103,15 @@ public class ChatRoomMember extends RealmObject {
             public void execute(Realm realm) {
                 ChatRoomMember chatRoomMember = realm.where(ChatRoomMember.class).equalTo("rid", rid).equalTo("uid", uid).findFirst();
                 chatRoomMember.deleteFromRealm();
+                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                if (chatRoom != null) {
+                    int orgMemberCount = chatRoom.getMemeberCount();
+                    chatRoom.setMemeberCount(orgMemberCount - 1);
+                    realm.copyToRealmOrUpdate(chatRoom);
+                }
             }
         });
     }
+
 }
+

@@ -7,12 +7,11 @@ package x.com.nubextalk.Model;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.UUID;
-
-import androidx.annotation.NonNull;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -20,25 +19,17 @@ import io.realm.annotations.PrimaryKey;
 import x.com.nubextalk.Manager.UtilityManager;
 
 public class Config extends RealmObject {
-    @NonNull
     @PrimaryKey
-    String oid;
     @NonNull
-    String CODENAME;
+    private String CODENAME;
     @NonNull
-    String CODE;
-    String ext1;
-    String ext2;
-    String ext3;
-    String ext4;
-    String ext5;
+    private String CODE;
+    private String ext1;
+    private String ext2;
+    private String ext3;
+    private String ext4;
+    private String ext5;
 
-    public String getOid() {
-        return oid;
-    }
-    public void setOid(String oid) {
-        this.oid = oid;
-    }
     @NonNull
     public String getCODENAME() {
         return CODENAME;
@@ -84,8 +75,8 @@ public class Config extends RealmObject {
         this.ext5 = ext5;
     }
 
-    public static void init(Context context, Realm realm){
-        realm.where(Config.class).findAll().deleteAllFromRealm();
+    public static void settingInit(Context context, Realm realm){
+        realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
         JSONArray jsonArray = null;
         try {
             jsonArray = new JSONArray(UtilityManager.loadJson(context, "config.json"));
@@ -117,5 +108,14 @@ public class Config extends RealmObject {
     }
     public static String getMyUID(Realm realm){
         return getMyAccount(realm).getExt1();
+    }
+    public static Config getAutoLogin(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "AutoLogin").findFirst();
+    }
+    public static Config getAlarm(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME","Alarm").findFirst();
+    }
+    public static Config getLastLoginID(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "LastLoginID").findFirst();
     }
 }

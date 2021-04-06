@@ -55,7 +55,9 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mApiManager = new ApiManager(mContext, mRealm);
 
-        mActivity.setTitle(TITLE_PACS);
+        if (!UtilityManager.isTablet(mActivity)) {
+            mActivity.setTitle(TITLE_PACS);
+        }
 
         mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
         mPacsWebView = mRootview.findViewById(R.id.webView);

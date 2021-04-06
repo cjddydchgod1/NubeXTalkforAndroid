@@ -21,29 +21,35 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.realm.Realm;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
+import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
+import static x.com.nubextalk.Module.CodeResources.EMPTY;
+import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
+import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
+import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
+
 public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final LayoutInflater mInflater;
-    private Context context;
-    private OnItemSelectedListener clickListener;
-    public ArrayList<User> userRealmResults;
-    private AQuery aq;
+    private Context mContext;
+    private AQuery mAquery;
+    private LayoutInflater mInflater;
+    private OnItemSelectedListener mClickListener;
+    private ArrayList<User> mUserList;
+
 
     public interface OnItemSelectedListener {
         void onItemSelected(User user);
     }
 
     public void setItemSelectedListener(OnItemSelectedListener listener) {
-        this.clickListener = listener;
+        this.mClickListener = listener;
     }
 
     public ChatAddSearchAdapter(Context context, ArrayList<User> userRealmResults) {
-        this.context = context;
-        this.userRealmResults = userRealmResults;
-        this.aq = new AQuery(context);
+        this.mContext = context;
+        this.mUserList = userRealmResults;
+        this.mAquery = new AQuery(context);
         mInflater = LayoutInflater.from(context);
     }
 
@@ -57,38 +63,38 @@ public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ViewItemHolder mHolder = (ViewItemHolder) holder;
-        User user = userRealmResults.get(position);
+        User user = mUserList.get(position);
 
         //이름 설정
         if (user.getAppName() != null) {
             mHolder.profileName.setText(user.getAppName());
         } else {
-            mHolder.profileName.setText("");
+            mHolder.profileName.setText(EMPTY);
         }
 
         //사진 설정
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
-            aq.view(mHolder.profileImage).image(user.getAppImagePath());
+            mAquery.view(mHolder.profileImage).image(user.getAppImagePath());
         } else {
-            aq.view(mHolder.profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+            mAquery.view(mHolder.profileImage).image(DEFAULT_PROFILE);
         }
 
         //상태 설정
         switch (user.getAppStatus()) {
             case "1":
-                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+                mAquery.view(mHolder.profileStatus).image(STATUS_BUSY);
                 break;
             case "2":
-                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                mAquery.view(mHolder.profileStatus).image(STATUS_OFF);
                 break;
             default: // 0과 기본으로 되어있는 설정
-                aq.view(mHolder.profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                mAquery.view(mHolder.profileStatus).image(STATUS_ON);
                 break;
         }
 
         mHolder.itemView.setOnClickListener(v -> {
-            if (clickListener != null) {
-                clickListener.onItemSelected(user);
+            if (mClickListener != null) {
+                mClickListener.onItemSelected(user);
             }
         });
     }
@@ -111,23 +117,23 @@ public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemCount() {
-        return userRealmResults.size();
+        return mUserList.size();
     }
 
     public void addItem(@NonNull User user) {
-        if (!userRealmResults.contains(user)) {
-            userRealmResults.add(user);
+        if (!mUserList.contains(user)) {
+            mUserList.add(user);
             notifyDataSetChanged();
         }
     }
 
     public void deleteAllItem() {
-        userRealmResults.clear();
+        mUserList.clear();
         notifyDataSetChanged();
     }
 
     public void setItem(ArrayList<User> userList) {
-        this.userRealmResults = userList;
+        this.mUserList = userList;
         notifyDataSetChanged();
     }
 

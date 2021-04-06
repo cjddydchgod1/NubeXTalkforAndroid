@@ -9,35 +9,32 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import io.realm.Realm;
 import x.com.nubextalk.ChatRoomActivity;
-import x.com.nubextalk.ImageViewActivity;
 import x.com.nubextalk.Manager.UtilityManager;
-import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.PACS.PacsWebView;
 import x.com.nubextalk.R;
 import x.com.nubextalk.SharePACSActivity;
 
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_HOME;
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_VIEWER;
+import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
+
 public class PACSReferenceFragment extends Fragment implements PacsWebView.onJavaScriptListener {
 
-    private Realm realm;
+    private Realm mRealm;
     private ApiManager mApiManager;
 
-    private ViewGroup rootview;
+    private ViewGroup mRootview;
     private PacsWebView mPacsWebView;
 
     private Context mContext;
@@ -55,21 +52,21 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mApiManager = new ApiManager(mContext, realm);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mApiManager = new ApiManager(mContext, mRealm);
 
-        mActivity.setTitle(getString(R.string.PACSReference));
+        mActivity.setTitle(TITLE_PACS);
 
-        rootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
-        mPacsWebView = rootview.findViewById(R.id.webView);
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
+        mPacsWebView = mRootview.findViewById(R.id.webView);
         /* 쿠키 생성 후 넣기 */
         try {
-            mPacsWebView.init(realm);
+            mPacsWebView.init(mRealm);
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {
-            if (realm != null)
-                realm.close();
+            if (mRealm != null)
+                mRealm.close();
         }
         mPacsWebView.setJavaScriptListener(this);
 
@@ -80,11 +77,11 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         }
 
         if (UtilityManager.checkString(studyId)) {
-            mPacsWebView.loadUrl("/mobile/app/?studyId=" + studyId);
+            mPacsWebView.loadUrl(PATH_PACS_VIEWER + studyId);
         } else {
-            mPacsWebView.loadUrl("/mobile/app/");
+            mPacsWebView.loadUrl(PATH_PACS_HOME);
         }
-        return rootview;
+        return mRootview;
     }
 
     @Override

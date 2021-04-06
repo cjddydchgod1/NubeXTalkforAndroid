@@ -14,10 +14,6 @@
         android:icon="@drawable/ic_chat_gray_24"
         android:title="ChatList" />
     <item
-        android:id="@+id/nav_calendar"
-        android:icon="@drawable/ic_doctor"
-        android:title="PACS" />
-    <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/ic_settings_24"
         android:title="Setting" />

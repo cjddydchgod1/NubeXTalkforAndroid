@@ -6,8 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,32 +22,35 @@ import com.aquery.AQuery;
 import java.util.ArrayList;
 
 import x.com.nubextalk.Model.User;
-import static x.com.nubextalk.Module.CodeResources.NON_RADIO;
-import static x.com.nubextalk.Module.CodeResources.RADIO;
 import x.com.nubextalk.R;
+
+import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
+import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
+import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
+import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
 
 public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<User> mDataSet;
     private Context mContext;
-    private onItemSelectedListener listener;
-    private AQuery aq;
-    private int sel_type;
+    private onItemSelectedListener mClickListener;
+    private AQuery mAquery;
+    private boolean mIsRadio;
     private int mLastCheckedPosition = -1;
 
-    public interface onItemSelectedListener{
+    public interface onItemSelectedListener {
         void onSelected(User address);
     }
 
-    public void setOnItemSelectedListener(onItemSelectedListener listener){
-        this.listener = listener;
+    public void setOnItemSelectedListener(onItemSelectedListener listener) {
+        this.mClickListener = listener;
     }
 
-    public FriendListAdapter(Context context, ArrayList<User> data, AQuery aq, int sel_type) {
+    public FriendListAdapter(Context context, ArrayList<User> data, AQuery aq, boolean isRadio) {
         this.mDataSet = data;
         this.mContext = context;
-        this.aq = aq;
-        this.sel_type = sel_type;
+        this.mAquery = aq;
+        this.mIsRadio = isRadio;
     }
 
 
@@ -57,17 +58,17 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View mItemView;
-        mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
+        mItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend, parent, false);
         return new FriendViewHolder(mItemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         User mCurrent = mDataSet.get(position);
-        if(holder instanceof FriendViewHolder) {
+        if (holder instanceof FriendViewHolder) {
             FriendViewHolder friendViewHolder = (FriendViewHolder) holder;
             friendViewHolder.bintTo(mCurrent);
-            if(sel_type == RADIO)
+            if (mIsRadio)
                 friendViewHolder.radioButton.setChecked(mLastCheckedPosition == position);
         }
     }
@@ -83,49 +84,51 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private final ImageView profileImage;
         private final ImageView profileStatus;
         private final RadioButton radioButton;
+
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
             // item_friend.xml에서 불러온다.
-            profileName     = itemView.findViewById(R.id.profileName);
-            profileImage    = itemView.findViewById(R.id.profileImage);
-            profileStatus   = itemView.findViewById(R.id.profileStatus);
-            radioButton     = itemView.findViewById(R.id.select_user);
+            profileName = itemView.findViewById(R.id.profileName);
+            profileImage = itemView.findViewById(R.id.profileImage);
+            profileStatus = itemView.findViewById(R.id.profileStatus);
+            radioButton = itemView.findViewById(R.id.select_user);
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(listener != null) {
+                    if (mClickListener != null) {
                         int copyLastCheckedPosition = mLastCheckedPosition;
                         mLastCheckedPosition = getAdapterPosition();
-                        if(sel_type == RADIO) {
+                        if (mIsRadio) {
                             notifyItemChanged(copyLastCheckedPosition);
                             notifyItemChanged(mLastCheckedPosition);
                         }
-                        listener.onSelected(mDataSet.get(mLastCheckedPosition));
+                        mClickListener.onSelected(mDataSet.get(mLastCheckedPosition));
                     }
                 }
             };
             itemView.setOnClickListener(clickListener);
             radioButton.setOnClickListener(clickListener);
         }
+
         public void bintTo(User user) {
-            if(sel_type == RADIO)
+            if (mIsRadio)
                 radioButton.setVisibility(View.VISIBLE);
             profileName.setText(user.getAppName());
-            if(URLUtil.isValidUrl(user.getAppImagePath())){
-                aq.view(profileImage).image(user.getAppImagePath());
+            if (URLUtil.isValidUrl(user.getAppImagePath())) {
+                mAquery.view(profileImage).image(user.getAppImagePath());
             } else {
-                aq.view(profileImage).image(R.drawable.baseline_account_circle_black_24dp);
+                mAquery.view(profileImage).image(DEFAULT_PROFILE);
             }
-            // 초록
-            switch(user.getAppStatus()) {
-                case "1" :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_yellow_50_24dp);
+
+            switch (user.getAppStatus()) {
+                case "1":
+                    mAquery.view(profileStatus).image(STATUS_BUSY);
                     break;
-                case "2" :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_red_800_24dp);
+                case "2":
+                    mAquery.view(profileStatus).image(STATUS_OFF);
                     break;
-                default :
-                    aq.view(profileStatus).image(R.drawable.baseline_fiber_manual_record_teal_a400_24dp);
+                default:
+                    mAquery.view(profileStatus).image(STATUS_ON);
                     break;
             }
         }

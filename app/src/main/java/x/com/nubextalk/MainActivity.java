@@ -81,7 +81,9 @@ public class MainActivity extends AppCompatActivity {
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
         if (UtilityManager.isTablet(this)) {
-            mFragTransaction2.replace(R.id.tablet_main_side, mPacsReferenceFrag).commitAllowingStateLoss();
+//            Toolbar pacsToolbar = findViewById(R.id.pacs_toolbar);
+//            setSupportActionBar(pacsToolbar);
+            mFragTransaction2.replace(R.id.main_pacs_layout, mPacsReferenceFrag).commitAllowingStateLoss();
         }
     }
 

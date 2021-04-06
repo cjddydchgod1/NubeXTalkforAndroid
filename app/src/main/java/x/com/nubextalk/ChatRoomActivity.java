@@ -155,7 +155,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             mPacsReferenceFrag = new PACSReferenceFragment();
             mFragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.tablet_chat_room_side, mPacsReferenceFrag).commit();
+            fragmentTransaction.replace(R.id.chat_room_pacs_layout, mPacsReferenceFrag).commit();
         }
 
         // 리사이클러 뷰와 어댑터를 연결 채팅을 불러 올수 있음

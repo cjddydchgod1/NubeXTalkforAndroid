@@ -237,7 +237,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                             fragment.setArguments(bundle);
-                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                            fragmentTransaction.replace(R.id.chat_room_pacs_layout, fragment).commit();
                         } else {
                             Intent intent = new Intent(mContext, ImageViewActivity.class);
                             intent.putExtra("studyId", chat.getExt1());
@@ -270,7 +270,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                             fragment.setArguments(bundle);
-                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                            fragmentTransaction.replace(R.id.chat_room_pacs_layout, fragment).commit();
                         } else {
                             Intent intent = new Intent(mContext, ImageViewActivity.class);
                             intent.putExtra("studyId", chat.getExt1());

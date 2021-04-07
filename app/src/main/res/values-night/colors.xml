@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2020.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<resources>
+    <!--<color name="colorPrimary">#A8C3B3</color>
+    <color name="colorPrimaryDark">#B0C2C4</color>
+    <color name="colorAccent">#C1FFC3</color>-->
+
+
+    <!--<color name="colorPrimary">#F5E7D4</color>
+    <color name="colorPrimaryDark">#F5E7D4</color>
+    <color name="colorAccent">#E07264</color>-->
+
+    <color name="colorPrimary">#384050</color>
+    <color name="colorPrimaryDark">#384050</color>
+    <color name="colorAccent">#0F56A3</color>
+
+    <color name="cChatRoomBackground">#1C1D20</color>
+    <color name="cBackground">#2E2F33</color>
+    <color name="cStatusOn">#5EE49F</color>
+    <color name="cStatusOff">#FBEE6B</color>
+    <color name="cStatusVac">#E80000</color>
+    <color name="cEditText">#CECED8</color>
+    <color name="cEditTextBackground">#1C1D20</color>
+    <color name="cChatRemain">#F4E558</color>
+    <color name="cSettingIconBackground">#1C1D20</color>
+    <color name="cActionBarIcon">#CECED8</color>
+
+    <color name="cGradientStart">#000000</color>
+    <color name="cGradientMiddle">#5B1D1D</color>
+    <color name="cGradientEnd">#e74c3c</color>
+
+    <color name="cTransparent">#00000000</color>
+    <color name="cHalfTransparent">#81000000</color>
+    <color name="cFillHalfTransparent">#D9000000</color>
+    <color name="cBlack">#000000</color>
+    <color name="cBlackLight">#323232</color>
+    <color name="cWhite">#FFFFFF</color>
+    <color name="cGrey">#696969</color>
+    <color name="cContentText">#DBDBDF</color>
+    <color name="cContent">#e3e3e3</color>
+    <color name="cContentHalf">#EEe3e3e3</color>
+
+
+    <color name="cTempHI">#ffb26a</color>
+    <color name="cTempLOW">#20b8c5</color>
+
+    <color name="cWhiteGray">#c9c9c9</color>
+    <color name="cGold">#e6b121</color>
+    <color name="cDarkGray">#979797</color>
+    <color name="cBlueLight">#1976D2</color>
+    <color name="cPinkLight">#FF4081</color>
+    <color name="cOrange">#f57f17</color>
+    <color name="cOrangeLight">#f19e55</color>
+    <color name="cBlueSky">#29b6f6</color>
+    <color name="cBlueSkyLight">#60cafa</color>
+    <color name="cGreenLight">#00796b</color>
+    <color name="cPurpleLight">#d500f9</color>
+    <color name="cIndigoLight">#304ffe</color>
+    <color name="cBlueGreyLight">#546e7a</color>
+    <color name="cTealLight">#009688</color>
+
+    <color name="cInvalid">#D50000</color>
+    <color name="cValid">#00C853</color>
+
+
+
+
+</resources>

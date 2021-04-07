@@ -6,13 +6,11 @@
 package x.com.nubextalk.PACS;
 
 import android.content.Context;
-import android.util.Log;
 
 import io.realm.Realm;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
@@ -191,7 +189,7 @@ public class ApiManager {
         RequestBody formBody  = new FormBody.Builder()
                 .add("code", user.getCode() == null ? "" : user.getCode())
                 .add("employtype", user.getTypeCode() == null ? "" : user.getTypeCode())
-                .add("userid", user.getUserId() == null ? "" : user.getUserId())
+                .add("userid", user.getUid() == null ? "" : user.getUid())
                 .add("removed", user.getRemoved() == null ? "0" : user.getRemoved())
                 .build();
 

@@ -25,24 +25,12 @@
         app:subtitle="PACS 공유" />
 
         />
-    <LinearLayout
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tablayout_PACS"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/btn_friend_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="친구"
-            android:layout_weight="1"/>
-        <Button
-            android:id="@+id/btn_chat_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="채팅"
-            android:layout_weight="1"/>
-    </LinearLayout>
-    <FrameLayout
-        android:id="@+id/main_PACS_frame_layout"
+        android:layout_height="wrap_content" />
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/main_PACS_pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"/>

@@ -194,8 +194,8 @@ public class CodeResources {
      * ThemeMode Resource
      */
     public static final String THEME_MODE = "theme mode";
-    public static final int LIGHT_MODE = 0;
-    public static final int DARK_MODE = 1;
-    public static final int USER_MODE = 2;
+    public static final String LIGHT_MODE = "Light";
+    public static final String DARK_MODE = "Dark";
+    public static final String USER_MODE = "User";
 }
 

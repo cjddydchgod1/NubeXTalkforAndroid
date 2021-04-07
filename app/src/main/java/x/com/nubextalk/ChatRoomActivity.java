@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.grpc.okhttp.internal.framed.Header;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -87,10 +88,18 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
     private ChatAdapter mAdapter;
     private RealmResults<ChatContent> mChatContents;
+    private ChatRoom mChatRoom;
     private int mChatContentsIndex;
 
     private RecyclerView mRecyclerView;
     private DrawerLayout mDrawerLayout;
+    private Toolbar mToolbar;
+    private ActionBar mActionbar;
+    private TextView mToolbarTitle;
+    private View mHeader;
+    private TextView mDrawerTitle;
+
+
     private NavigationView mNavigationView;
     private EditText mEditChat;
     private IconButton mSendButton;
@@ -117,20 +126,20 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         mUid = Config.getMyUID(mRealm);
 
         // rid 를 사용하여 채팅 내용과 채팅방 이름을 불러옴
-        ChatRoom chatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
-        String chatRoomTitle = chatRoom.getRoomName();
+        mChatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        String chatRoomTitle = mChatRoom.getRoomName();
 
         // 채팅방 툴바 설정
-        Toolbar toolbar = findViewById(R.id.toolbar_chat_room);
-        setSupportActionBar(toolbar);
+        mToolbar = findViewById(R.id.toolbar_chat_room);
+        setSupportActionBar(mToolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        mActionbar = getSupportActionBar();
+        mActionbar.setDisplayShowTitleEnabled(false);
+        mActionbar.setDisplayHomeAsUpEnabled(true);
+        mActionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        TextView title = (TextView) findViewById(R.id.toolbar_chat_room_title);
-        title.setText(chatRoomTitle);
+        mToolbarTitle = (TextView) findViewById(R.id.toolbar_chat_room_title);
+        mToolbarTitle.setText(chatRoomTitle);
 
         // rid 참조하여 채팅내용 불러옴
         mChatContents = mRealm.where(ChatContent.class).equalTo("rid", mRid).findAll();
@@ -155,7 +164,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             mPacsReferenceFrag = new PACSReferenceFragment();
             mFragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.tablet_chat_room_side, mPacsReferenceFrag).commit();
+            fragmentTransaction.replace(R.id.chat_room_pacs_layout, mPacsReferenceFrag).commit();
         }
 
         // 리사이클러 뷰와 어댑터를 연결 채팅을 불러 올수 있음
@@ -171,9 +180,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        View header = mNavigationView.getHeaderView(0);
-        TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
-        drawerTitle.setText(chatRoomTitle);
+        mHeader = mNavigationView.getHeaderView(0);
+        mDrawerTitle = (TextView) mHeader.findViewById(R.id.drawer_title);
+        mDrawerTitle.setText(chatRoomTitle);
 
         // pacs 데이터를 인텐트로 받은 상태로 채팅방 입장시
         String studyId = getIntent().getStringExtra("studyId");
@@ -192,25 +201,25 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
             }
         };
 
-//        RealmChangeListener<ChatRoom> realmChangeListener1 = new RealmChangeListener<ChatRoom>() {
-//            @Override
-//            public void onChange(ChatRoom chatRoom) {
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
-//                        ChatRoom chatRoom = realm1.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
-//                        String chatRoomTitle = chatRoom.getRoomName();
-//
-//                        title.setText(chatRoomTitle);
-//                        drawerTitle.setText(chatRoomTitle);
-//                        aq.toast("채팅방 이름이 변경 되었습니다.");
-//                    }
-//                });
-//            }
-//        };
+        RealmChangeListener<ChatRoom> realmChangeListener1 = new RealmChangeListener<ChatRoom>() {
+            @Override
+            public void onChange(ChatRoom chatRoom) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
+                        ChatRoom chatRoom = realm1.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+                        String chatRoomTitle = chatRoom.getRoomName();
+
+                        mToolbarTitle.setText(chatRoomTitle);
+                        mDrawerTitle.setText(chatRoomTitle);
+                        mAquery.toast("채팅방 이름이 변경 되었습니다.");
+                    }
+                });
+            }
+        };
         mChatContents.addChangeListener(realmChangeListener);
-//        chatRoom.addChangeListener(realmChangeListener1);
+        mChatRoom.addChangeListener(realmChangeListener1);
 
         addContentView(mKeyboardManager, new FrameLayout.LayoutParams(-1, -1));
         mKeyboardManager.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
@@ -233,18 +242,18 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
 
         mRid = intent.getExtras().getString("rid");
 
-        ChatRoom chatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
-        String chatRoomTitle = chatRoom.getRoomName();
-        Toolbar toolbar = findViewById(R.id.toolbar_chat_room);
-        setSupportActionBar(toolbar);
+        mChatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
+        String chatRoomTitle = mChatRoom.getRoomName();
+        mToolbar = findViewById(R.id.toolbar_chat_room);
+        setSupportActionBar(mToolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        mActionbar = getSupportActionBar();
+        mActionbar.setDisplayShowTitleEnabled(false);
+        mActionbar.setDisplayHomeAsUpEnabled(true);
+        mActionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        TextView title = (TextView) findViewById(R.id.toolbar_chat_room_title);
-        title.setText(chatRoomTitle);
+        mToolbarTitle = (TextView) findViewById(R.id.toolbar_chat_room_title);
+        mToolbarTitle.setText(chatRoomTitle);
         mChatContents = mRealm.where(ChatContent.class).equalTo("rid", mRid).findAll();
         mChatContents = mChatContents.sort("sendDate", Sort.ASCENDING);
         mChatContentsIndex = setChatContentRead(mChatContents, 0);
@@ -253,9 +262,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-        View header = mNavigationView.getHeaderView(0);
-        TextView drawerTitle = (TextView) header.findViewById(R.id.drawer_title);
-        drawerTitle.setText(chatRoomTitle);
+        mHeader = mNavigationView.getHeaderView(0);
+        mDrawerTitle = (TextView) mHeader.findViewById(R.id.drawer_title);
+        mDrawerTitle.setText(chatRoomTitle);
     }
 
     @Override // Back pressed

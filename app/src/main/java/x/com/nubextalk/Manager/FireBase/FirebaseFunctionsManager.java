@@ -60,7 +60,7 @@ public class FirebaseFunctionsManager {
     }
 
     public static Task<HttpsCallableResult> createChatRoom(@NonNull Map data, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
         params.put("hid", data.get("hid"));
         params.put("rid", data.get("rid"));
@@ -114,7 +114,7 @@ public class FirebaseFunctionsManager {
     }
 
     public static Task<HttpsCallableResult> getChatRoom(@NonNull String hid, @NonNull String rid, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
         params.put("hid", hid);
         params.put("rid", rid);
@@ -137,7 +137,7 @@ public class FirebaseFunctionsManager {
     }
 
     public static Task<HttpsCallableResult> getUserAttendingChatRoom(@NonNull String hid, @NonNull String uid, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
         params.put("hid", hid);
         params.put("uid", uid);
@@ -213,7 +213,7 @@ public class FirebaseFunctionsManager {
     }
 
     public static Task<HttpsCallableResult> notifyToChatRoomAddedUser(@NonNull Map data, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
         params.put("hid", data.get("hid"));
         params.put("rid", data.get("rid"));
@@ -239,7 +239,7 @@ public class FirebaseFunctionsManager {
     }
 
     public static Task<HttpsCallableResult> exitChatRoom(@NonNull String hid, @NonNull String uid, @NonNull String rid, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
         params.put("hid", hid);
         params.put("rid", rid);
@@ -266,7 +266,7 @@ public class FirebaseFunctionsManager {
     public static Task<HttpsCallableResult> getPersonalChatRoomId(
             @NonNull String hid, @NonNull String myUid,
             @NonNull String otherUid, OnCompleteListener onCompleteListener) {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        FirebaseFunctions functions = FirebaseFunctions.getInstance(FIREBASE_LOC);
         Map<String, Object> params = new HashMap<>();
         params.put("hid", hid);
         params.put("myUid", myUid);

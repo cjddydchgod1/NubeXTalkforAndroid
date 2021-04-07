@@ -208,7 +208,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         Intent intent = new Intent(mContext, ChatImageViewActivity.class);
                         intent.putExtra("cid", chat.getCid());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
+                        mContext.startActivity(intent);
                     }
                 });
 
@@ -237,7 +237,25 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                             fragment.setArguments(bundle);
-                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                            fragmentTransaction.replace(R.id.chat_room_pacs_layout, fragment).commit();
+                        } else {
+                            Intent intent = new Intent(mContext, ImageViewActivity.class);
+                            intent.putExtra("studyId", chat.getExt1());
+                            mContext.startActivity(intent);
+                        }
+                    }
+                });
+                cpvHolder.myPacsButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (UtilityManager.isTablet(mContext)) {
+                            Fragment fragment = new PACSReferenceFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", chat.getExt1());
+
+                            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                            fragment.setArguments(bundle);
+                            fragmentTransaction.replace(R.id.chat_room_pacs_layout, fragment).commit();
                         } else {
                             Intent intent = new Intent(mContext, ImageViewActivity.class);
                             intent.putExtra("studyId", chat.getExt1());
@@ -270,7 +288,25 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                             fragment.setArguments(bundle);
-                            fragmentTransaction.replace(R.id.tablet_chat_room_side, fragment).commit();
+                            fragmentTransaction.replace(R.id.chat_room_pacs_layout, fragment).commit();
+                        } else {
+                            Intent intent = new Intent(mContext, ImageViewActivity.class);
+                            intent.putExtra("studyId", chat.getExt1());
+                            mContext.startActivity(intent);
+                        }
+                    }
+                });
+                cpvHolder.otherPacsButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (UtilityManager.isTablet(mContext)) {
+                            Fragment fragment = new PACSReferenceFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("studyId", chat.getExt1());
+
+                            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                            fragment.setArguments(bundle);
+                            fragmentTransaction.replace(R.id.chat_room_pacs_layout, fragment).commit();
                         } else {
                             Intent intent = new Intent(mContext, ImageViewActivity.class);
                             intent.putExtra("studyId", chat.getExt1());

@@ -7,14 +7,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/nav_friend_list"
-        android:icon="@drawable/ic_baseline_people_outline_24"
+        android:icon="@drawable/ic_people_gray_24"
         android:title="FriendList" />
     <item
         android:id="@+id/nav_chat_list"
-        android:icon="@drawable/ic_baseline_chat_bubble_outline_24"
+        android:icon="@drawable/ic_chat_gray_24"
         android:title="ChatList" />
     <item
         android:id="@+id/nav_setting"
-        android:icon="@drawable/ic_outline_settings_24"
+        android:icon="@drawable/ic_settings_24"
         android:title="Setting" />
 </menu>

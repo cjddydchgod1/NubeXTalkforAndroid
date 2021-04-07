@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -54,6 +59,9 @@
             android:maxLength="80"
             android:maxLines="3"
             android:padding="@dimen/padding_m"
+            android:layout_marginBottom="@dimen/margin_m"
+            android:textColor="@color/cEditText"
+            android:backgroundTint="@color/cEditTextBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/send_button"
             app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +72,8 @@
             android:layout_width="@dimen/icon_size_l"
             android:layout_height="@dimen/icon_size_l"
             android:layout_marginRight="@dimen/margin_l"
-            android:background="@android:color/transparent"
+            android:layout_marginBottom="@dimen/margin_s"
+            android:background="@drawable/bg_btn_ripple_gray_borderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

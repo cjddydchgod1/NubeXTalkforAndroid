@@ -7,7 +7,7 @@
         style="@style/SettingItemWrapperStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_ripple_white_borderless"
+        android:background="@drawable/bg_btn_ripple_white_borderless"
         android:gravity="center_vertical">
 
         <LinearLayout

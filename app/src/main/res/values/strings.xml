@@ -62,5 +62,9 @@
     <string name="chatList">채팅목록</string>
     <string name="PACSReference">PACS</string>
     <string name="setting">설정</string>
+    <string name="entire_friends">전체</string>
+    <string name="added_user">추가된 사용자</string>
+    <string name="search_user">사용자 검색</string>
+    <string name="pacs_new_window">PACS 새 창에서 열기</string>
 
 </resources>

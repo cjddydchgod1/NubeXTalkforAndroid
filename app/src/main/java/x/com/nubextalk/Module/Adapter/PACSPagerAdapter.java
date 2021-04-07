@@ -6,7 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,13 +15,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import x.com.nubextalk.Module.Fragment.PACSChatListFragment;
 import x.com.nubextalk.Module.Fragment.PACSFriendListFragment;
 
+import static x.com.nubextalk.Module.CodeResources.REFERENCE_ITEM_SIZE;
+
 public class PACSPagerAdapter extends FragmentStateAdapter {
-    private static final int REFERENCE_ITEM_SIZE = 2;
-    private Bundle bundle;
+
+    private Bundle mBundle;
 
     public PACSPagerAdapter(@NonNull FragmentActivity fragmentActivity, Bundle bundle) {
         super(fragmentActivity);
-        this.bundle = bundle;
+        this.mBundle = bundle;
     }
 
     @NonNull
@@ -30,15 +31,14 @@ public class PACSPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         int index = getRealPosition(position);
         Fragment fragment;
-        Log.e("adapter", Integer.toString(position));
-        switch(index){
+        switch (index) {
             case 1:
                 fragment = new PACSChatListFragment();
-                fragment.setArguments(bundle);
+                fragment.setArguments(mBundle);
                 return fragment;
             default:
                 fragment = new PACSFriendListFragment();
-                fragment.setArguments(bundle);
+                fragment.setArguments(mBundle);
                 return fragment;
         }
     }
@@ -49,6 +49,6 @@ public class PACSPagerAdapter extends FragmentStateAdapter {
     }
 
     private int getRealPosition(int pos) {
-        return pos%REFERENCE_ITEM_SIZE;
+        return pos % REFERENCE_ITEM_SIZE;
     }
 }

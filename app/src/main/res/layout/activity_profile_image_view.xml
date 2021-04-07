@@ -9,37 +9,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ThemeModeActivity"
-    android:background="@color/cBackground">
+    tools:context=".ProfileImageViewActivity">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/touch_image_view_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
 
-    <RadioGroup
-        android:id="@+id/radioGroupTheme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:background="@color/cBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <RadioButton
-            android:id="@+id/rgt_btn3"
+
+        <com.ortiz.touchview.TouchImageView
+            android:id="@+id/touch_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="라이트 모드" />
 
-        <RadioButton
-            android:id="@+id/rgt_btn2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="다크 모드" />
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
 
-        <RadioButton
-            android:id="@+id/rgt_btn1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="사용자 설정" />
 
-    </RadioGroup>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
-            android:id="@+id/rgt_btn3"
+            android:id="@+id/rgt_btn1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="라이트 모드" />
@@ -35,7 +35,7 @@
             android:text="다크 모드" />
 
         <RadioButton
-            android:id="@+id/rgt_btn1"
+            android:id="@+id/rgt_btn3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="사용자 설정" />

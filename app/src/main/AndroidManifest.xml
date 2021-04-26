@@ -35,6 +35,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" />
+        <activity android:name=".TutorialActivity" />
         <activity
             android:name=".LoginActivity"
             android:noHistory="true" />

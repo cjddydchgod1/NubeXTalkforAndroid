@@ -5,7 +5,9 @@
 
 package x.com.nubextalk;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -49,6 +51,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("checkFirstAccess", Activity.MODE_PRIVATE);
+        boolean checkFirstAccess = sharedPreferences.getBoolean("checkFirstAccess", false);
+
+        if (!checkFirstAccess) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("checkFirstAccess", true);
+            editor.apply();
+
+            Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
+            startActivity(tutorialIntent);
+        }
+
         setContentView(R.layout.activity_login);
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mApiManager = new ApiManager(this, mRealm);
@@ -76,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     public void onSuccess(Response response, String body) {
                         startActivity(mIntent);
                     }
+
                     @Override
                     public void onFail() {
                         Toast.makeText(LoginActivity.this, MSG_LOGIN_FAIL, Toast.LENGTH_SHORT).show();

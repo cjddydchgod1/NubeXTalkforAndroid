@@ -86,7 +86,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRealm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm realm) {
-                refreshChatList();
+                if(!realm.isClosed())
+                    refreshChatList();
             }
         });
 

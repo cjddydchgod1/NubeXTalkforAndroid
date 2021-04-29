@@ -63,6 +63,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
             startActivity(tutorialIntent);
         }
+//        Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
+//        startActivity(tutorialIntent);
 
         setContentView(R.layout.activity_login);
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());

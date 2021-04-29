@@ -27,7 +27,8 @@ public class TutorialPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return TutorialFragment.newInstance(layouts.get(position));
+        Fragment fragment = TutorialFragment.newInstance(layouts.get(position));
+        return fragment;
     }
 
     @Override

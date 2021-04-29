@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,7 +20,6 @@ import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.R;
 
 public class TutorialFragment extends Fragment {
-    private Button mBtnTutorialEnd;
 
     private TutorialFragment() {
 
@@ -37,17 +37,15 @@ public class TutorialFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @NonNull ViewGroup container, @NonNull Bundle savedInstanceState) {
         int page = this.getArguments().getInt("tutorial_page");
         View view = inflater.inflate(page, container, false);
-
-        if (page == R.layout.tutorial_2) {
-            mBtnTutorialEnd = view.findViewById(R.id.tutorial_end_btn);
-            mBtnTutorialEnd.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().startActivity(new Intent(getActivity(), LoginActivity.class));
-                    getActivity().finish();
-                }
-            });
-        }
+//        if (page == R.layout.tutorial_2) {
+//        mBtnTutorialEnd = view.findViewById(R.id.tutorial_end_btn);
+//        mBtnTutorialEnd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(getActivity(), LoginActivity.class));
+//            }
+//        });
+//        }
 
         return view;
     }

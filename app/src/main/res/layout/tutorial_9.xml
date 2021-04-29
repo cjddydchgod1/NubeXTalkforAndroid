@@ -10,7 +10,5 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/tutorial_main1" />
-
-
+        android:src="@drawable/tutorial_chat5" />
 </RelativeLayout>

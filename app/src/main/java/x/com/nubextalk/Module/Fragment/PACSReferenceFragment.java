@@ -9,33 +9,32 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import io.realm.Realm;
-import x.com.nubextalk.ImageViewActivity;
+import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.PACS.PacsWebView;
 import x.com.nubextalk.R;
 import x.com.nubextalk.SharePACSActivity;
 
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_HOME;
+import static x.com.nubextalk.Module.CodeResources.PATH_PACS_VIEWER;
+import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
+
 public class PACSReferenceFragment extends Fragment implements PacsWebView.onJavaScriptListener {
 
-    private Realm realm;
+    private Realm mRealm;
     private ApiManager mApiManager;
 
-    private ViewGroup rootview;
+    private ViewGroup mRootview;
     private PacsWebView mPacsWebView;
 
     private Context mContext;
@@ -44,7 +43,7 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
     @Override
     public void onAttach(@NonNull Context context) {
         mContext = context;
-        if(context instanceof Activity)
+        if (context instanceof Activity)
             mActivity = (Activity) context;
         super.onAttach(context);
     }
@@ -53,26 +52,38 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        realm = Realm.getInstance(UtilityManager.getRealmConfig());
-        mApiManager = new ApiManager(mContext, realm);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mApiManager = new ApiManager(mContext, mRealm);
 
-        mActivity.setTitle(getString(R.string.PACSReference));
+        if (!UtilityManager.isTablet(mActivity)) {
+            mActivity.setTitle(TITLE_PACS);
+        }
 
-        rootview    = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
-        mPacsWebView    = rootview.findViewById(R.id.webView);
+        mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
+        mPacsWebView = mRootview.findViewById(R.id.webView);
         /* 쿠키 생성 후 넣기 */
         try {
-            mPacsWebView.init(realm);
+            mPacsWebView.init(mRealm);
         } catch (Exception e) {
             Log.e("e", e.toString());
         } finally {
-            if(realm != null)
-                realm.close();
+            if (mRealm != null)
+                mRealm.close();
+        }
+        mPacsWebView.setJavaScriptListener(this);
+
+        String studyId = null;
+        if (UtilityManager.isTablet(mContext)) {
+            Bundle bundle = getArguments();
+            studyId = bundle != null ? bundle.getString("studyId") : null;
         }
 
-        mPacsWebView.setJavaScriptListener(this);
-        mPacsWebView.loadUrl("/mobile/app/");
-        return rootview;
+        if (UtilityManager.checkString(studyId)) {
+            mPacsWebView.loadUrl(PATH_PACS_VIEWER + studyId);
+        } else {
+            mPacsWebView.loadUrl(PATH_PACS_HOME);
+        }
+        return mRootview;
     }
 
     @Override
@@ -84,16 +95,19 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
 
     @Override
     public void onCall(String func, String... arg) {
-        switch (func){
+        switch (func) {
             case "shareApp":
-                Intent intent = new Intent(mActivity, SharePACSActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("studyId", arg[0]);
-                bundle.putString("description", arg[1]);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                if (mActivity instanceof ChatRoomActivity) {
+                    ((ChatRoomActivity) mActivity).sendPacs(arg[0], arg[1], Realm.getInstance(UtilityManager.getRealmConfig()));
+                } else {
+                    Intent intent = new Intent(mActivity, SharePACSActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("studyId", arg[0]);
+                    bundle.putString("description", arg[1]);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
                 break;
         }
-
     }
 }

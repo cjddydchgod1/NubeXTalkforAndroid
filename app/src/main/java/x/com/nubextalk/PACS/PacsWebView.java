@@ -97,13 +97,13 @@ public class PacsWebView extends WebView {
     private class JavaScriptBridge{
 
         @JavascriptInterface
-        public void shareApp(final String studyId){
+        public void shareApp(final String studyId, final String desc, final String thumbSrc){
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
                     if(UtilityManager.checkString(studyId)){
                         if(listener != null){
-                            listener.onCall("shareApp", studyId, "Desc");
+                            listener.onCall("shareApp", studyId, desc);
                         }
                     }
                 }

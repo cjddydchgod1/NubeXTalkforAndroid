@@ -2,18 +2,55 @@ package x.com.nubextalk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.TextView;
+import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AppCompatDelegate;
+
+import io.realm.Realm;
+import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
+
+import static x.com.nubextalk.Module.CodeResources.*;
 
 public class LoadingActivity extends Activity {
-
-    private TextView mTextView;
-
+    private Realm mRealm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        /** Theme Mode 설정 **/
+        Config theme = Config.getThemeMode(mRealm);
+        if(theme == null) {
+            theme = new Config();
+            theme.setCODENAME("Theme");
+            theme.setCODE("Theme");
+            theme.setExt1(USER_MODE);
+        }
+        String theme_mode = theme.getExt1();
+
+        switch (theme_mode) {
+            case LIGHT_MODE:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case DARK_MODE:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case USER_MODE:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+                }
+                break;
+        }
+
         setContentView(R.layout.activity_loading);
+
+
         startLoading();
     }
 
@@ -21,6 +58,7 @@ public class LoadingActivity extends Activity {
         final LoadingActivity activity = this;
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
+
             @Override
             public void run() {
                 try {
@@ -30,6 +68,6 @@ public class LoadingActivity extends Activity {
                     e.printStackTrace();
                 }
             }
-        }, 2000);
+        }, 1000);
     }
 }

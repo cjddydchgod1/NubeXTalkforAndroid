@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/padding_s">
 
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="@dimen/profile_image_xs"
-        android:layout_height="@dimen/profile_image_xs"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <TextView
+        android:id="@+id/chat_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_date" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_profile_image"
+        android:layout_width="@dimen/profile_image_xs"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chat_date">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="@dimen/profile_image_xs"
+            android:layout_height="@dimen/profile_image_xs"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/profile_name"
@@ -21,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_m"
         app:layout_constraintBottom_toTopOf="@+id/other_chat_text"
-        app:layout_constraintStart_toEndOf="@+id/profile_image"
+        app:layout_constraintStart_toEndOf="@+id/layout_profile_image"
         app:layout_constraintTop_toBottomOf="@+id/chat_date" />
 
     <TextView
@@ -34,7 +52,7 @@
         android:maxWidth="200dp"
         android:padding="@dimen/padding_s"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_image" />
+        app:layout_constraintStart_toEndOf="@+id/layout_profile_image" />
 
     <TextView
         android:id="@+id/other_time"
@@ -55,9 +73,10 @@
         android:gravity="center_vertical"
         android:maxWidth="200dp"
         android:padding="@dimen/padding_s"
+        app:layout_constraintTop_toBottomOf="@+id/chat_date"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_date" />
+        />
 
     <TextView
         android:id="@+id/my_time"
@@ -67,14 +86,6 @@
         android:gravity="center_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/my_chat_text" />
-
-    <TextView
-        android:id="@+id/chat_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

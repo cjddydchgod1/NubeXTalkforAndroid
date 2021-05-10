@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/dialog_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:duplicateParentState="true"
+        android:fontFamily="sans-serif-black"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:scaleType="center"
+        android:text="채팅방 이름 편집"
+        android:textAlignment="center"
+        android:textSize="@dimen/sp_txt_xl"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/modified_room_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="새로운 채팅방 이름 입력"
+        android:inputType="text"
+        android:layout_marginTop="@dimen/margin_m"
+        android:layout_marginLeft="@dimen/margin_l"
+        android:layout_marginRight="@dimen/margin_l"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_text_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

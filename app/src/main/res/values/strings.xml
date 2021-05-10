@@ -4,7 +4,7 @@
   -->
 
 <resources>
-    <string name="app_name">NubeX Talk</string>
+    <string name="app_name">NubeX Messenger</string>
     <string name="title_activity_loading">LoadingActivity</string>
     <!--
     This string is used for square devices and overridden by hello_world in
@@ -43,7 +43,7 @@
     <string name="title_activity_chat_add">ChatAddActivity</string>
     <string name="hint_password">PASSWORD</string>
     <string name="login">로그인</string>
-    <string name="sign_hospital">병원 등록</string>
+    <string name="sign_hospital">병원 설정</string>
     <string name="auto_login">자동 로그인</string>
     <string name="hint_user_id">USER ID</string>
     <string name="search_pacs">PACS 이동</string>
@@ -62,5 +62,9 @@
     <string name="chatList">채팅목록</string>
     <string name="PACSReference">PACS</string>
     <string name="setting">설정</string>
+    <string name="entire_friends">전체</string>
+    <string name="added_user">추가된 사용자</string>
+    <string name="search_user">사용자 검색</string>
+    <string name="pacs_new_window">PACS 새 창에서 열기</string>
 
 </resources>

@@ -55,16 +55,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences sharedPreferences = getSharedPreferences("checkFirstAccess", Activity.MODE_PRIVATE);
         boolean checkFirstAccess = sharedPreferences.getBoolean("checkFirstAccess", false);
 
-        if (!checkFirstAccess) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("checkFirstAccess", true);
-            editor.apply();
-
-            Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
-            startActivity(tutorialIntent);
-        }
-//        Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
-//        startActivity(tutorialIntent);
+//        if (!checkFirstAccess) {
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putBoolean("checkFirstAccess", true);
+//            editor.apply();
+//
+//            Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
+//            startActivity(tutorialIntent);
+//        }
+        Intent tutorialIntent = new Intent(LoginActivity.this, TutorialActivity.class);
+        startActivity(tutorialIntent);
 
         setContentView(R.layout.activity_login);
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());

@@ -6,59 +6,100 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tutorial_viewpager_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_viewpager_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tutorial_description1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_l"
+            android:layout_marginTop="@dimen/margin_xl"
+            android:layout_marginRight="@dimen/margin_l"
+            android:text="튜토리얼 설명 제목"
+            android:textAlignment="center"
+            android:textColor="@color/cWhite"
+            android:textSize="@dimen/sp_txt_Ml"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tutorial_description2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tutorial_viewpager_head" />
+
+        <TextView
+            android:id="@+id/tutorial_description2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_Ml"
+            android:layout_marginTop="@dimen/margin_m"
+            android:layout_marginRight="@dimen/margin_Ml"
+            android:text="튜토리얼 상세 설명"
+            android:textAlignment="center"
+            android:textColor="@color/cWhite"
+            android:textSize="@dimen/sp_txt_l"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tutorial_description1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/tutorial_viewpager_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <me.relex.circleindicator.CircleIndicator3
-            android:id="@+id/tutorial_status"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            app:ci_drawable="@drawable/ic_black_circle"
-            app:layout_constraintBottom_toTopOf="@id/tutorial_viewpager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tutorial_viewpager_layout"
-
-            />
+        app:layout_constraintTop_toBottomOf="@id/tutorial_viewpager_head">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/tutorial_viewpager"
             android:layout_width="match_parent"
-            android:layout_height="480dp"
+            android:layout_height="520dp"
+            app:layout_constraintBottom_toTopOf="@id/tutorial_status"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tutorial_viewpager_layout" />
+
+        <me.relex.circleindicator.CircleIndicator3
+            android:id="@+id/tutorial_status"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            app:ci_drawable="@drawable/ic_black_circle"
+            app:layout_constraintBottom_toTopOf="@id/tutorial_end_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tutorial_viewpager" />
+
+        <Button
+            android:id="@+id/tutorial_end_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_xl"
+            android:layout_marginRight="@dimen/margin_xl"
+            android:background="@drawable/bg_btn_transparent_border"
+            android:paddingLeft="@dimen/padding_Ml"
+            android:paddingRight="@dimen/padding_Ml"
+            android:text="NubeXTalk 앱 시작"
+            android:textColor="@color/cWhite"
+            android:textSize="@dimen/sp_txt_xl"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tutorial_viewpager_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tutorial_status" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/tutorial_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="튜토리얼 설명을 해주세요."
-        app:layout_constraintBottom_toTopOf="@id/tutorial_end_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tutorial_viewpager_layout" />
-
-
-    <Button
-        android:id="@+id/tutorial_end_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Skip"
-        android:textSize="@dimen/sp_txt_Ml"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

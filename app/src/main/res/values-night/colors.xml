@@ -16,7 +16,7 @@
 
     <color name="colorPrimary">#384050</color>
     <color name="colorPrimaryDark">#384050</color>
-    <color name="colorAccent">#0F56A3</color>
+    <color name="colorAccent">#4FA4FF</color>
 
     <color name="cChatRoomBackground">#1C1D20</color>
     <color name="cBackground">#2E2F33</color>
@@ -28,6 +28,8 @@
     <color name="cChatRemain">#F4E558</color>
     <color name="cSettingIconBackground">#1C1D20</color>
     <color name="cActionBarIcon">#CECED8</color>
+    <color name="cProfile">#FFFFFF</color>
+    <color name="cGroupProfile">#FFFFFF</color>
 
     <color name="cGradientStart">#000000</color>
     <color name="cGradientMiddle">#5B1D1D</color>

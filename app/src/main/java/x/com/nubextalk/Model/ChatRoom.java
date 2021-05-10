@@ -165,7 +165,7 @@ public class ChatRoom extends RealmObject {
                 }
             }
         } else { // 단체 채팅방일 때, 채팅방 사진을 기본 단체채팅방 사진으로 설정
-            roomImg = String.valueOf(R.drawable.ic_people_gray_24);
+            roomImg = String.valueOf(R.drawable.ic_default_people_24);
             isGroupChat = true;
         }
 

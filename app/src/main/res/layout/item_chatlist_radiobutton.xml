@@ -17,7 +17,7 @@
         android:layout_height="64dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_default_profile_black_24" />
+        tools:src="@drawable/ic_default_profile_24" />
 
     <ImageView
         android:id="@+id/chat_list_friend_status"

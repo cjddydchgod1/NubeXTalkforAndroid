@@ -28,6 +28,8 @@
     <color name="cChatRemain">#F4E558</color>
     <color name="cSettingIconBackground">#FFFFFF</color>
     <color name="cActionBarIcon">#2F2F30</color>
+    <color name="cProfile">#000000</color>
+    <color name="cGroupProfile">#636161</color>
 
     <color name="cGradientStart">#000000</color>
     <color name="cGradientMiddle">#5B1D1D</color>

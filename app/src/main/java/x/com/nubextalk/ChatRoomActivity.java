@@ -200,26 +200,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
             }
         };
-
-        RealmChangeListener<ChatRoom> realmChangeListener1 = new RealmChangeListener<ChatRoom>() {
-            @Override
-            public void onChange(ChatRoom chatRoom) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Realm realm1 = Realm.getInstance(UtilityManager.getRealmConfig());
-                        ChatRoom chatRoom = realm1.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
-                        String chatRoomTitle = chatRoom.getRoomName();
-
-                        mToolbarTitle.setText(chatRoomTitle);
-                        mDrawerTitle.setText(chatRoomTitle);
-                        mAquery.toast("채팅방 이름이 변경 되었습니다.");
-                    }
-                });
-            }
-        };
         mChatContents.addChangeListener(realmChangeListener);
-        mChatRoom.addChangeListener(realmChangeListener1);
 
         addContentView(mKeyboardManager, new FrameLayout.LayoutParams(-1, -1));
         mKeyboardManager.setOnShownKeyboard(new KeyboardManager.OnShownKeyboardListener() {
@@ -736,6 +717,14 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     // Rename ChatRoom
     private void renameChatRoom() {
         RoomNameModificationDialogFragment fragment = new RoomNameModificationDialogFragment(mRealm, mRid);
+        fragment.setNameModifiedListener(new RoomNameModificationDialogFragment.NameModifiedListener() {
+            @Override
+            public void onChange(String name) {
+                mToolbarTitle.setText(name);
+                mDrawerTitle.setText(name);
+                mAquery.toast("채팅방 이름이 변경 되었습니다.");
+            }
+        });
         fragment.show(getSupportFragmentManager(), "Change RoomName");
     }
 }

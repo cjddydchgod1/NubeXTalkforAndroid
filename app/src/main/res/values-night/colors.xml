@@ -30,8 +30,9 @@
     <color name="cLogoPink">#DB695B</color>
     <color name="cLoginEditText">#384050</color>
     <color name="cLoginIcon">#F5F5F5</color>
-        <color name="cLoginBorder">#798293</color>
-
+    <color name="cLoginBorder">#798293</color>
+    <color name="cLoginButtonBg">#384050</color>
+    <color name="cLoginButtonBorder">#384050</color>
 
 
     <color name="cGradientStart">#000000</color>

@@ -71,8 +71,8 @@ public class CodeResources {
     public static final int STATUS_BUSY = R.drawable.ic_status_busy;
     public static final int STATUS_OFF = R.drawable.ic_status_off;
     public static final int STATUS_ON = R.drawable.ic_status_on;
-    public static final int DEFAULT_PROFILE = R.drawable.ic_default_profile_black_24;
-    public static final int DEFAULT_GROUP_PROFILE = R.drawable.ic_people_gray_24;
+    public static final int DEFAULT_PROFILE = R.drawable.ic_default_profile_24;
+    public static final int DEFAULT_GROUP_PROFILE = R.drawable.ic_default_people_24;
     public static final int SEARCH = R.id.toolbar_search;
 
     /**

@@ -31,6 +31,8 @@
     <color name="cLoginEditText">#F5F5F5</color>
     <color name="cLoginIcon">#384050</color>
     <color name="cLoginBorder">#dcdcdc</color>
+    <color name="cProfile">#000000</color>
+    <color name="cGroupProfile">#636161</color>
 
 
     <color name="cGradientStart">#000000</color>

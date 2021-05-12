@@ -3,7 +3,7 @@
   ~ Copyright 테크하임(주). All rights reserved.
   -->
 
-<vector android:height="24dp" android:tint="#636161"
+<vector android:height="24dp" android:tint="@color/cGroupProfile"
     android:viewportHeight="24" android:viewportWidth="24"
     android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
     <path android:fillAlpha="0.3"

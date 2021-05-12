@@ -6,10 +6,15 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -19,8 +24,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import x.com.nubextalk.Manager.ImageManager;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
@@ -37,6 +44,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private AQuery mAquery;
     private boolean mIsRadio;
     private int mLastCheckedPosition = -1;
+
+    private static String mProfilePath;
 
     public interface onItemSelectedListener {
         void onSelected(User address);
@@ -115,9 +124,34 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 radioButton.setVisibility(View.VISIBLE);
             profileName.setText(user.getAppName());
             if (URLUtil.isValidUrl(user.getAppImagePath())) {
+//                ImageManager imageManager = new ImageManager(mContext);
+//                mProfilePath = "aaa";
+//                Thread thread = new Thread(new Runnable() {
+//                    @Override
+//                    public void run()
+//                    {
+////                        String path = imageManager.getCachePath(user.getUid());
+//                        String path = imageManager.saveUrlToCache(user.getAppImagePath(), user.getUid());
+//                        // Cache file이 존재하는지 안하는지 확인한 뒤, 불러오거나 저장하는 방법
+//                        Log.d("thread path", path);
+//                        mProfilePath = path;
+//                    }
+//                });
+//                try{
+//                    thread.start();
+//                    thread.join();
+//                    Log.d("sibal", "wialt");
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.d("path", mProfilePath);
+//                mAquery.view(profileImage).image(mProfilePath);
                 mAquery.view(profileImage).image(user.getAppImagePath());
             } else {
-                mAquery.view(profileImage).image(DEFAULT_PROFILE);
+                Drawable drawable = profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
+                mAquery.view(profileImage).image(drawable);
+                //profileImage.invalidate();
+                //profileImage.invalidateDrawable(drawable);
             }
 
             switch (user.getAppStatus()) {

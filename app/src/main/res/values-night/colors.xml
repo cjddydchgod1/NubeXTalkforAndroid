@@ -15,7 +15,7 @@
 
     <color name="colorPrimary">#384050</color>
     <color name="colorPrimaryDark">#384050</color>
-    <color name="colorAccent">#0F56A3</color>
+    <color name="colorAccent">#4FA4FF</color>
 
     <color name="cChatRoomBackground">#1C1D20</color>
     <color name="cBackground">#2E2F33</color>
@@ -30,8 +30,11 @@
     <color name="cLogoPink">#DB695B</color>
     <color name="cLoginEditText">#384050</color>
     <color name="cLoginIcon">#F5F5F5</color>
-        <color name="cLoginBorder">#798293</color>
-
+    <color name="cLoginBorder">#798293</color>
+    <color name="cLoginButtonBg">#384050</color>
+    <color name="cLoginButtonBorder">#384050</color>
+    <color name="cProfile">#FFFFFF</color>
+    <color name="cGroupProfile">#FFFFFF</color>
 
 
     <color name="cGradientStart">#000000</color>

@@ -6,10 +6,13 @@
 package x.com.nubextalk;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,6 +60,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //SetTheme(Dark, Light)
+
+        //앱 초기 설치 후 로그인 했을 때 메인 화면 넘어가기 전에 튜토리얼 보여주기. -> 로그아웃 하고 다른 아이디로 로그인했을 떄도 보여주도록 수정
+        SharedPreferences sharedPreferences = getSharedPreferences("checkFirstAccess", Activity.MODE_PRIVATE);
+        boolean checkFirstAccess = sharedPreferences.getBoolean("checkFirstAccess", false);
+
+        if (!checkFirstAccess) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("checkFirstAccess", true);
+            editor.apply();
+            Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
+            startActivity(tutorialIntent);
+        }
+//        Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
+//        startActivity(tutorialIntent);
 
         setContentView(R.layout.activity_main);
 
@@ -169,10 +186,12 @@ public class MainActivity extends AppCompatActivity {
         PermissionListener pm = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
+
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                //Toast.makeText(MainActivity.class, "", Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
         };

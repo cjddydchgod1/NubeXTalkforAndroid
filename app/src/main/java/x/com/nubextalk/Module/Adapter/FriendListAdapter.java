@@ -148,8 +148,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //                mAquery.view(profileImage).image(mProfilePath);
                 mAquery.view(profileImage).image(user.getAppImagePath());
             } else {
-                Drawable drawable = profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-                mAquery.view(profileImage).image(drawable);
+                //Drawable drawable = profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
+                //mAquery.view(profileImage).image(drawable);
+                mAquery.view(profileImage).image(DEFAULT_PROFILE);
+                profileImage.setColorFilter(profileName.getTextColors().getDefaultColor());
                 //profileImage.invalidate();
                 //profileImage.invalidateDrawable(drawable);
             }

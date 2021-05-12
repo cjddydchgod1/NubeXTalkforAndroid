@@ -24,6 +24,13 @@ import me.relex.circleindicator.CircleIndicator3;
 import x.com.nubextalk.Manager.TutorialPageAnimManager;
 import x.com.nubextalk.Module.Adapter.TutorialPagerAdapter;
 
+import static x.com.nubextalk.Module.CodeResources.CONTENT_DESC1;
+import static x.com.nubextalk.Module.CodeResources.CONTENT_DESC2;
+import static x.com.nubextalk.Module.CodeResources.CONTENT_DESC3;
+import static x.com.nubextalk.Module.CodeResources.TITLE_DESC1;
+import static x.com.nubextalk.Module.CodeResources.TITLE_DESC2;
+import static x.com.nubextalk.Module.CodeResources.TITLE_DESC3;
+
 public class TutorialActivity extends FragmentActivity {
 
     private ViewPager2 mTutorialViewPager;
@@ -60,16 +67,16 @@ public class TutorialActivity extends FragmentActivity {
                 mStatusCircleIndicator.animatePageSelected((position) % mTutorialLayouts.size());
                 switch (position) {
                     case 0:
-                        mTutorialDesc1.setText("1.채팅 기능");
-                        mTutorialDesc2.setText("채팅목록에서 새로운 1:1 채팅과 단체채팅방을 생성할 수 있습니다.");
+                        mTutorialDesc1.setText(TITLE_DESC1);
+                        mTutorialDesc2.setText(CONTENT_DESC1);
                         break;
                     case 1:
-                        mTutorialDesc1.setText("2.PACS 기능");
-                        mTutorialDesc2.setText("하단 3번째 PACS메뉴를 통해 PACS 정보에 접근하고 채팅을 통해 내용을 공유할 수 있습니다.");
+                        mTutorialDesc1.setText(TITLE_DESC2);
+                        mTutorialDesc2.setText(CONTENT_DESC2);
                         break;
                     case 2:
-                        mTutorialDesc1.setText("3.근무 상황 기능");
-                        mTutorialDesc2.setText("자신의 상태를 선택할 수 있으며 사용자 프로필 우상단의 아이콘을 통해 현재 근무 상태를 확인할 수 있습니다.");
+                        mTutorialDesc1.setText(TITLE_DESC3);
+                        mTutorialDesc2.setText(CONTENT_DESC3);
                         break;
                 }
 
@@ -80,7 +87,7 @@ public class TutorialActivity extends FragmentActivity {
         mBtnTutorialEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(TutorialActivity.this, LoginActivity.class));
+                startActivity(new Intent(TutorialActivity.this, MainActivity.class));
             }
         });
     }

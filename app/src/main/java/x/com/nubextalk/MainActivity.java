@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -185,10 +186,12 @@ public class MainActivity extends AppCompatActivity {
         PermissionListener pm = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
+
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                //Toast.makeText(MainActivity.class, "", Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
         };

@@ -71,8 +71,8 @@ public class CodeResources {
     public static final int STATUS_BUSY = R.drawable.ic_status_busy;
     public static final int STATUS_OFF = R.drawable.ic_status_off;
     public static final int STATUS_ON = R.drawable.ic_status_on;
-    public static final int DEFAULT_PROFILE = R.drawable.ic_default_profile_black_24;
-    public static final int DEFAULT_GROUP_PROFILE = R.drawable.ic_people_gray_24;
+    public static final int DEFAULT_PROFILE = R.drawable.ic_default_profile_24;
+    public static final int DEFAULT_GROUP_PROFILE = R.drawable.ic_default_people_24;
     public static final int SEARCH = R.id.toolbar_search;
 
     /**
@@ -189,6 +189,16 @@ public class CodeResources {
      */
     public static final int CHAT_ADD = 0;
     public static final int MOVE_TO_CHAT_ROOM = 1;
+
+    /**
+     * TutorialActivity Resource
+     */
+    public static final String TITLE_DESC1 = "1.채팅 기능";
+    public static final String TITLE_DESC2 = "2.PACS 기능";
+    public static final String TITLE_DESC3 = "3.근무 상황 기능";
+    public static final String CONTENT_DESC1 = "채팅목록에서 새로운 1:1 채팅과 단체채팅방을 생성할 수 있습니다.";
+    public static final String CONTENT_DESC2 = "PACS메뉴를 통해 PACS 정보에 접근하고 채팅을 통해 내용을 공유할 수 있습니다.";
+    public static final String CONTENT_DESC3 = "자신의 상태를 선택할 수 있으며 타사용자의 현재 근무 상태를 확인할 수 있습니다.";
 
     /**
      * ThemeMode Resource

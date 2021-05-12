@@ -33,6 +33,8 @@
     <color name="cLoginBorder">#dcdcdc</color>
     <color name="cLoginButtonBg">#F5F5F5</color>
     <color name="cLoginButtonBorder">#dcdcdc</color>
+    <color name="cProfile">#000000</color>
+    <color name="cGroupProfile">#636161</color>
 
 
     <color name="cGradientStart">#000000</color>

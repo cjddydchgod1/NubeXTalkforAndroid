@@ -112,6 +112,17 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         }
     }
 
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        /** Modified By Jongho Lee*/
+        if(!hidden){
+            mChatRoomList = ChatRoom.getAll(mRealm);
+            mAdapter.updateData(mChatRoomList);
+        }
+    }
+
     /**
      * 채팅방 목록 중 아이템 하나 꾹 눌렀을 떄 이벤트
      */

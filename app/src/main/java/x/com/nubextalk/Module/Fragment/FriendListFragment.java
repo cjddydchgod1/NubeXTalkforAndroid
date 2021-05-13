@@ -201,6 +201,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         super.onDetach();
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        /** Modified By Jongho Lee*/
+        if(hidden){
+            if (mBottomWrapper.getTranslationY() == 0) {
+                new AnimManager(
+                        AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
+                ).start(AnimManager.TOGETHER);
+                mExitWrapper.setVisibility(View.GONE);
+            }
+        }
+    }
+
     public void getDataFromPACS() {
         /**
          * PACS서버에서 Userlist를 가져와 Realm DB에 저장한다.

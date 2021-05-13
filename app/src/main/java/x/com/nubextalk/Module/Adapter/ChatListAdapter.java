@@ -313,6 +313,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+
+    /** Modified By Jongho Lee*/
+    public void updateData(RealmResults<ChatRoom> dataSet){
+        this.mDataset = dataSet;
+        sortChatRoomByDate();
+        notifyDataSetChanged();
+    }
+
     /**
      * 채팅방 목록 시간 순서대로 정렬
      */

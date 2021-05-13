@@ -6,11 +6,11 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="@color/cTransparent" /> //배경색
+    <solid android:color="@color/cLoginButtonBg" /> //배경색
 
     <stroke
         android:width="2dp"
-        android:color="@color/cLogoPink" /> //선색
+        android:color= "@color/cLoginButtonBorder" /> //선색
     <corners
         android:topLeftRadius="30dp"
         android:topRightRadius="30dp"

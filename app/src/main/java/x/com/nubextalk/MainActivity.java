@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -214,10 +215,12 @@ public class MainActivity extends AppCompatActivity {
         PermissionListener pm = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
+
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                //Toast.makeText(MainActivity.class, "", Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
         };

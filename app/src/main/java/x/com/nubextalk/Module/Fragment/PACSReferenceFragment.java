@@ -9,12 +9,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import io.realm.Realm;
@@ -48,6 +50,22 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         super.onAttach(context);
     }
 
+    /** Modified By Jongho Lee*/
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mPacsWebView.saveState(outState);
+    }
+
+    /** Modified By Jongho Lee*/
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        mPacsWebView.restoreState(savedInstanceState);
+    }
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,10 +96,12 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
             studyId = bundle != null ? bundle.getString("studyId") : null;
         }
 
-        if (UtilityManager.checkString(studyId)) {
-            mPacsWebView.loadUrl(PATH_PACS_VIEWER + studyId);
-        } else {
-            mPacsWebView.loadUrl(PATH_PACS_HOME);
+        if(savedInstanceState == null){
+            if (UtilityManager.checkString(studyId)) {
+                mPacsWebView.loadUrl(PATH_PACS_VIEWER + studyId);
+            } else {
+                mPacsWebView.loadUrl(PATH_PACS_HOME);
+            }
         }
         return mRootview;
     }

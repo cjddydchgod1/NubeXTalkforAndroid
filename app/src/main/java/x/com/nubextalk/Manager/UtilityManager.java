@@ -18,6 +18,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.DisplayMetrics;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.joanzapata.iconify.widget.IconButton;
@@ -171,9 +172,17 @@ public class UtilityManager {
      class 파일 에서 tablet 확인
      **/
     public static boolean isTablet(Context context) {
+        DisplayMetrics dm = context.getApplicationContext()
+                .getResources().getDisplayMetrics();
+        float screenWidth = dm.widthPixels / dm.density;
+        float screenHeight = dm.heightPixels / dm.density;
+
         int screenSizeType = context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
 
         if(screenSizeType==Configuration.SCREENLAYOUT_SIZE_XLARGE || screenSizeType==Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            if(Math.min(screenWidth, screenHeight) < 600){
+                return false;
+            }
             return true;
         }
         return false;

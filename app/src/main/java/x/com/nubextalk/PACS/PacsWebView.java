@@ -74,6 +74,7 @@ public class PacsWebView extends WebView {
         settings.setJavaScriptEnabled(true);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setTextZoom(100);
         settings.setDomStorageEnabled(true);
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);

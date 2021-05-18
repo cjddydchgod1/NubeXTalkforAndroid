@@ -93,6 +93,9 @@ public class Protocol extends AsyncTask<String, Integer, ArrayList<Object>> {
     @Override
     protected void onPostExecute(ArrayList<Object> response) {
         super.onPostExecute(response);
+        if(response == null){
+            return;
+        }
         try{
             if(onCallback != null){
                 onCallback.onCallback(

@@ -3,91 +3,134 @@
   ~ Copyright 테크하임(주). All rights reserved.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".RegisterActivity">
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/editTextSSL"
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.3" />
+
+    <LinearLayout
+        android:id="@+id/register_logo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_l"
-        android:ems="10"
-        android:hint="ssl설정 (ex: https://)"
-        android:inputType="text"
-        android:textSize="25sp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="1.8">
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPort"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_main" />
 
-    <EditText
-        android:id="@+id/editTextHost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_l"
-        android:ems="10"
-        android:hint="host (ex: 192.0.0.1)"
-        android:inputType="text"
-        android:text=""
-        android:textSize="@dimen/sp_txt_Ml"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextHospitalName" />
+    </LinearLayout>
 
-    <EditText
-        android:id="@+id/editTextPort"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_l"
-        android:ems="10"
-        android:hint="port (ex: 8080)"
-        android:inputType="text"
-        android:text=""
-        android:textSize="@dimen/sp_txt_Ml"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextHost" />
 
-    <TextView
-        android:id="@+id/textViewRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:text="병원 설정"
-        android:textSize="@dimen/sp_txt_GGl"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.8"
+        android:layout_marginTop="@dimen/sp_txt_xl"
+        android:orientation="horizontal"
+        tools:context=".RegisterActivity">
 
-    <Button
-        android:id="@+id/buttonRegister"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="32dp"
-        android:text="확 인"
-        android:textSize="@dimen/sp_txt_Ml"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextSSL" />
+        <TextView
+            android:id="@+id/textViewRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="병원 설정"
+            android:textColor="@color/cContentText"
+            android:textSize="20sp"
+            android:paddingBottom="@dimen/padding_xl"
+            android:layout_marginHorizontal="@dimen/sp_txt_Ml"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/editTextHospitalName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
-        android:ems="10"
-        android:hint="병원 이름"
-        android:inputType="text"
-        android:text=""
-        android:textSize="@dimen/sp_txt_Ml"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewRegister" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <EditText
+            android:id="@+id/editTextHospitalName"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_login_edit_text"
+            android:hint="병원 이름"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="@color/cContentText"
+            android:textColorHint="@color/cWhiteGray"
+            android:textSize="@dimen/sp_txt_xl"
+            app:layout_constraintTop_toBottomOf="@id/textViewRegister" />
+
+        <EditText
+            android:id="@+id/editTextHost"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_l"
+            android:background="@drawable/bg_login_edit_text"
+            android:hint="host (ex: 192.0.0.1)"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="@dimen/sp_txt_xl"
+            app:layout_constraintTop_toBottomOf="@id/editTextHospitalName" />
+
+        <EditText
+            android:id="@+id/editTextPort"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_l"
+            android:background="@drawable/bg_login_edit_text"
+            android:hint="port (ex: 8080)"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="@dimen/sp_txt_xl"
+            app:layout_constraintTop_toBottomOf="@id/editTextHost" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:gravity="center">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/editTextSSL"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:ems="10"
+            android:inputType="text"
+            android:text="ssl설정 (https://)"
+            android:textColor="@color/cContentText"
+            android:textSize="16sp"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/buttonRegister"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_l"
+            android:layout_marginEnd="@dimen/margin_l"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_login"
+            android:text="확 인"
+            android:textColor="@color/cContentText"
+            android:textSize="@dimen/txt_xl"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

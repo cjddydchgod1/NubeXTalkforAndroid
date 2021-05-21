@@ -244,42 +244,35 @@ public class ChatAddActivity extends AppCompatActivity implements
                         });
                     }
                 } else { //기존 채팅방에서 대화 상대 추가
-                    ChatRoom chatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirstAsync();
+                    ChatRoom chatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
                     Intent intent = new Intent(this, ChatRoomActivity.class);
 
-                    chatRoom.addChangeListener(new RealmChangeListener<ChatRoom>() {
-                        @Override
-                        public void onChange(ChatRoom chatRoom1) {
-                            if (chatRoom1.isValid()) {
-                                if (chatRoom1.getIsGroupChat()) { //단체 채팅방인 경우 선택한 사용자(들)만 초대
+                    if (chatRoom != null) {
+                        if (chatRoom.getIsGroupChat()) { //단체 채팅방인 경우 선택한 사용자(들)만 초대
 
-                                    //기존에 있던 유저들은 초대에서 제외
-                                    for (ChatAddActivityUser chatAddActivityUser : selectedUser) {
-                                        if (chatAddActivityUser.getIsAlreadyChatRoomUser()) {
-                                            userArrayList.remove(chatAddActivityUser.getUser());
-                                        }
-                                    }
-
-                                    inviteChatUser(mRealm, HOSPITAL_ID, mRid, userArrayList);
-                                    onBackPressed();
-
-                                } else { // 기존 1:1 채팅방에서 새로운 대화상대를 초대하는 경우 새로운 단체 채팅방 생성
-                                    if (userArrayList.size() != 2) {
-                                        String roomName = getUserNameSequence(userArrayList);
-                                        createNewChat(mRealm, mContext, userArrayList, roomName, new onNewChatCreatedListener() {
-                                            @Override
-                                            public void onCreate(String rid) {
-                                                intent.putExtra("rid", rid);
-                                                startActivity(intent);
-                                            }
-                                        });
-                                    }
+                            //기존에 있던 유저들은 초대에서 제외
+                            for (ChatAddActivityUser chatAddActivityUser : selectedUser) {
+                                if (chatAddActivityUser.getIsAlreadyChatRoomUser()) {
+                                    userArrayList.remove(chatAddActivityUser.getUser());
                                 }
                             }
 
-                        }
-                    });
+                            inviteChatUser(mRealm, HOSPITAL_ID, mRid, userArrayList);
+                            onBackPressed();
 
+                        } else { // 기존 1:1 채팅방에서 새로운 대화상대를 초대하는 경우 새로운 단체 채팅방 생성
+                            if (userArrayList.size() != 2) {
+                                String roomName = getUserNameSequence(userArrayList);
+                                createNewChat(mRealm, mContext, userArrayList, roomName, new onNewChatCreatedListener() {
+                                    @Override
+                                    public void onCreate(String rid) {
+                                        intent.putExtra("rid", rid);
+                                        startActivity(intent);
+                                    }
+                                });
+                            }
+                        }
+                    }
                 }
                 break;
 

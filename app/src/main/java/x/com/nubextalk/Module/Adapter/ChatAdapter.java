@@ -41,10 +41,12 @@ import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.R;
 
+import static x.com.nubextalk.Manager.UtilityManager.checkString;
 import static x.com.nubextalk.Module.CodeResources.DATE_FINAL;
 import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT1;
 import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT2;
 import static x.com.nubextalk.Module.CodeResources.DATE_FORMAT3;
+import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
 import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.SENDING;
@@ -134,10 +136,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
-                cvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
+                if (checkString(mUserData.getAppImagePath())) {
+                    cvHolder.aq.view(cvHolder.profileImage).image(mUserData.getAppImagePath());
+                } else {
+                    cvHolder.aq.view(cvHolder.profileImage).image(DEFAULT_PROFILE);
+                    cvHolder.profileImage.setColorFilter(cvHolder.profileName.getTextColors().getDefaultColor());
+                }
                 cvHolder.profileName.setText(mUserData.getAppName());
                 cvHolder.other_chat_text.setText(chat.getContent());
                 cvHolder.otherTime.setText(sendTime);
+
 
                 if (chat.getUid().equals(preSenderId)) {
                     cvHolder.profileImage.setVisibility(View.GONE);
@@ -187,7 +195,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
-                cmvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
+                if (checkString(mUserData.getAppImagePath())) {
+                    cmvHolder.aq.view(cmvHolder.profileImage).image(mUserData.getAppImagePath());
+                } else {
+                    cmvHolder.aq.view(cmvHolder.profileImage).image(DEFAULT_PROFILE);
+                    cmvHolder.profileImage.setColorFilter(cmvHolder.profileName.getTextColors().getDefaultColor());
+                }
                 cmvHolder.aq.id(R.id.other_chat_image).image(chat.getContent());
 
                 cmvHolder.profileName.setText(mUserData.getAppName());
@@ -274,7 +287,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             // 아이디가 다른 경우 , 즉 자신이 보낸 메세지가 아닌경우 좌측 하단에 표시
             else {
-                cpvHolder.aq.id(R.id.profile_image).image(mUserData.getAppImagePath());
+                if (checkString(mUserData.getAppImagePath())) {
+                    cpvHolder.aq.view(cpvHolder.profileImage).image(mUserData.getAppImagePath());
+                } else {
+                    cpvHolder.aq.view(cpvHolder.profileImage).image(DEFAULT_PROFILE);
+                    cpvHolder.profileImage.setColorFilter(cpvHolder.profileName.getTextColors().getDefaultColor());
+                }
                 cpvHolder.profileName.setText(mUserData.getAppName());
                 cpvHolder.otherTime.setText(sendTime);
                 cpvHolder.otherPacsDescription.setText(chat.getContent());

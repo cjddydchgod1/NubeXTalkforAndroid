@@ -433,8 +433,13 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
         MenuItem item = menu.findItem(R.id.menu_chat_member);
         SubMenu subMenu = item.getSubMenu();
 
+
         ChatRoom chatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mRid).findFirst();
         RealmResults<ChatRoomMember> chatRoomMembers = mRealm.where(ChatRoomMember.class).equalTo("rid", mRid).findAll();
+        RealmResults<ChatRoomMember> users = ChatRoom.getChatRoomUsers(mRealm, mRid);
+
+
+        item.setTitle("채팅방 멤버 " + users.size());
 
         subMenu.clear();
         int menuId = 0;

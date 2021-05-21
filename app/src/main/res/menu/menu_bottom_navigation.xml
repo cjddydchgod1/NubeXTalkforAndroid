@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/nav_friend_list"
-        android:icon="@drawable/ic_people_gray_24"
+        android:icon="@drawable/ic_default_people_24"
         android:title="FriendList" />
     <item
         android:id="@+id/nav_chat_list"

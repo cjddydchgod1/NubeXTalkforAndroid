@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid
+        android:color="@color/cBlack"/>
+</shape>

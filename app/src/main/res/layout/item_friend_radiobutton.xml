@@ -29,7 +29,7 @@
                 android:id="@+id/profileImage"
                 android:layout_width="@dimen/profile_image_s"
                 android:layout_height="@dimen/profile_image_s"
-                android:src="@drawable/ic_default_profile_black_24"
+                android:src="@drawable/ic_default_profile_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
             <ImageView

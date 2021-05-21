@@ -28,10 +28,20 @@ public class RoomNameModificationDialogFragment extends DialogFragment {
 
     private String mChatRoomId;
     private Realm mRealm;
+    private NameModifiedListener listener;
+
+    public interface NameModifiedListener{
+        void onChange(String name);
+
+    }
 
     public RoomNameModificationDialogFragment(Realm realm, String rid) {
         mChatRoomId = rid;
         mRealm = realm;
+    }
+
+    public void setNameModifiedListener(NameModifiedListener listener){
+        this.listener = listener;
     }
 
     @Override
@@ -77,6 +87,9 @@ public class RoomNameModificationDialogFragment extends DialogFragment {
                 public void execute(Realm realm) {
                     chatRoom.setRoomName(name);
                     realm.copyToRealmOrUpdate(chatRoom);
+                    if(listener != null){
+                        listener.onChange(name);
+                    }
                 }
             });
         }

@@ -6,12 +6,18 @@
 package x.com.nubextalk;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -49,14 +55,24 @@ public class MainActivity extends AppCompatActivity {
     private PACSReferenceFragment mPacsReferenceFrag = new PACSReferenceFragment();
     private SettingFragment mSettingFrag = new SettingFragment();
     private FragmentManager mFragManager = getSupportFragmentManager();
-    private FragmentTransaction mFragTransaction;
-    private FragmentTransaction mFragTransaction2;
     private BottomNavigationView mBottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //SetTheme(Dark, Light)
+
+        //앱 초기 설치 후 로그인 했을 때 메인 화면 넘어가기 전에 튜토리얼 보여주기. -> 로그아웃 하고 다른 아이디로 로그인했을 떄도 보여주도록 수정
+        SharedPreferences sharedPreferences = getSharedPreferences("checkFirstAccess", Activity.MODE_PRIVATE);
+        boolean checkFirstAccess = sharedPreferences.getBoolean("checkFirstAccess", false);
+
+        if (!checkFirstAccess) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("checkFirstAccess", true);
+            editor.apply();
+            Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
+            startActivity(tutorialIntent);
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -68,39 +84,52 @@ public class MainActivity extends AppCompatActivity {
         mBottomNavigationView = findViewById(R.id.bottom_nav);
         initBottomNavigation();
 
-        // Begin fragment transaction
-        int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
-        mFragTransaction = mFragManager.beginTransaction();
-        mFragTransaction2 = mFragManager.beginTransaction();
+        /** Modified By Jongho Lee */
+        //Init Fragment
+        FragmentTransaction transaction = mFragManager.beginTransaction();
+        transaction.add(R.id.main_frame_layout, mFriendListFrag).hide(mFriendListFrag);
+        transaction.add(R.id.main_frame_layout, mChatListFrag).hide(mChatListFrag);
 
+        //Tablet PACS reference fragment control
+        if (UtilityManager.isTablet(this)) {
+            FragmentTransaction transactionTablet = mFragManager.beginTransaction();
+            transactionTablet.add(R.id.main_pacs_layout, mPacsReferenceFrag).commitAllowingStateLoss();
+        }
+        else{
+            transaction.add(R.id.main_frame_layout, mPacsReferenceFrag).hide(mPacsReferenceFrag);
+        }
+
+        transaction.add(R.id.main_frame_layout, mSettingFrag).hide(mSettingFrag);
+
+        int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
         if (requestChatList == RESULT_OK) {
-            mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
+            transaction.show(mChatListFrag);
             mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
-            mFragTransaction.replace(R.id.main_frame_layout, mFriendListFrag).commitAllowingStateLoss();
+            transaction.show(mFriendListFrag);
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
-        if (UtilityManager.isTablet(this)) {
-//            Toolbar pacsToolbar = findViewById(R.id.pacs_toolbar);
-//            setSupportActionBar(pacsToolbar);
-            mFragTransaction2.replace(R.id.main_pacs_layout, mPacsReferenceFrag).commitAllowingStateLoss();
-        }
+        transaction.commitAllowingStateLoss();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
+        /** Modified By Jongho Lee
+         * TODO 위 oncreate getIntent()랑 중복 가능성 있음 체크해서 필요없는 로직은 삭제
+         * */
+        FragmentTransaction transaction = mFragManager.beginTransaction();
         int requestChatList = intent.getIntExtra("requestChatList", RESULT_CANCELED);
-        mFragTransaction = mFragManager.beginTransaction();
         if (requestChatList == RESULT_OK) {
-            mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
+            transaction.show(mChatListFrag).commitAllowingStateLoss();
             mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
-            mFragTransaction.replace(R.id.main_frame_layout, mFriendListFrag).commitAllowingStateLoss();
+            transaction.show(mFriendListFrag).commitAllowingStateLoss();
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
     }
+
 
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
@@ -110,22 +139,30 @@ public class MainActivity extends AppCompatActivity {
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                mFragTransaction = mFragManager.beginTransaction();
+                /** Modified By Jongho Lee*/
+                FragmentTransaction fragTransaction = mFragManager.beginTransaction();
+                for(Fragment fragment : mFragManager.getFragments()){
+                    fragTransaction.hide(fragment);
+                }
                 switch (item.getItemId()) {
                     case R.id.nav_friend_list:
-                        mFragTransaction.replace(R.id.main_frame_layout, mFriendListFrag).commitAllowingStateLoss();
-                        return true;
+                        fragTransaction.show(mFriendListFrag);
+                        break;
                     case R.id.nav_chat_list:
-                        mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
-                        return true;
+                        fragTransaction.show(mChatListFrag);
+                        break;
                     case R.id.nav_calendar:
-                        mFragTransaction.replace(R.id.main_frame_layout, mPacsReferenceFrag).commitAllowingStateLoss();
-                        return true;
+                        fragTransaction.show(mPacsReferenceFrag);
+                        break;
                     case R.id.nav_setting:
-                        mFragTransaction.replace(R.id.main_frame_layout, mSettingFrag).commitAllowingStateLoss();
-                        return true;
+                        fragTransaction.show(mSettingFrag);
+                        break;
                 }
-                return false;
+                if(UtilityManager.isTablet(getApplicationContext())){
+                    fragTransaction.show(mPacsReferenceFrag);
+                }
+                fragTransaction.commitAllowingStateLoss();
+                return true;
             }
         });
     }
@@ -152,8 +189,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK) {
             if (requestCode == MOVE_TO_CHAT_ROOM) {
-                mFragTransaction = mFragManager.beginTransaction();
-                mFragTransaction.replace(R.id.main_frame_layout, mChatListFrag).commitAllowingStateLoss();
+                /** Modified By Jongho Lee*/
+                FragmentTransaction fragTransaction = mFragManager.beginTransaction();
+                for(Fragment fragment : mFragManager.getFragments()){
+                    fragTransaction.hide(fragment);
+                }
+                fragTransaction.show(mChatListFrag);
+
+                if(UtilityManager.isTablet(getApplicationContext())){
+                    fragTransaction.show(mPacsReferenceFrag);
+                }
+                fragTransaction.commitAllowingStateLoss();
                 mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
             }
         }
@@ -169,10 +215,12 @@ public class MainActivity extends AppCompatActivity {
         PermissionListener pm = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
+
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                //Toast.makeText(MainActivity.class, "", Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
         };

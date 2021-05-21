@@ -6,6 +6,7 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +62,8 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (URLUtil.isValidUrl(mUserList.get(position).getUser().getAppImagePath())) {
                 mAquery.view(mHolder.profileImage).image(user.getAppImagePath());
             } else {
-                mAquery.view(mHolder.profileImage).image(DEFAULT_PROFILE);
+                Drawable drawable = mHolder.profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
+                mAquery.view(mHolder.profileImage).image(drawable);
             }
 
             //기존 채팅방에서 가져온 사용자인 경우 아이템 삭제 버튼 사라짐

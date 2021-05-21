@@ -86,7 +86,8 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         mRealm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm realm) {
-                refreshChatList();
+                if(!realm.isClosed())
+                    refreshChatList();
             }
         });
 
@@ -108,6 +109,17 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
             mRealm.removeAllChangeListeners();
             mRealm.close();
             mRealm = null;
+        }
+    }
+
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        /** Modified By Jongho Lee*/
+        if(!hidden){
+            mChatRoomList = ChatRoom.getAll(mRealm);
+            mAdapter.updateData(mChatRoomList);
         }
     }
 

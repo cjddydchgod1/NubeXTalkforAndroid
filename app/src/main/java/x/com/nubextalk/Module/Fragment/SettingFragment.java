@@ -161,6 +161,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
                 mActivity.startService(tokenIntent);
 
                 intent = new Intent(mActivity, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 break;
             case EXE_HOW_TO_USE:

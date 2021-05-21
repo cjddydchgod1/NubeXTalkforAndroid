@@ -10,8 +10,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,6 +68,7 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
+import x.com.nubextalk.ProfileImageViewActivity;
 import x.com.nubextalk.R;
 
 import static android.app.Activity.RESULT_OK;
@@ -108,6 +111,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private EditText mEditName;
     private TextView mMdoifyNameBtn;
     private TextView mModifyImageBtn;
+    private ImageView mDelImageBtn;
     // 상태레이아웃
     private LinearLayout mStatusLayout;
     // 채팅 버튼
@@ -153,6 +157,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mEditName = mBottomWrapper.findViewById(R.id.modifyName);
         mMdoifyNameBtn = mBottomWrapper.findViewById(R.id.modifyButton);
         mModifyImageBtn = mBottomWrapper.findViewById(R.id.modifyImage);
+        mDelImageBtn = mBottomWrapper.findViewById(R.id.deleteImage);
         // 상태레이아웃
         mStatusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
         // 채팅 버튼
@@ -190,11 +195,24 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void onDetach() {
         if (mRealm != null) {
             mRealm.close();
-            mRealm = null;
         }
         mContext = null;
         mActivity = null;
         super.onDetach();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        /** Modified By Jongho Lee*/
+        if(hidden){
+            if (mBottomWrapper.getTranslationY() == 0) {
+                new AnimManager(
+                        AnimManager.make(mBottomWrapper, AnimManager.SHORT).translationY(0).translationY(3000).setInterpolator(new DecelerateInterpolator())
+                ).start(AnimManager.TOGETHER);
+                mExitWrapper.setVisibility(View.GONE);
+            }
+        }
     }
 
     public void getDataFromPACS() {
@@ -288,8 +306,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         if (URLUtil.isValidUrl(mMyProfile.getAppImagePath())) {
             mAquery.view(myProfileImage).image(mMyProfile.getAppImagePath());
-        } else {
-            mAquery.view(myProfileImage).image(DEFAULT_PROFILE);
         }
         myProfileName.setText(mMyProfile.getAppName());
         switch (mMyProfile.getAppStatus()) {
@@ -391,22 +407,27 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
             mAquery.view(mProfileImage).image(user.getAppImagePath());
+            mProfileImage.setEnabled(true);
         } else {
-            mAquery.view(mProfileImage).image(DEFAULT_PROFILE);
+            Drawable drawable = mProfileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
+            mAquery.view(mProfileImage).image(drawable);
+            mProfileImage.setEnabled(false);
         }
         /**
          * 임시로 userId로 primaryKey를 사용하고 있지만, 추후에 code로 변경해야 한다.
          * if(user.getCode().equals(myUid))
          */
-        // 내 프로필과 친구 프로필에서 이미지 수정버튼, 1대1채팅 버튼 유무
+        // 이미지 수정버튼, 1대1채팅 버튼 유무 (내 프로필과 친구 프로필의 차이)
         if (user.getUid().equals(mMyUid)) {
+            mDelImageBtn.setVisibility(View.VISIBLE);
             mModifyImageBtn.setVisibility(View.VISIBLE);
             mChatBtn.setVisibility((View.GONE));
-            mProfileStatus.setClickable(true);
+            mProfileStatus.setEnabled(true);
         } else {
+            mDelImageBtn.setVisibility(View.GONE);
             mModifyImageBtn.setVisibility(View.GONE);
             mChatBtn.setVisibility(View.VISIBLE);
-            mProfileStatus.setClickable(false);
+            mProfileStatus.setEnabled(false);
         }
         mStatusLayout.setVisibility(View.INVISIBLE);
         mEditName.setVisibility(View.GONE);
@@ -415,6 +436,14 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // 해당 exitWrapper클릭시 onBackPressed() 수행
         mExitWrapper.setVisibility(View.VISIBLE);
+
+        // Profile Image 선택시 확대된 사진 띄우기
+        mProfileImage.setOnClickListener(v ->{
+            Intent intent = new Intent(mContext, ProfileImageViewActivity.class);
+                            intent.putExtra("uid", user.getUid());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            mContext.startActivity(intent);
+        });
 
         // Nickname 변경
         mMdoifyNameBtn.setOnClickListener(v -> {
@@ -428,6 +457,20 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             } else {
                 startGallery();
             }
+        });
+
+        // 기본 프로필로 변경 (myProfile만 가능)
+        mDelImageBtn.setOnClickListener(v -> {
+            mRealm.executeTransaction(realm1 -> {
+                user.setAppImagePath("null");
+            });
+
+            mApiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
+                @Override
+                public void onSuccess(Response response, String body) {
+                    refreshFragment();
+                }
+            });
         });
 
         // 프로필 Status 변경

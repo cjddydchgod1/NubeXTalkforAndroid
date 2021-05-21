@@ -43,8 +43,13 @@
                     android:id="@+id/profileImage"
                     android:layout_width="@dimen/profile_image_l"
                     android:layout_height="@dimen/profile_image_l"
-                    android:src="@drawable/ic_default_profile_black_24" />
-
+                    android:src="@drawable/ic_default_profile_24" />
+                <ImageView
+                    android:id="@+id/deleteImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_del_profile_image"
+                    android:layout_gravity="right|top"/>
                 <ImageView
                     android:id="@+id/profileStatus"
                     android:layout_width="@dimen/status_l"
@@ -67,6 +72,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageWrapeer"
             app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="@dimen/margin_xl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

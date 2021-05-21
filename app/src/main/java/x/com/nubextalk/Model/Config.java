@@ -102,7 +102,6 @@ public class Config extends RealmObject {
     public static Config getMyAccount(Realm realm){
         return realm.where(Config.class).equalTo("CODENAME", "MyAccount").findFirst();
     }
-
     public static Config getServerInfo(Realm realm){
         return realm.where(Config.class).equalTo("CODENAME", "ServerInfo").findFirst();
     }
@@ -117,5 +116,8 @@ public class Config extends RealmObject {
     }
     public static Config getLastLoginID(Realm realm){
         return realm.where(Config.class).equalTo("CODENAME", "LastLoginID").findFirst();
+    }
+    public static Config getThemeMode(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "Theme").findFirst();
     }
 }

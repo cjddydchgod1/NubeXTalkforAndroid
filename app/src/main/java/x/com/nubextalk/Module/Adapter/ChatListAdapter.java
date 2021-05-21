@@ -6,6 +6,7 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,9 +182,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 mAquery.view(chatRoomImg).image(roomImgUrl);
             } else {
                 if (roomMemberCount > 2) {
-                    mAquery.view(chatRoomImg).image(DEFAULT_GROUP_PROFILE);
+                    Drawable drawable = chatRoomImg.getContext().getResources().getDrawable(DEFAULT_GROUP_PROFILE, null);
+                    mAquery.view(chatRoomImg).image(drawable);
                 } else {
-                    mAquery.view(chatRoomImg).image(DEFAULT_PROFILE);
+                    Drawable drawable = chatRoomImg.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
+                    mAquery.view(chatRoomImg).image(drawable);
                 }
             }
 
@@ -308,6 +311,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
         }
+    }
+
+
+    /** Modified By Jongho Lee*/
+    public void updateData(RealmResults<ChatRoom> dataSet){
+        this.mDataset = dataSet;
+        sortChatRoomByDate();
+        notifyDataSetChanged();
     }
 
     /**

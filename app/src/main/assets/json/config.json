@@ -1,3 +1,4 @@
 [
-  {"CODENAME":"Alarm","CODE":"Alarm","ext1":"true","ext2":"","ext3":"","ext4":"","ext5":""}
+  {"CODENAME":"Alarm","CODE":"Alarm","ext1":"true","ext2":"","ext3":"","ext4":"","ext5":""},
+  {"CODENAME":"ServerInfo","CODE":"ServerInfo","ext1":"false","ext2":"121.166.85.235","ext3":"","ext4":"데모 서버","ext5":""}
 ]

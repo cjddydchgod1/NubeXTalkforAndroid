@@ -132,7 +132,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/bg_btn_login"
                 android:text="@string/login"
-                android:textColor="@color/cLogoPink"
+                android:textColor="@color/cContentText"
                 android:textSize="@dimen/txt_xl" />
 
             <Button
@@ -145,7 +145,7 @@
                 android:background="@drawable/bg_btn_login"
                 android:singleLine="true"
                 android:text="@string/sign_hospital"
-                android:textColor="@color/cLogoPink"
+                android:textColor="@color/cContentText"
                 android:textSize="@dimen/txt_xl" />
 
         </LinearLayout>

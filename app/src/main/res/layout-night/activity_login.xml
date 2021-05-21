@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="4">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_main_dark" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_xl"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="Login to your account"
+        android:textColor="@color/cContentText"
+        android:textSize="@dimen/txt_xl"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="vertical"
+        tools:context=".LoginActivity">
+
+        <EditText
+            android:id="@+id/login_id_edit"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_login_edit_text"
+            android:drawableLeft="@drawable/ic_login_username"
+            android:drawablePadding="@dimen/_l"
+            android:hint="@string/hint_user_id"
+            android:inputType="text"
+            android:paddingLeft="@dimen/padding_Ml"
+            android:paddingRight="@dimen/padding_Ml"
+            android:textColor="@color/cContentText"
+            android:textColorHint="@color/cWhiteGray"
+            android:textSize="@dimen/txt_xl"
+
+            app:layout_constraintBottom_toTopOf="@+id/login_password_edit"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/login_password_edit"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/bg_login_edit_text"
+            android:drawableLeft="@drawable/ic_login_password"
+            android:drawablePadding="@dimen/_l"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"
+            android:paddingLeft="@dimen/padding_Ml"
+            android:paddingRight="@dimen/padding_Ml"
+            android:textColor="@color/cContentText"
+            android:textColorHint="@color/cWhiteGray"
+            android:textSize="@dimen/txt_xl"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_id_edit" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <CheckBox
+            android:id="@+id/checkAutoLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_login" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/login_sign_in"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_l"
+            android:layout_marginEnd="@dimen/margin_l"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_login"
+            android:text="@string/login"
+            android:textColor="@color/cContentText"
+            android:textSize="@dimen/txt_xl"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/login_sign_up"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_l"
+            android:layout_marginEnd="@dimen/margin_l"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_login"
+            android:singleLine="true"
+            android:text="@string/sign_hospital"
+            android:textColor="@color/cContentText"
+            android:textSize="@dimen/txt_xl"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2" />
+</LinearLayout>

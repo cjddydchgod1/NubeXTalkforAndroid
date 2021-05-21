@@ -5,6 +5,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="@dimen/elevation_l"
@@ -12,7 +13,7 @@
     android:orientation="vertical"
     android:padding="@dimen/padding_xl"
     android:background="@color/cBackground"
-    android:translationY="8000dp">
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rowWRapperName"
@@ -105,11 +106,12 @@
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageWrapeer"
-            app:layout_constraintTop_toBottomOf="@+id/rowWrapperName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            app:layout_constraintTop_toBottomOf="@+id/rowWrapperName">
 
             <LinearLayout
                 android:id="@+id/statusLayout"
@@ -174,8 +176,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_l"
-                android:drawableLeft="@drawable/ic_chat_black_24"
                 android:background="@color/cTransparent"
+                android:drawableLeft="@drawable/ic_chat_black_24"
                 android:drawablePadding="@dimen/padding_l"
                 android:paddingStart="@dimen/padding_l"
                 android:text="@string/Chatting"
@@ -183,7 +185,15 @@
                 android:visibility="visible" />
         </FrameLayout>
 
-
+        <TextView
+            android:id="@+id/myProfileModification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="프로필 사진 변경"
+            android:textSize="@dimen/txt_m"
+            android:padding="@dimen/padding_l"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/mClose" />
         <TextView
             android:id="@+id/mClose"
             app:layout_constraintBottom_toBottomOf="parent"

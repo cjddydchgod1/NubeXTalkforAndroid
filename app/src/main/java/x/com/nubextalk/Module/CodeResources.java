@@ -28,6 +28,8 @@ public class CodeResources {
     public static final String ALARM = "알림";
     public static final String EXIT = "나가기";
 
+    public static final String MODIFY_IMAGE = "앨범에서 사진 선택";
+    public static final String MODIFY_DEFAULT_IMAGE = "기본이미지로 변경";
 
     /**
      * Title Resource
@@ -37,7 +39,7 @@ public class CodeResources {
     public static final String TITLE_FRIEND_LIST = "친구";
     public static final String TITLE_PACS = "PACS";
     public static final String TITLE_SETTING = "설정";
-
+    public static final String TITLE_MODIFY_PROFILE = "프로필 사진 설정";
 
     /**
      * Path Resource

@@ -10,10 +10,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,6 +67,7 @@ import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
 import x.com.nubextalk.ProfileImageViewActivity;
+import x.com.nubextalk.ProfileModificationActivity2;
 import x.com.nubextalk.R;
 
 import static android.app.Activity.RESULT_OK;
@@ -112,6 +111,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     private TextView mMdoifyNameBtn;
     private TextView mModifyImageBtn;
     private ImageView mDelImageBtn;
+    private TextView mMyProfileMod;
     // 상태레이아웃
     private LinearLayout mStatusLayout;
     // 채팅 버튼
@@ -158,6 +158,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mMdoifyNameBtn = mBottomWrapper.findViewById(R.id.modifyButton);
         mModifyImageBtn = mBottomWrapper.findViewById(R.id.modifyImage);
         mDelImageBtn = mBottomWrapper.findViewById(R.id.deleteImage);
+        mMyProfileMod = mBottomWrapper.findViewById(R.id.myProfileModification);
         // 상태레이아웃
         mStatusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
         // 채팅 버튼
@@ -426,11 +427,13 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             mModifyImageBtn.setVisibility(View.VISIBLE);
             mChatBtn.setVisibility((View.GONE));
             mProfileStatus.setEnabled(true);
+            mMyProfileMod.setVisibility(View.VISIBLE);
         } else {
             mDelImageBtn.setVisibility(View.GONE);
             mModifyImageBtn.setVisibility(View.GONE);
             mChatBtn.setVisibility(View.VISIBLE);
             mProfileStatus.setEnabled(false);
+            mMyProfileMod.setVisibility(View.GONE);
         }
         mStatusLayout.setVisibility(View.INVISIBLE);
         mEditName.setVisibility(View.GONE);
@@ -443,16 +446,23 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // Profile Image 선택시 확대된 사진 띄우기
         mProfileImage.setOnClickListener(v ->{
             Intent intent = new Intent(mContext, ProfileImageViewActivity.class);
-                            intent.putExtra("uid", user.getUid());
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            mContext.startActivity(intent);
+            intent.putExtra("uid", user.getUid());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            mContext.startActivity(intent);
         });
 
+        /** 여기서부터 다 삭제 가즈아 **/
         // Nickname 변경
         mMdoifyNameBtn.setOnClickListener(v -> {
             changeOpponentNickName(user);
         });
-
+        // 전체적인 myProfile변경
+        mMyProfileMod.setOnClickListener(v -> {
+            Intent intent = new Intent(mContext, ProfileModificationActivity2.class);
+            intent.putExtra("uid", user.getUid());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            mContext.startActivity(intent);
+        });
         // 프로필 사진 변경 (myProfile만 가능)
         mModifyImageBtn.setOnClickListener(v -> {
             if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -480,7 +490,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mProfileStatus.setOnClickListener(v -> {
             changeMyStatus(user);
         });
-
+        /** 여기까지 삭제 가즈아 **/
         // 1대1채팅 버튼
         mChatBtn.setOnClickListener(v -> {
             /**

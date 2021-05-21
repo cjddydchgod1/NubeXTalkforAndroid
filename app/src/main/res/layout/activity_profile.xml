@@ -25,26 +25,13 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/change_profile_image"
-            android:layout_width="@dimen/icon_size_GGGl"
-            android:layout_height="@dimen/icon_size_GGGl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:scaleType="centerInside"
-            android:src="@drawable/change_profile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:text="@string/change_profile_image"
-            android:textColor="@color/cContent"
-            android:textSize="@dimen/txt_xl"
-            app:layout_constraintBottom_toBottomOf="@+id/change_profile_image"
-            app:layout_constraintLeft_toLeftOf="@+id/change_profile_image"
-            app:layout_constraintRight_toRightOf="@+id/change_profile_image" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

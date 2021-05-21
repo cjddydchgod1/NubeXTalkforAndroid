@@ -10,7 +10,7 @@
     android:layout_height="match_parent"
     android:background="@color/cBackground"
     android:orientation="vertical"
-    tools:context=".LoginActivity">
+    tools:context=".ProfileModificationActivity2">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,26 +25,13 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/change_profile_image"
-            android:layout_width="@dimen/icon_size_GGGl"
-            android:layout_height="@dimen/icon_size_GGGl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:scaleType="centerInside"
-            android:src="@drawable/change_profile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:text="@string/change_profile_image"
-            android:textColor="@color/cContent"
-            android:textSize="@dimen/txt_xl"
-            app:layout_constraintBottom_toBottomOf="@+id/change_profile_image"
-            app:layout_constraintLeft_toLeftOf="@+id/change_profile_image"
-            app:layout_constraintRight_toRightOf="@+id/change_profile_image" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -70,6 +57,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <RadioGroup
+            android:id="@+id/status_group"
             android:layout_width="@dimen/icon_size_GGl"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -79,6 +67,7 @@
             app:layout_constraintTop_toBottomOf="@+id/change_profile_text">
 
             <RadioButton
+                android:id="@+id/rgt_busy"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="3.33"
@@ -87,6 +76,7 @@
 
 
             <RadioButton
+                android:id="@+id/rgt_exit"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="3.33"
@@ -95,6 +85,7 @@
 
 
             <RadioButton
+                android:id="@+id/rgt_vacation"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="3.33"
@@ -114,6 +105,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/cancel_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_l"
@@ -123,6 +115,7 @@
             android:textColor="@color/cContentText" />
 
         <Button
+            android:id="@+id/confirm_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_l"

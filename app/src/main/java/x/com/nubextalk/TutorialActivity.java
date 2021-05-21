@@ -15,8 +15,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.button.MaterialButton;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +28,7 @@ import static x.com.nubextalk.Module.CodeResources.CONTENT_DESC3;
 import static x.com.nubextalk.Module.CodeResources.TITLE_DESC1;
 import static x.com.nubextalk.Module.CodeResources.TITLE_DESC2;
 import static x.com.nubextalk.Module.CodeResources.TITLE_DESC3;
+import static x.com.nubextalk.Module.CodeResources.TUTORIAL_CLOSE;
 
 public class TutorialActivity extends FragmentActivity {
 
@@ -46,7 +45,9 @@ public class TutorialActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
+        Intent intent = getIntent();
 
+        mBtnTutorialEnd = findViewById(R.id.tutorial_end_btn);
         mTutorialDesc1 = findViewById(R.id.tutorial_description1);
         mTutorialDesc2 = findViewById(R.id.tutorial_description2);
         mStatusCircleIndicator = findViewById(R.id.tutorial_status);
@@ -79,15 +80,23 @@ public class TutorialActivity extends FragmentActivity {
                         mTutorialDesc2.setText(CONTENT_DESC3);
                         break;
                 }
-
             }
         });
 
-        mBtnTutorialEnd = findViewById(R.id.tutorial_end_btn);
+        //Setting 프래그먼트에서 '도움말' 메뉴를 클릭한 경우
+        if (intent.getExtras().getString("fromSetting").equals("true")) {
+            mBtnTutorialEnd.setText(TUTORIAL_CLOSE);
+        }
+
         mBtnTutorialEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(TutorialActivity.this, MainActivity.class));
+                //Setting 프래그먼트에서 '도움말' 메뉴를 클릭한 경우
+                if (intent.getExtras().getString("fromSetting").equals("true")) {
+                    onBackPressed();
+                } else { //로그인 후 MainActivity 가 실행되고 튜토리얼 Activity 가 실행된 경우
+                    onBackPressed();
+                }
             }
         });
     }

@@ -31,7 +31,9 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import x.com.nubextalk.Manager.UtilityManager;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Module.Fragment.ChatListFragment;
 import x.com.nubextalk.Module.Fragment.FriendListFragment;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
@@ -55,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private PACSReferenceFragment mPacsReferenceFrag = new PACSReferenceFragment();
     private SettingFragment mSettingFrag = new SettingFragment();
     private FragmentManager mFragManager = getSupportFragmentManager();
+    private Config mTutorialStatus;
+    private Realm mRealm;
+
     private BottomNavigationView mBottomNavigationView;
 
     @Override
@@ -62,15 +67,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //SetTheme(Dark, Light)
 
-        //앱 초기 설치 후 로그인 했을 때 메인 화면 넘어가기 전에 튜토리얼 보여주기. -> 로그아웃 하고 다른 아이디로 로그인했을 떄도 보여주도록 수정
-        SharedPreferences sharedPreferences = getSharedPreferences("checkFirstAccess", Activity.MODE_PRIVATE);
-        boolean checkFirstAccess = sharedPreferences.getBoolean("checkFirstAccess", false);
+        //앱 초기 설치 후 로그인 했을 때 메인 화면 넘어가기 전에 튜토리얼 보여주기, 로그아웃 하고 다른 아이디로 로그인했을 떄도 보여줌
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mTutorialStatus = Config.getTutorialStatus(mRealm);
 
-        if (!checkFirstAccess) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("checkFirstAccess", true);
-            editor.apply();
+        if (mTutorialStatus.getExt1().equals("first")) {
+            Config.setTutorialStatus(mRealm, "not first");
             Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
+            tutorialIntent.putExtra("fromSetting", "false");
             startActivity(tutorialIntent);
         }
 
@@ -94,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
         if (UtilityManager.isTablet(this)) {
             FragmentTransaction transactionTablet = mFragManager.beginTransaction();
             transactionTablet.add(R.id.main_pacs_layout, mPacsReferenceFrag).commitAllowingStateLoss();
-        }
-        else{
+        } else {
             transaction.add(R.id.main_frame_layout, mPacsReferenceFrag).hide(mPacsReferenceFrag);
         }
 
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 /** Modified By Jongho Lee*/
                 FragmentTransaction fragTransaction = mFragManager.beginTransaction();
-                for(Fragment fragment : mFragManager.getFragments()){
+                for (Fragment fragment : mFragManager.getFragments()) {
                     fragTransaction.hide(fragment);
                 }
                 switch (item.getItemId()) {
@@ -158,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                         fragTransaction.show(mSettingFrag);
                         break;
                 }
-                if(UtilityManager.isTablet(getApplicationContext())){
+                if (UtilityManager.isTablet(getApplicationContext())) {
                     fragTransaction.show(mPacsReferenceFrag);
                 }
                 fragTransaction.commitAllowingStateLoss();
@@ -191,12 +194,12 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == MOVE_TO_CHAT_ROOM) {
                 /** Modified By Jongho Lee*/
                 FragmentTransaction fragTransaction = mFragManager.beginTransaction();
-                for(Fragment fragment : mFragManager.getFragments()){
+                for (Fragment fragment : mFragManager.getFragments()) {
                     fragTransaction.hide(fragment);
                 }
                 fragTransaction.show(mChatListFrag);
 
-                if(UtilityManager.isTablet(getApplicationContext())){
+                if (UtilityManager.isTablet(getApplicationContext())) {
                     fragTransaction.show(mPacsReferenceFrag);
                 }
                 fragTransaction.commitAllowingStateLoss();

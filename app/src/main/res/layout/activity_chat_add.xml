@@ -21,24 +21,24 @@
         android:background="@color/colorPrimaryDark"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:titleTextColor="@color/cWhite"
         app:layout_constraintBottom_toTopOf="@id/chat_add_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="새로운 채팅방 추가" />
+        app:title="새로운 채팅방 추가"
+        app:titleTextColor="@color/cWhite" />
 
     <TextView
         android:id="@+id/chat_add_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/padding_m"
-        android:paddingBottom="@dimen/padding_m"
-        android:paddingTop="@dimen/padding_m"
-        android:text="@string/added_user"
-        android:textColor="@color/cWhite"
         android:background="@color/colorPrimary"
         android:elevation="@dimen/elevation_xs"
+        android:paddingStart="@dimen/padding_m"
+        android:paddingTop="@dimen/padding_m"
+        android:paddingBottom="@dimen/padding_m"
+        android:text="@string/added_user"
+        android:textColor="@color/cWhite"
         app:layout_constraintBottom_toTopOf="@id/chat_added_member_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_add_toolbar" />
@@ -93,7 +93,9 @@
             android:layout_marginRight="2dp"
             android:layout_marginBottom="@dimen/margin_s"
             android:layout_weight="1"
-            android:text="확   인" />
+            android:background="@drawable/bg_btn"
+            android:text="@string/confirm"
+            android:textColor="@color/cContentText" />
 
         <Button
             android:id="@+id/chat_add_cancel_btn"
@@ -101,7 +103,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_s"
             android:layout_weight="1"
-            android:text="취   소" />
+            android:background="@drawable/bg_btn"
+            android:text="@string/cancel"
+            android:textColor="@color/cContentText" />
     </LinearLayout>
 
 

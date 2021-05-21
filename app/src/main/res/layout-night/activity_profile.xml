@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_l"
             android:layout_weight="1"
-            android:background="@drawable/bg_btn_login"
+            android:background="@drawable/bg_btn"
             android:text="@string/cancel"
             android:textColor="@color/cContentText" />
 
@@ -127,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_l"
             android:layout_weight="1"
-            android:background="@drawable/bg_btn_login"
+            android:background="@drawable/bg_btn"
             android:text="@string/confirm"
             android:textColor="@color/cContentText" />
 

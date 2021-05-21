@@ -123,37 +123,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             if (mIsRadio)
                 radioButton.setVisibility(View.VISIBLE);
             profileName.setText(user.getAppName());
-            if (URLUtil.isValidUrl(user.getAppImagePath())) {
-//                ImageManager imageManager = new ImageManager(mContext);
-//                mProfilePath = "aaa";
-//                Thread thread = new Thread(new Runnable() {
-//                    @Override
-//                    public void run()
-//                    {
-////                        String path = imageManager.getCachePath(user.getUid());
-//                        String path = imageManager.saveUrlToCache(user.getAppImagePath(), user.getUid());
-//                        // Cache file이 존재하는지 안하는지 확인한 뒤, 불러오거나 저장하는 방법
-//                        Log.d("thread path", path);
-//                        mProfilePath = path;
-//                    }
-//                });
-//                try{
-//                    thread.start();
-//                    thread.join();
-//                    Log.d("sibal", "wialt");
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                Log.d("path", mProfilePath);
-//                mAquery.view(profileImage).image(mProfilePath);
+            if (URLUtil.isValidUrl(user.getAppImagePath())) { ;
                 mAquery.view(profileImage).image(user.getAppImagePath());
             } else {
-                //Drawable drawable = profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-                //mAquery.view(profileImage).image(drawable);
                 mAquery.view(profileImage).image(DEFAULT_PROFILE);
                 profileImage.setColorFilter(profileName.getTextColors().getDefaultColor());
-                //profileImage.invalidate();
-                //profileImage.invalidateDrawable(drawable);
             }
 
             switch (user.getAppStatus()) {

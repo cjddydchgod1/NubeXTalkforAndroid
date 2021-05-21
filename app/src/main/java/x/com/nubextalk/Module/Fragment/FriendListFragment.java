@@ -306,6 +306,9 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         if (URLUtil.isValidUrl(mMyProfile.getAppImagePath())) {
             mAquery.view(myProfileImage).image(mMyProfile.getAppImagePath());
+        } else {
+            mAquery.view(myProfileImage).image(DEFAULT_PROFILE);
+            myProfileImage.setColorFilter(myProfileName.getTextColors().getDefaultColor());
         }
         myProfileName.setText(mMyProfile.getAppName());
         switch (mMyProfile.getAppStatus()) {
@@ -409,8 +412,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             mAquery.view(mProfileImage).image(user.getAppImagePath());
             mProfileImage.setEnabled(true);
         } else {
-            Drawable drawable = mProfileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-            mAquery.view(mProfileImage).image(drawable);
+            mAquery.view(mProfileImage).image(DEFAULT_PROFILE);
+            mProfileImage.setColorFilter(mProfileName.getTextColors().getDefaultColor());
             mProfileImage.setEnabled(false);
         }
         /**

@@ -19,6 +19,10 @@
     <dimen name="icon_size_l">48dp</dimen>
     <dimen name="icon_size_xl">60dp</dimen>
     <dimen name="icon_size_Ml">72dp</dimen>
+    <dimen name="icon_size_Gl">100dp</dimen>
+    <dimen name="icon_size_GGl">200dp</dimen>
+    <dimen name="icon_size_GGGl">370dp</dimen>
+
 
     <dimen name="sp_txt_xs">6sp</dimen>
     <dimen name="sp_txt_s">8sp</dimen>

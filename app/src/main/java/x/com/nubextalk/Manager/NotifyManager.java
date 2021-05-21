@@ -21,6 +21,7 @@ import io.realm.Realm;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.Model.ChatContent;
 import x.com.nubextalk.Model.ChatRoom;
+import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.R;
 
@@ -39,6 +40,7 @@ public class NotifyManager {
     private ChatContent mChatContent;
     private ChatRoom mChatRoom;
     private User mUser;
+    private Config mAlarm;
 
     public NotifyManager(Context context, Realm realm) {
         this.mContext = context;
@@ -47,18 +49,21 @@ public class NotifyManager {
     }
 
     public void notify(String chatContentId) {
-        mChatContent = mRealm.where(ChatContent.class).equalTo("cid", chatContentId).findFirst();
-        mChatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mChatContent.getRid()).findFirst();
-        mUser = mRealm.where(User.class).equalTo("uid", mChatContent.getUid()).findFirst();
+        mAlarm = Config.getAlarm(mRealm);
+        if (Boolean.parseBoolean(mAlarm.getExt1())) {
+            mChatContent = mRealm.where(ChatContent.class).equalTo("cid", chatContentId).findFirst();
+            mChatRoom = mRealm.where(ChatRoom.class).equalTo("rid", mChatContent.getRid()).findFirst();
+            mUser = mRealm.where(User.class).equalTo("uid", mChatContent.getUid()).findFirst();
+            if(mChatRoom.getSettingAlarm()) {
+                createNotificationChannel();
 
-        createNotificationChannel();
+                NotificationCompat.Builder builder = createBuilder();
+                NotificationCompat.Builder summaryBuilder = createSummaryBuilder();
 
-        NotificationCompat.Builder builder = createBuilder();
-        NotificationCompat.Builder summaryBuilder = createSummaryBuilder();
-
-        mNotificationManager.notify(Integer.parseInt(mChatRoom.getNotificationId()), builder.build());
-        mNotificationManager.notify(0, summaryBuilder.build());
-
+                mNotificationManager.notify(Integer.parseInt(mChatRoom.getNotificationId()), builder.build());
+                mNotificationManager.notify(0, summaryBuilder.build());
+            }
+        }
         mRealm.close();
     }
 

@@ -32,6 +32,7 @@ import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.R;
 import x.com.nubextalk.ThemeModeActivity;
+import x.com.nubextalk.TutorialActivity;
 
 import static x.com.nubextalk.Module.CodeResources.*;
 
@@ -46,27 +47,28 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
     private Config mMyAccount;
     private Config mAlarm;
     private Config mAutoLogin;
+
     @Override
     public void onAttach(@NonNull Context context) {
         mContext = context;
-        if(context instanceof Activity)
+        if (context instanceof Activity)
             mActivity = (Activity) context;
         super.onAttach(context);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_setting, container, false);
 
-        mWrapperApp           = mRootview.findViewById(R.id.wrapperApp);
-        mWrapperAccount       = mRootview.findViewById(R.id.wrapperAccount);
-        mWrapperVesionInfo    = mRootview.findViewById(R.id.wrapperVesionInfo);
+        mWrapperApp = mRootview.findViewById(R.id.wrapperApp);
+        mWrapperAccount = mRootview.findViewById(R.id.wrapperAccount);
+        mWrapperVesionInfo = mRootview.findViewById(R.id.wrapperVesionInfo);
 
         mActivity.setTitle(TITLE_SETTING);
 
-        mWrapperHowToUse      = mRootview.findViewById(R.id.wrapperHowToUse);
+        mWrapperHowToUse = mRootview.findViewById(R.id.wrapperHowToUse);
 
         mMyAccount = Config.getMyAccount(mRealm);
         mAlarm = Config.getAlarm(mRealm);
@@ -165,7 +167,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
                 startActivity(intent);
                 break;
             case EXE_HOW_TO_USE:
-                intent = new Intent(mActivity, HowToUseActivity.class);
+                intent = new Intent(mActivity, TutorialActivity.class);
+                intent.putExtra("fromSetting", "true");
                 startActivity(intent);
                 break;
             case EXE_VERSION_INFO:
@@ -177,12 +180,11 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         mRealm.executeTransaction(realm1 -> {
-            switch ((int)buttonView.getTag()) {
+            switch ((int) buttonView.getTag()) {
                 case EXE_ALARM:
-                    if(isChecked) {
+                    if (isChecked) {
                         mAlarm.setExt1("true");
-                    }
-                    else {
+                    } else {
                         mAlarm.setExt1("false");
                     }
                     break;

@@ -12,6 +12,10 @@ public class CodeResources {
     public static final String VERSION = "NubeX Talk 1.0.0";
     public static final String EMPTY = "";
     public static final String FIREBASE_LOC = "asia-northeast3";
+    public static final String HTTP_SSL = "http://";
+    public static final String HTTPS_SSL = "https://";
+    public static final String PACS_SERVER_IP = "121.166.85.235";
+    public static final String PACS_HOSPITAL_NAME = "한양대학교 병원";
 
     public static final String LOGIN = "로그인";
     public static final String LOGOUT = "로그아웃";

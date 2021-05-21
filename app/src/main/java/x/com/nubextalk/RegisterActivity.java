@@ -23,6 +23,11 @@ import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 
+import static x.com.nubextalk.Module.CodeResources.HTTPS_SSL;
+import static x.com.nubextalk.Module.CodeResources.HTTP_SSL;
+import static x.com.nubextalk.Module.CodeResources.PACS_HOSPITAL_NAME;
+import static x.com.nubextalk.Module.CodeResources.PACS_SERVER_IP;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private SwitchCompat mSslSwitch;
@@ -30,6 +35,12 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mEditHost;
     private EditText mEditPort;
     private Realm mRealm;
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +53,10 @@ public class RegisterActivity extends AppCompatActivity {
         mEditHost = findViewById(R.id.editTextHost);
         mEditPort = findViewById(R.id.editTextPort);
 
+        //기본 병원 이름이랑 병원 PACS 서버 IP 입력되어 있음
+        mEditName.setText(PACS_HOSPITAL_NAME);
+        mEditHost.setText(PACS_SERVER_IP);
+
         Button registerButton = findViewById(R.id.buttonRegister);
         final RegisterActivity activity = this;
 
@@ -52,8 +67,8 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void execute(Realm realm) {
                         Config serverInfo = Config.getServerInfo(realm);
-                        String ssl = mSslSwitch.isChecked() ? "https://" : "http://";
-                        String host = mEditHost.getText().toString().equals("") ? "121.166.85.235" : mEditHost.getText().toString();
+                        String ssl = mSslSwitch.isChecked() ? HTTPS_SSL : HTTP_SSL;
+                        String host = mEditHost.getText().toString().equals("") ? PACS_SERVER_IP : mEditHost.getText().toString();
                         String port = mEditPort.getText().toString().equals("") ? "" : ":".concat(mEditPort.getText().toString());
                         String name = mEditName.getText().toString().equals("") ? "" : mEditName.getText().toString();
                         if (serverInfo == null) {

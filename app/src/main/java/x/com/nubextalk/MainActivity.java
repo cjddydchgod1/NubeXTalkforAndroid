@@ -41,6 +41,10 @@ import x.com.nubextalk.Module.Fragment.SettingFragment;
 
 import static x.com.nubextalk.Module.CodeResources.CHAT_ADD;
 import static x.com.nubextalk.Module.CodeResources.MOVE_TO_CHAT_ROOM;
+import static x.com.nubextalk.Module.CodeResources.TITLE_CHAT_LIST;
+import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
+import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
+import static x.com.nubextalk.Module.CodeResources.TITLE_SETTING;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Setting bottom navigation
         mBottomNavigationView = findViewById(R.id.bottom_nav);
-        initBottomNavigation();
+        initBottomNavigation(this);
 
         /** Modified By Jongho Lee */
         //Init Fragment
@@ -103,15 +107,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         transaction.add(R.id.main_frame_layout, mSettingFrag).hide(mSettingFrag);
-
-        int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
-        if (requestChatList == RESULT_OK) {
-            transaction.show(mChatListFrag);
-            mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
-        } else {
-            transaction.show(mFriendListFrag);
-            mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
-        }
+        transaction.show(mFriendListFrag);
+        toolbar.setTitle(TITLE_FRIEND_LIST);
+        mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         transaction.commitAllowingStateLoss();
     }
 
@@ -120,15 +118,17 @@ public class MainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
 
         /** Modified By Jongho Lee
-         * TODO 위 oncreate getIntent()랑 중복 가능성 있음 체크해서 필요없는 로직은 삭제
+         * TODO 위 oncreate getIntent()랑 중복 가능성 있음 체크해서 필요없는 로직은 삭제 -> oncreate 부분 로직 정리함
          * */
         FragmentTransaction transaction = mFragManager.beginTransaction();
         int requestChatList = intent.getIntExtra("requestChatList", RESULT_CANCELED);
         if (requestChatList == RESULT_OK) {
             transaction.show(mChatListFrag).commitAllowingStateLoss();
+            this.setTitle(TITLE_CHAT_LIST);
             mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
             transaction.show(mFriendListFrag).commitAllowingStateLoss();
+            this.setTitle(TITLE_FRIEND_LIST);
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
     }
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/
-    private void initBottomNavigation() {
+    private void initBottomNavigation(Activity activity) {
         //네비게이션 버튼 해당 프래그먼트로 전환
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -149,15 +149,19 @@ public class MainActivity extends AppCompatActivity {
                 }
                 switch (item.getItemId()) {
                     case R.id.nav_friend_list:
+                        activity.setTitle(TITLE_FRIEND_LIST);
                         fragTransaction.show(mFriendListFrag);
                         break;
                     case R.id.nav_chat_list:
+                        activity.setTitle(TITLE_CHAT_LIST);
                         fragTransaction.show(mChatListFrag);
                         break;
                     case R.id.nav_calendar:
+                        activity.setTitle(TITLE_PACS);
                         fragTransaction.show(mPacsReferenceFrag);
                         break;
                     case R.id.nav_setting:
+                        activity.setTitle(TITLE_SETTING);
                         fragTransaction.show(mSettingFrag);
                         break;
                 }

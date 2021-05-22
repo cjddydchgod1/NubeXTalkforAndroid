@@ -5,9 +5,9 @@
 
 package x.com.nubextalk;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,8 +16,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import okhttp3.Response;
@@ -61,6 +66,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         Button mSignUpBtn = (Button) findViewById(R.id.login_sign_up);
         Button mSignInBtn = (Button) findViewById(R.id.login_sign_in);
+
+        initPermission();
 
         mCheckAutoLogin = findViewById(R.id.checkAutoLogin);
 
@@ -170,4 +177,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         });
     }
+
+    private void initPermission() {
+        PermissionListener pm = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                onBackPressed();
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+            new TedPermission().with(this)
+                    .setPermissionListener(pm)
+                    .setPermissions(Manifest.permission.CAMERA,
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.VIBRATE
+                    ).check();
+        } else {
+
+        }
+    }
+
 }

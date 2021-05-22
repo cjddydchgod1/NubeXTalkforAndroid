@@ -9,11 +9,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +16,13 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.fragment.app.Fragment;
+
 import com.joanzapata.iconify.widget.IconTextView;
 
 import io.realm.Realm;
-import x.com.nubextalk.HowToUseActivity;
 import x.com.nubextalk.LoginActivity;
 import x.com.nubextalk.Manager.FcmTokenRefreshService;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
@@ -34,7 +32,15 @@ import x.com.nubextalk.R;
 import x.com.nubextalk.ThemeModeActivity;
 import x.com.nubextalk.TutorialActivity;
 
-import static x.com.nubextalk.Module.CodeResources.*;
+import static x.com.nubextalk.Module.CodeResources.ALARM;
+import static x.com.nubextalk.Module.CodeResources.EXE_ALARM;
+import static x.com.nubextalk.Module.CodeResources.EXE_HOW_TO_USE;
+import static x.com.nubextalk.Module.CodeResources.EXE_LOGOUT;
+import static x.com.nubextalk.Module.CodeResources.EXE_THEME;
+import static x.com.nubextalk.Module.CodeResources.EXE_VERSION_INFO;
+import static x.com.nubextalk.Module.CodeResources.LOGOUT;
+import static x.com.nubextalk.Module.CodeResources.SETTING_THEME;
+import static x.com.nubextalk.Module.CodeResources.VERSION;
 
 public class SettingFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
@@ -66,7 +72,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
         mWrapperAccount = mRootview.findViewById(R.id.wrapperAccount);
         mWrapperVesionInfo = mRootview.findViewById(R.id.wrapperVesionInfo);
 
-        mActivity.setTitle(TITLE_SETTING);
+//        mActivity.setTitle(TITLE_SETTING);
 
         mWrapperHowToUse = mRootview.findViewById(R.id.wrapperHowToUse);
 

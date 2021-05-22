@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -54,7 +55,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     private Activity mActivity;
 
     private String mHid;
-
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
 
@@ -70,17 +70,17 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
-        mActivity.setTitle(TITLE_CHAT_LIST);
+//        mActivity.setTitle(TITLE_CHAT_LIST);
         mHid = HOSPITAL_ID;
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
         mChatRoomList = ChatRoom.getAll(mRealm);
         FloatingActionButton fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
 
-        mAdapter = new ChatListAdapter(getActivity(), mChatRoomList, false);
+        mAdapter = new ChatListAdapter(mActivity, mChatRoomList, false);
         mAdapter.setItemLongSelectedListener(this);
         mAdapter.setItemSelectedListener(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setAdapter(mAdapter);
 
         mRealm.addChangeListener(new RealmChangeListener<Realm>() {
@@ -95,7 +95,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         fab_sub1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mContext, ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+                startActivity(new Intent(mActivity, ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
             }
         });
 

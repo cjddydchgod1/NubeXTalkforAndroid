@@ -144,7 +144,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mUserList = new ArrayList<>();
         mAquery = new AQuery(mActivity);
 
-        mActivity.setTitle(TITLE_FRIEND_LIST);
+//        mActivity.setTitle(TITLE_FRIEND_LIST);
 
         /**
          * bottomSheet

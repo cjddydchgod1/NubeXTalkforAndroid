@@ -74,11 +74,12 @@ public class ChatAddSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         //사진 설정
+        mHolder.profileImage.setColorFilter(null);
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
             mAquery.view(mHolder.profileImage).image(user.getAppImagePath());
         } else {
-            Drawable drawable = mHolder.profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-            mAquery.view(mHolder.profileImage).image(drawable);
+            mAquery.view(mHolder.profileImage).image(DEFAULT_PROFILE);
+            mHolder.profileImage.setColorFilter((mHolder.profileName.getTextColors().getDefaultColor()));
         }
 
         //상태 설정

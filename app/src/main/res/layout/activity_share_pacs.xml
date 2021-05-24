@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Created By Jong Ho, Lee on  2021.
   ~ Copyright 테크하임(주). All rights reserved.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SharePACSActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".SharePACSActivity">
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/chat_add_toolbar"
         android:layout_width="match_parent"
@@ -22,16 +22,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="PACS 공유" />
+        app:title="PACS 공유"
+        app:titleTextColor="@color/cWhite" />
 
-        />
+    />
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tablayout_PACS"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/main_PACS_pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 </LinearLayout>

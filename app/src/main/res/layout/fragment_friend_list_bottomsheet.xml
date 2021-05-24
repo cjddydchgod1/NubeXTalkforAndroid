@@ -5,6 +5,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="@dimen/elevation_l"
@@ -12,7 +13,8 @@
     android:orientation="vertical"
     android:padding="@dimen/padding_xl"
     android:background="@color/cBackground"
-    android:translationY="8000dp">
+    android:translationY="8000dp"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rowWRapperName"
@@ -45,12 +47,6 @@
                     android:layout_height="@dimen/profile_image_l"
                     android:src="@drawable/ic_default_profile_24" />
                 <ImageView
-                    android:id="@+id/deleteImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_del_profile_image"
-                    android:layout_gravity="right|top"/>
-                <ImageView
                     android:id="@+id/profileStatus"
                     android:layout_width="@dimen/status_l"
                     android:layout_height="@dimen/status_l"
@@ -58,13 +54,6 @@
                     android:src="@drawable/ic_status_on" />
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/modifyImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/bottomProfileImage"
-                android:layout_centerHorizontal="true"
-                android:text="@string/modify" />
         </RelativeLayout>
 
         <LinearLayout
@@ -105,11 +94,12 @@
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageWrapeer"
-            app:layout_constraintTop_toBottomOf="@+id/rowWrapperName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            app:layout_constraintTop_toBottomOf="@+id/rowWrapperName">
 
             <LinearLayout
                 android:id="@+id/statusLayout"
@@ -174,8 +164,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_l"
-                android:drawableLeft="@drawable/ic_chat_black_24"
                 android:background="@color/cTransparent"
+                android:drawableLeft="@drawable/ic_chat_black_24"
                 android:drawablePadding="@dimen/padding_l"
                 android:paddingStart="@dimen/padding_l"
                 android:text="@string/Chatting"
@@ -183,7 +173,15 @@
                 android:visibility="visible" />
         </FrameLayout>
 
-
+        <TextView
+            android:id="@+id/myProfileModification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="프로필 변경"
+            android:textSize="@dimen/txt_m"
+            android:padding="@dimen/padding_l"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/mClose" />
         <TextView
             android:id="@+id/mClose"
             app:layout_constraintBottom_toBottomOf="parent"

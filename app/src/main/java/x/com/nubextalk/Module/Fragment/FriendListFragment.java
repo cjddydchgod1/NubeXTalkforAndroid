@@ -5,15 +5,10 @@
 
 package x.com.nubextalk.Module.Fragment;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,7 +29,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -43,10 +37,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aquery.AQuery;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,25 +51,20 @@ import x.com.nubextalk.ChatAddActivity;
 import x.com.nubextalk.ChatRoomActivity;
 import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.AnimManager;
-import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.ChatRoom;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
-import x.com.nubextalk.ProfileImageViewActivity;
+import x.com.nubextalk.ProfileActivity;
 import x.com.nubextalk.R;
 
-import static android.app.Activity.RESULT_OK;
 import static x.com.nubextalk.Module.CodeResources.COMPLETE;
 import static x.com.nubextalk.Module.CodeResources.DEFAULT_PROFILE;
 import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
 import static x.com.nubextalk.Module.CodeResources.MODIFICATION;
-import static x.com.nubextalk.Module.CodeResources.PATH_IMAGE;
-import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE1;
-import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE2;
 import static x.com.nubextalk.Module.CodeResources.SEARCH;
 import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
 import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
@@ -110,8 +95,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     // 수정 버튼
     private EditText mEditName;
     private TextView mMdoifyNameBtn;
-    private TextView mModifyImageBtn;
-    private ImageView mDelImageBtn;
+    private TextView mMyProfileMod;
     // 상태레이아웃
     private LinearLayout mStatusLayout;
     // 채팅 버튼
@@ -144,7 +128,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mUserList = new ArrayList<>();
         mAquery = new AQuery(mActivity);
 
-        mActivity.setTitle(TITLE_FRIEND_LIST);
+//        mActivity.setTitle(TITLE_FRIEND_LIST);
 
         /**
          * bottomSheet
@@ -156,8 +140,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         // 수정 버튼
         mEditName = mBottomWrapper.findViewById(R.id.modifyName);
         mMdoifyNameBtn = mBottomWrapper.findViewById(R.id.modifyButton);
-        mModifyImageBtn = mBottomWrapper.findViewById(R.id.modifyImage);
-        mDelImageBtn = mBottomWrapper.findViewById(R.id.deleteImage);
+        mMyProfileMod = mBottomWrapper.findViewById(R.id.myProfileModification);
         // 상태레이아웃
         mStatusLayout = mBottomWrapper.findViewById(R.id.statusLayout);
         // 채팅 버튼
@@ -306,6 +289,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         if (URLUtil.isValidUrl(mMyProfile.getAppImagePath())) {
             mAquery.view(myProfileImage).image(mMyProfile.getAppImagePath());
+            myProfileImage.setColorFilter(null);
+        } else {
+            mAquery.view(myProfileImage).image(DEFAULT_PROFILE);
+            myProfileImage.setColorFilter(myProfileName.getTextColors().getDefaultColor());
         }
         myProfileName.setText(mMyProfile.getAppName());
         switch (mMyProfile.getAppStatus()) {
@@ -407,10 +394,11 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
             mAquery.view(mProfileImage).image(user.getAppImagePath());
+            mProfileImage.setColorFilter(null);
             mProfileImage.setEnabled(true);
         } else {
-            Drawable drawable = mProfileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-            mAquery.view(mProfileImage).image(drawable);
+            mAquery.view(mProfileImage).image(DEFAULT_PROFILE);
+            mProfileImage.setColorFilter(mProfileName.getTextColors().getDefaultColor());
             mProfileImage.setEnabled(false);
         }
         /**
@@ -419,15 +407,15 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         // 이미지 수정버튼, 1대1채팅 버튼 유무 (내 프로필과 친구 프로필의 차이)
         if (user.getUid().equals(mMyUid)) {
-            mDelImageBtn.setVisibility(View.VISIBLE);
-            mModifyImageBtn.setVisibility(View.VISIBLE);
             mChatBtn.setVisibility((View.GONE));
             mProfileStatus.setEnabled(true);
+            mMyProfileMod.setVisibility(View.VISIBLE);
+            mMdoifyNameBtn.setVisibility(View.GONE);
         } else {
-            mDelImageBtn.setVisibility(View.GONE);
-            mModifyImageBtn.setVisibility(View.GONE);
             mChatBtn.setVisibility(View.VISIBLE);
             mProfileStatus.setEnabled(false);
+            mMyProfileMod.setVisibility(View.GONE);
+            mMdoifyNameBtn.setVisibility(View.VISIBLE);
         }
         mStatusLayout.setVisibility(View.INVISIBLE);
         mEditName.setVisibility(View.GONE);
@@ -439,43 +427,22 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // Profile Image 선택시 확대된 사진 띄우기
         mProfileImage.setOnClickListener(v ->{
-            Intent intent = new Intent(mContext, ProfileImageViewActivity.class);
-                            intent.putExtra("uid", user.getUid());
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            mContext.startActivity(intent);
+            Intent intent = new Intent(mContext, ProfileActivity.class);
+            intent.putExtra("uid", user.getUid());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            mContext.startActivity(intent);
         });
 
         // Nickname 변경
         mMdoifyNameBtn.setOnClickListener(v -> {
             changeOpponentNickName(user);
         });
-
-        // 프로필 사진 변경 (myProfile만 가능)
-        mModifyImageBtn.setOnClickListener(v -> {
-            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-            } else {
-                startGallery();
-            }
-        });
-
-        // 기본 프로필로 변경 (myProfile만 가능)
-        mDelImageBtn.setOnClickListener(v -> {
-            mRealm.executeTransaction(realm1 -> {
-                user.setAppImagePath("null");
-            });
-
-            mApiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
-                @Override
-                public void onSuccess(Response response, String body) {
-                    refreshFragment();
-                }
-            });
-        });
-
-        // 프로필 Status 변경
-        mProfileStatus.setOnClickListener(v -> {
-            changeMyStatus(user);
+        // 전체적인 myProfile변경
+        mMyProfileMod.setOnClickListener(v -> {
+            Intent intent = new Intent(mContext, ProfileActivity.class);
+            intent.putExtra("uid", user.getUid());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            mContext.startActivity(intent);
         });
 
         // 1대1채팅 버튼
@@ -514,7 +481,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
 
         });
-
 
         // 닫기
         mBottomWrapper.findViewById(R.id.mClose).setOnClickListener(v -> {
@@ -561,105 +527,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         } else { // 완료버튼을 눌렀을 경우
             updateNickname(user, mEditName.getText().toString());
             refreshFragment();
-        }
-    }
-
-    public void changeMyStatus(User user) {
-        // chatButton은 숨기고, status를 선택하는 Layout등장
-        mChatBtn.setVisibility(View.INVISIBLE);
-        mStatusLayout.setVisibility(View.VISIBLE);
-        // status를 클릭
-        LinearLayout working = mStatusLayout.findViewById(R.id.working_status);
-        LinearLayout leaving = mStatusLayout.findViewById(R.id.leaving_status);
-        LinearLayout vacation = mStatusLayout.findViewById(R.id.vacation_status);
-        LinearLayout.OnClickListener onClickListener = new LinearLayout.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mChatBtn.setVisibility(View.VISIBLE);
-                mStatusLayout.setVisibility(View.INVISIBLE);
-                mRealm.executeTransaction(realm1 -> {
-                    switch (v.getId()) {
-                        case R.id.working_status:
-                            user.setAppStatus("0");
-                            break;
-                        case R.id.leaving_status:
-                            user.setAppStatus("1");
-                            break;
-                        case R.id.vacation_status:
-                            user.setAppStatus("2");
-                            break;
-                    }
-                });
-                mApiManager.setEmployeeAppInfo(user, new ApiManager.onApiListener() {
-                    @Override
-                    public void onSuccess(Response response, String body) {
-                        refreshFragment();
-                    }
-                });
-            }
-        };
-        working.setOnClickListener(onClickListener);
-        leaving.setOnClickListener(onClickListener);
-        vacation.setOnClickListener(onClickListener);
-    }
-
-    // Gallery start
-    private void startGallery() {
-        // 갤러리를 들어가기 위한 intent
-        Intent cameraIntent = new Intent(Intent.ACTION_PICK);
-        cameraIntent.setType(PATH_IMAGE);
-        if (cameraIntent.resolveActivity(mActivity.getPackageManager()) != null) {
-            // 갤러리 실행
-            startActivityForResult(cameraIntent, 1);
-        }
-    }
-
-    // Gallery 실행 후 결과
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                try {
-                    Uri imgUri = data.getData();
-                    /* Uri값의 이미지값을 불러온다.
-                     * 이미지값을 저장한다.
-                     * 해당 이미지값을 Storage에 올린다.
-                     */
-
-                    UploadTask uploadTask = FirebaseStorageManager.uploadFile(imgUri, PATH_STORAGE1 + mHid + PATH_STORAGE2 + mMyUid);
-                    Task<Uri> urlTask = uploadTask
-                            .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                                @Override
-                                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                                    if (!task.isSuccessful()) {
-                                        throw task.getException();
-                                    }
-                                    return FirebaseStorageManager.downloadFile(PATH_STORAGE1 + mHid + PATH_STORAGE2 + mMyUid);
-                                }
-                            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Uri> task) {
-                                    if (task.isSuccessful()) {
-                                        Uri imgUri = task.getResult();
-                                        if (imgUri != null) {
-                                            mRealm.executeTransaction(realm1 -> {
-                                                mMyProfile.setAppImagePath(imgUri.toString());
-                                            });
-                                            mApiManager.setEmployeeAppInfo(mMyProfile, new ApiManager.onApiListener() {
-                                                @Override
-                                                public void onSuccess(Response response, String body) {
-                                                    refreshFragment();
-                                                }
-                                            });
-                                        } else {
-                                        }
-                                    }
-                                }
-                            });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 

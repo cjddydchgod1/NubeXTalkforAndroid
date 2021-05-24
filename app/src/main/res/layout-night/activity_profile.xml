@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created By Jong Ho, Lee on  2021.
+  ~ Copyright 테크하임(주). All rights reserved.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cBackground"
+    android:orientation="vertical"
+    tools:context=".ProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="2.5">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/change_profile_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5">
+
+        <TextView
+            android:id="@+id/change_profile_text"
+            android:layout_width="@dimen/icon_size_GGl"
+            android:layout_height="@dimen/txt_GGl"
+            android:layout_marginTop="5dp"
+            android:width="@dimen/_l"
+            android:gravity="center"
+            android:textSize="@dimen/txt_Gl"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/status_group"
+            android:layout_width="@dimen/icon_size_GGl"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/change_profile_text">
+
+            <RadioButton
+                android:id="@+id/rgt_busy"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="3.33"
+                android:text="근무"
+                android:textColor="@color/cContentText" />
+
+
+            <RadioButton
+                android:id="@+id/rgt_exit"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="3.33"
+                android:text="퇴근"
+                android:textColor="@color/cContentText" />
+
+
+            <RadioButton
+                android:id="@+id/rgt_vacation"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="3.33"
+                android:text="휴가"
+                android:textColor="@color/cContentText" />
+
+        </RadioGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/icon_size_GGGl"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.5"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_l"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn"
+            android:text="@string/cancel"
+            android:textColor="@color/cContentText" />
+
+        <Button
+            android:id="@+id/confirm_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_l"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn"
+            android:text="@string/confirm"
+            android:textColor="@color/cContentText" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
+</LinearLayout>

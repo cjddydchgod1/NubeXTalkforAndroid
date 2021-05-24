@@ -131,6 +131,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chatLayout = itemView.findViewById(R.id.chat_list_layout);
             radioButton = itemView.findViewById(R.id.select_chat);
 
+
             //채팅방 목록 아이템 누르면 발생 이벤트
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
@@ -180,14 +181,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //채팅방 목록 사진 설정
             if (URLUtil.isValidUrl(roomImgUrl)) {
                 mAquery.view(chatRoomImg).image(roomImgUrl);
+                chatRoomImg.setColorFilter(null);
             } else {
                 if (roomMemberCount > 2) {
-                    Drawable drawable = chatRoomImg.getContext().getResources().getDrawable(DEFAULT_GROUP_PROFILE, null);
-                    mAquery.view(chatRoomImg).image(drawable);
+                    mAquery.view(chatRoomImg).image(DEFAULT_GROUP_PROFILE);
+                    chatRoomImg.setColorFilter(chatRoomName.getTextColors().getDefaultColor());
                 } else {
-                    Drawable drawable = chatRoomImg.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-                    mAquery.view(chatRoomImg).image(drawable);
+                    mAquery.view(chatRoomImg).image(DEFAULT_PROFILE);
+                    chatRoomImg.setColorFilter(chatRoomName.getTextColors().getDefaultColor());
                 }
+                chatRoomImg.setColorFilter(lastMsg.getTextColors().getDefaultColor());
             }
 
             //채팅방 목록 이름 설정
@@ -252,6 +255,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 notifyImg1.setText(EMPTY);
                 notifyImg2.setText(EMPTY);
             }
+
+            notifyImg1.setTextColor(lastMsg.getTextColors().getDefaultColor());
+            notifyImg2.setTextColor(lastMsg.getTextColors().getDefaultColor());
+
         }
 
         /**

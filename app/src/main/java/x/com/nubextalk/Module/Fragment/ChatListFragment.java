@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -54,7 +55,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     private Activity mActivity;
 
     private String mHid;
-
     private RecyclerView mRecyclerView;
     private ChatListAdapter mAdapter;
 
@@ -69,24 +69,24 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ViewGroup rootView  = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
-        mActivity.setTitle(TITLE_CHAT_LIST);
-        mHid                = HOSPITAL_ID;
-        mRealm              = Realm.getInstance(UtilityManager.getRealmConfig());
-        mRecyclerView       = rootView.findViewById(R.id.fragment_chat_list_view);
-        mChatRoomList       = ChatRoom.getAll(mRealm);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_chat_list, container, false);
+//        mActivity.setTitle(TITLE_CHAT_LIST);
+        mHid = HOSPITAL_ID;
+        mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
+        mRecyclerView = rootView.findViewById(R.id.fragment_chat_list_view);
+        mChatRoomList = ChatRoom.getAll(mRealm);
         FloatingActionButton fab_sub1 = rootView.findViewById(R.id.chat_fab_sub1);
 
-        mAdapter = new ChatListAdapter(getActivity(), mChatRoomList, false);
+        mAdapter = new ChatListAdapter(mActivity, mChatRoomList, false);
         mAdapter.setItemLongSelectedListener(this);
         mAdapter.setItemSelectedListener(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setAdapter(mAdapter);
 
         mRealm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm realm) {
-                if(!realm.isClosed())
+                if (!realm.isClosed())
                     refreshChatList();
             }
         });
@@ -95,7 +95,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         fab_sub1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mContext, ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+                startActivity(new Intent(mActivity, ChatAddActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
             }
         });
 
@@ -117,7 +117,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         /** Modified By Jongho Lee*/
-        if(!hidden){
+        if (!hidden) {
             mChatRoomList = ChatRoom.getAll(mRealm);
             mAdapter.updateData(mChatRoomList);
         }
@@ -155,7 +155,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 openDialog(chatRoom.getRid());
                                 break;
                             case 4: /**채팅방 나가기 이벤트**/
-                                exitChatRoom(chatRoom);
+                                ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
                                 break;
                         }
                     }
@@ -176,16 +176,6 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         DialogFragment dialogFragment = new RoomNameModificationDialogFragment(mRealm, chatRoomId);
         dialogFragment.setTargetFragment(this, 0);
         dialogFragment.show(getParentFragmentManager(), "Change RoomName");
-    }
-
-    public void exitChatRoom(ChatRoom chatRoom) {
-        if (chatRoom.getIsGroupChat()) {
-            User me = (User) User.getMyAccountInfo(mRealm);
-            ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
-            FirebaseFunctionsManager.exitChatRoom(mHid, me.getUid(), chatRoom.getRid());
-        } else {
-            ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
-        }
     }
 
     /**

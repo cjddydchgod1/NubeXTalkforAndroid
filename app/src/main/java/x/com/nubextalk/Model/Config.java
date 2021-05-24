@@ -77,6 +77,8 @@ public class Config extends RealmObject {
 
     public static void settingInit(Context context, Realm realm){
         realm.where(Config.class).equalTo("CODENAME", "Alarm").findAll().deleteAllFromRealm();
+        realm.where(Config.class).equalTo("CODENAME", "TutorialStatus").findAll().deleteAllFromRealm();
+
         JSONArray jsonArray = null;
         try {
             jsonArray = new JSONArray(UtilityManager.loadJson(context, "config.json"));
@@ -119,5 +121,24 @@ public class Config extends RealmObject {
     }
     public static Config getThemeMode(Realm realm){
         return realm.where(Config.class).equalTo("CODENAME", "Theme").findFirst();
+    }
+    public static Config getTutorialStatus(Realm realm){
+        return realm.where(Config.class).equalTo("CODENAME", "TutorialStatus").findFirst();
+    }
+
+    public static void setTutorialStatus(Realm realm, String value){
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Config status = getTutorialStatus(realm);
+                if(status == null){
+                    status = new Config();
+                    status.setCODE("TutorialStatus");
+                    status.setCODENAME("TutorialStatus");
+                }
+                status.setExt1(value);
+                realm.copyToRealmOrUpdate(status);
+            }
+        });
     }
 }

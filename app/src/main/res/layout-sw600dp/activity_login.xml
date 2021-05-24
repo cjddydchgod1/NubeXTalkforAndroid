@@ -123,17 +123,6 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/login_sign_in"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_l"
-                android:layout_marginEnd="@dimen/margin_l"
-                android:layout_weight="1"
-                android:background="@drawable/bg_btn_login"
-                android:text="@string/login"
-                android:textColor="@color/cLogoPink"
-                android:textSize="@dimen/txt_xl" />
 
             <Button
                 android:id="@+id/login_sign_up"
@@ -142,10 +131,22 @@
                 android:layout_marginStart="@dimen/margin_l"
                 android:layout_marginEnd="@dimen/margin_l"
                 android:layout_weight="1"
-                android:background="@drawable/bg_btn_login"
+                android:background="@drawable/bg_btn"
                 android:singleLine="true"
                 android:text="@string/sign_hospital"
-                android:textColor="@color/cLogoPink"
+                android:textColor="@color/cContentText"
+                android:textSize="@dimen/txt_xl" />
+
+            <Button
+                android:id="@+id/login_sign_in"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_l"
+                android:layout_marginEnd="@dimen/margin_l"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn"
+                android:text="@string/login"
+                android:textColor="@color/cContentText"
                 android:textSize="@dimen/txt_xl" />
 
         </LinearLayout>

@@ -262,13 +262,22 @@ public class ChatRoom extends RealmObject {
      * @param rid   채팅방 rid
      */
     public static void deleteChatRoom(Realm realm, String rid) {
+        ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+
+        //단체 채팅방에서 나가는 경우 - Firebase 의 채팅방 멤버 데이터도 삭제
+        if (chatRoom.getIsGroupChat()) {
+            User me = (User) User.getMyAccountInfo(realm);
+            FirebaseFunctionsManager.exitChatRoom(HOSPITAL_ID, me.getUid(), chatRoom.getRid());
+        }
+
+        //채팅방 관련 로컬 realm 데이터 삭제
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                ChatRoom chatRoom = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
+                ChatRoom chatRoom1 = realm.where(ChatRoom.class).equalTo("rid", rid).findFirst();
                 RealmResults<ChatContent> chatContents = realm.where(ChatContent.class).equalTo("rid", rid).findAll();
                 RealmResults<ChatRoomMember> chatRoomMembers = realm.where(ChatRoomMember.class).equalTo("rid", rid).findAll();
-                chatRoom.deleteFromRealm();
+                chatRoom1.deleteFromRealm();
                 chatContents.deleteAllFromRealm();
                 chatRoomMembers.deleteAllFromRealm();
             }

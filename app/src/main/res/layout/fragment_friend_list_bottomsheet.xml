@@ -177,7 +177,7 @@
             android:id="@+id/myProfileModification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="프로필 사진 변경"
+            android:text="프로필 변경"
             android:textSize="@dimen/txt_m"
             android:padding="@dimen/padding_l"
             app:layout_constraintBottom_toBottomOf="parent"

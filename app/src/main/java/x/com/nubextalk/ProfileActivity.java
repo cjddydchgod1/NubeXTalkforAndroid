@@ -112,11 +112,7 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int pos) {
                             switch (pos) {
                                 case 0: /** 갤러리 실행 후 사진 변경 **/
-                                    if (ActivityCompat.checkSelfPermission(ProfileActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                                    } else {
-                                        startGallery();
-                                    }
+                                    startGallery();
                                     break;
                                 case 1: /** 기본 프로필 사진으로 변경 **/
                                     changeDefaultImage();
@@ -180,7 +176,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 Uri imgUri = task.getResult();
                                 if (imgUri != null) {
                                     changeUserInfo(imgUri);
-                                    Toast.makeText(ProfileActivity.this, "프로필 사진이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                                 } else {
                                 }
                             }
@@ -202,6 +197,7 @@ public class ProfileActivity extends AppCompatActivity {
         apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
+                Toast.makeText(ProfileActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         });
@@ -218,6 +214,7 @@ public class ProfileActivity extends AppCompatActivity {
         apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
+                Toast.makeText(ProfileActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         });

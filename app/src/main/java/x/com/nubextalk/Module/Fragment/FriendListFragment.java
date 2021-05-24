@@ -289,6 +289,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
          */
         if (URLUtil.isValidUrl(mMyProfile.getAppImagePath())) {
             mAquery.view(myProfileImage).image(mMyProfile.getAppImagePath());
+            myProfileImage.setColorFilter(null);
         } else {
             mAquery.view(myProfileImage).image(DEFAULT_PROFILE);
             myProfileImage.setColorFilter(myProfileName.getTextColors().getDefaultColor());
@@ -393,6 +394,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         if (URLUtil.isValidUrl(user.getAppImagePath())) {
             mAquery.view(mProfileImage).image(user.getAppImagePath());
+            mProfileImage.setColorFilter(null);
             mProfileImage.setEnabled(true);
         } else {
             mAquery.view(mProfileImage).image(DEFAULT_PROFILE);

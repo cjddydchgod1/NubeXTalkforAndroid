@@ -26,9 +26,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ProfileModificationActivity2" />
+            android:name=".ProfileActivity"/>
 
-        <activity android:name=".ProfileImageViewActivity" />
         <activity
             android:name=".ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar" />

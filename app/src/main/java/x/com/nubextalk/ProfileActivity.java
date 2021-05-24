@@ -6,27 +6,19 @@
 package x.com.nubextalk;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -39,16 +31,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import io.realm.Realm;
 import okhttp3.Response;
 import x.com.nubextalk.Manager.FireBase.FirebaseStorageManager;
-import x.com.nubextalk.Manager.ImageManager;
 import x.com.nubextalk.Manager.UtilityManager;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.PACS.ApiManager;
@@ -62,7 +47,7 @@ import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE1;
 import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE2;
 import static x.com.nubextalk.Module.CodeResources.TITLE_MODIFY_PROFILE;
 
-public class ProfileModificationActivity2 extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
     private Realm mRealm;
     private AQuery mAquery;
     private User mUser;
@@ -101,9 +86,12 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
         /** 이름 설정 **/
         mProfileName.setText(mUser.getAppName());
         /** 이미지 설정 **/
+
         if (URLUtil.isValidUrl(mUser.getAppImagePath())) {
-            mAquery.view(mProfileImage).image(mUser.getAppImagePath());
+            mImgUri = Uri.parse(mUser.getAppImagePath());
+            mAquery.view(mProfileImage).image(mImgUri.toString());
         } else {
+            mImgUri = null;
             mAquery.view(mProfileImage).image(DEFAULT_PROFILE);
             mProfileImage.setColorFilter(mProfileName.getTextColors().getDefaultColor());
         }
@@ -124,7 +112,7 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int pos) {
                             switch (pos) {
                                 case 0: /** 갤러리 실행 후 사진 변경 **/
-                                    if (ActivityCompat.checkSelfPermission(ProfileModificationActivity2.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    if (ActivityCompat.checkSelfPermission(ProfileActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                                     } else {
                                         startGallery();
@@ -142,6 +130,7 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
 
         /** 확인 버튼 및 취소 버튼 **/
         mConfirmBtn.setOnClickListener(v -> {
+
             applyModification();
         });
         mCancelBtn.setOnClickListener(v -> {
@@ -192,14 +181,14 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
                                         mUser.setAppStatus(mStatus);
                                         mUser.setAppImagePath(imgUri.toString());
                                     });
-                                    ApiManager apiManager = new ApiManager(ProfileModificationActivity2.this, mRealm);
+                                    ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
                                     apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
                                         @Override
                                         public void onSuccess(Response response, String body) {
                                             exitActivity();
                                         }
                                     });
-                                    Toast.makeText(ProfileModificationActivity2.this, "프로필 사진이 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ProfileActivity.this, "프로필 사진이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                                 } else {
                                 }
                             }
@@ -210,7 +199,7 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
                 mUser.setAppStatus(mStatus);
                 mUser.setAppImagePath("");
             });
-            ApiManager apiManager = new ApiManager(ProfileModificationActivity2.this, mRealm);
+            ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
             apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
                 @Override
                 public void onSuccess(Response response, String body) {
@@ -242,14 +231,8 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 mImgUri = data.getData();
-                String path = createCopyAndReturnRealPath(this, mImgUri);
-                Log.e("aaaaaaaa", path);
-
-                Log.e("bbbbbbbbb", path);
-                mProfileImage.setImageURI(mImgUri);
-
-                    Log.e("cccccccccc", path);
-
+                mProfileImage.setColorFilter(null);
+                mAquery.view(mProfileImage).image(mImgUri);
             }
         }
     }
@@ -271,55 +254,8 @@ public class ProfileModificationActivity2 extends AppCompatActivity {
     }
 
     private void exitActivity() {
-        Intent intent = new Intent(ProfileModificationActivity2.this, MainActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
-
-
-
-    @Nullable
-    public static String createCopyAndReturnRealPath(@NonNull Context context, @NonNull Uri uri) {
-        final ContentResolver contentResolver = context.getContentResolver();
-
-        if (contentResolver == null)
-            return null;
-
-
-
-        // 파일 경로를 만듬
-        String filePath = context.getApplicationInfo().dataDir + File.separator
-                + System.currentTimeMillis();
-
-
-
-
-        File file = new File(filePath);
-        try {
-            // 매개변수로 받은 uri 를 통해  이미지에 필요한 데이터를 불러 들인다.
-
-            InputStream inputStream = contentResolver.openInputStream(uri);
-            if (inputStream == null)
-                return null;
-            // 이미지 데이터를 다시 내보내면서 file 객체에  만들었던 경로를 이용한다.
-
-
-
-            OutputStream outputStream = new FileOutputStream(file);
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buf)) > 0)
-                outputStream.write(buf, 0, len);
-                outputStream.close();
-
-                 inputStream.close();
-
-
-        } catch (IOException ignore) {
-            return null;
-        }
-
-        return file.getAbsolutePath();
-    }
-
 }

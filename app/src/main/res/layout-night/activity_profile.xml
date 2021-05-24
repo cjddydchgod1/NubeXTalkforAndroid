@@ -10,7 +10,7 @@
     android:layout_height="match_parent"
     android:background="@color/cBackground"
     android:orientation="vertical"
-    tools:context=".ProfileModificationActivity2">
+    tools:context=".ProfileActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

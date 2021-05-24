@@ -61,6 +61,8 @@ public class ProfileActivity extends AppCompatActivity {
     private RadioGroup mStatusGroup;
     private String mStatus;
 
+    private Boolean mChkModImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,12 +88,10 @@ public class ProfileActivity extends AppCompatActivity {
         /** 이름 설정 **/
         mProfileName.setText(mUser.getAppName());
         /** 이미지 설정 **/
-
+        mChkModImage = false;
         if (URLUtil.isValidUrl(mUser.getAppImagePath())) {
-            mImgUri = Uri.parse(mUser.getAppImagePath());
-            mAquery.view(mProfileImage).image(mImgUri.toString());
+            mAquery.view(mProfileImage).image(mUser.getAppImagePath());
         } else {
-            mImgUri = null;
             mAquery.view(mProfileImage).image(DEFAULT_PROFILE);
             mProfileImage.setColorFilter(mProfileName.getTextColors().getDefaultColor());
         }
@@ -157,10 +157,12 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileImage.setColorFilter(mProfileName.getTextColors().getDefaultColor());
         /** Uri 초기화 방법 알아보자 **/
         mImgUri = null;
+        mChkModImage = true;
     }
 
     private void applyModification() {
-        if(mImgUri != null) {
+        /** 이미지 변경 **/
+        if (mChkModImage && mImgUri != null) {
             UploadTask uploadTask = FirebaseStorageManager.uploadFile(mImgUri, PATH_STORAGE1 + HOSPITAL_ID + PATH_STORAGE2 + mUser.getUid());
             Task<Uri> urlTask = uploadTask
                     .continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -177,40 +179,49 @@ public class ProfileActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Uri imgUri = task.getResult();
                                 if (imgUri != null) {
-                                    mRealm.executeTransaction(realm1 -> {
-                                        mUser.setAppStatus(mStatus);
-                                        mUser.setAppImagePath(imgUri.toString());
-                                    });
-                                    ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
-                                    apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
-                                        @Override
-                                        public void onSuccess(Response response, String body) {
-                                            exitActivity();
-                                        }
-                                    });
+                                    changeUserInfo(imgUri);
                                     Toast.makeText(ProfileActivity.this, "프로필 사진이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                                 } else {
                                 }
                             }
                         }
                     });
-        } else {
-            mRealm.executeTransaction(realm1 -> {
-                mUser.setAppStatus(mStatus);
-                mUser.setAppImagePath("");
-            });
-            ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
-            apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
-                @Override
-                public void onSuccess(Response response, String body) {
-                    exitActivity();
-                }
-            });
+        } else { /** 이미지 변경 X **/
+            changeUserInfo();
         }
 
 
     }
 
+    private void changeUserInfo(Uri imgUri) {
+        mRealm.executeTransaction(realm1 -> {
+            mUser.setAppStatus(mStatus);
+            mUser.setAppImagePath(imgUri.toString());
+        });
+        ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
+        apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
+            @Override
+            public void onSuccess(Response response, String body) {
+                exitActivity();
+            }
+        });
+    }
+
+    private void changeUserInfo() {
+        mRealm.executeTransaction(realm1 -> {
+            mUser.setAppStatus(mStatus);
+            if(mChkModImage) {
+                mUser.setAppImagePath("");
+            }
+        });
+        ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
+        apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
+            @Override
+            public void onSuccess(Response response, String body) {
+                exitActivity();
+            }
+        });
+    }
 
     // Gallery start
     private void startGallery() {
@@ -230,6 +241,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
+                mChkModImage = true;
                 mImgUri = data.getData();
                 mProfileImage.setColorFilter(null);
                 mAquery.view(mProfileImage).image(mImgUri);

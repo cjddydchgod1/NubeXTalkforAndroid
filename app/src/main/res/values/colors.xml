@@ -35,7 +35,7 @@
     <color name="cLoginButtonBorder">#dcdcdc</color>
     <color name="cProfile">#000000</color>
     <color name="cGroupProfile">#636161</color>
-
+    <color name="cChatBtn">#000000</color>
 
     <color name="cGradientStart">#000000</color>
     <color name="cGradientMiddle">#5B1D1D</color>

@@ -75,12 +75,12 @@ public class MainActivity extends AppCompatActivity {
         mRealm = Realm.getInstance(UtilityManager.getRealmConfig());
         mTutorialStatus = Config.getTutorialStatus(mRealm);
 
-//        if (mTutorialStatus.getExt1().equals("first")) {
-//            Config.setTutorialStatus(mRealm, "not first");
-//            Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
-//            tutorialIntent.putExtra("fromSetting", "false");
-//            startActivity(tutorialIntent);
-//        }
+        if (mTutorialStatus.getExt1().equals("first")) {
+            Config.setTutorialStatus(mRealm, "not first");
+            Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
+            tutorialIntent.putExtra("fromSetting", "false");
+            startActivity(tutorialIntent);
+        }
 
         setContentView(R.layout.activity_main);
 

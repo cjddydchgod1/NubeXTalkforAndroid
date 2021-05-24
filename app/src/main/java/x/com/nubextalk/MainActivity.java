@@ -107,7 +107,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         transaction.add(R.id.main_frame_layout, mSettingFrag).hide(mSettingFrag);
-        transaction.show(mFriendListFrag);
+
+        int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
+        if (requestChatList == RESULT_OK) {
+            transaction.show(mChatListFrag);
+            mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
+        } else {
+            transaction.show(mFriendListFrag);
+            mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
+        }
+
         toolbar.setTitle(TITLE_FRIEND_LIST);
         mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         transaction.commitAllowingStateLoss();

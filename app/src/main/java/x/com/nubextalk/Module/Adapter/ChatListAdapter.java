@@ -180,13 +180,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //채팅방 목록 사진 설정
             if (URLUtil.isValidUrl(roomImgUrl)) {
                 mAquery.view(chatRoomImg).image(roomImgUrl);
+                chatRoomImg.setColorFilter(null);
             } else {
                 if (roomMemberCount > 2) {
-                    Drawable drawable = chatRoomImg.getContext().getResources().getDrawable(DEFAULT_GROUP_PROFILE, null);
-                    mAquery.view(chatRoomImg).image(drawable);
+                    mAquery.view(chatRoomImg).image(DEFAULT_GROUP_PROFILE);
+                    chatRoomImg.setColorFilter(chatRoomName.getTextColors().getDefaultColor());
                 } else {
-                    Drawable drawable = chatRoomImg.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-                    mAquery.view(chatRoomImg).image(drawable);
+                    mAquery.view(chatRoomImg).image(DEFAULT_PROFILE);
+                    chatRoomImg.setColorFilter(chatRoomName.getTextColors().getDefaultColor());
                 }
             }
 

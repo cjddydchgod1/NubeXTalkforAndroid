@@ -180,7 +180,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 Uri imgUri = task.getResult();
                                 if (imgUri != null) {
                                     changeUserInfo(imgUri);
-                                    Toast.makeText(ProfileActivity.this, "프로필 사진이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                                 } else {
                                 }
                             }
@@ -202,6 +201,7 @@ public class ProfileActivity extends AppCompatActivity {
         apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
+                Toast.makeText(ProfileActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         });
@@ -218,6 +218,7 @@ public class ProfileActivity extends AppCompatActivity {
         apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
+                Toast.makeText(ProfileActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         });

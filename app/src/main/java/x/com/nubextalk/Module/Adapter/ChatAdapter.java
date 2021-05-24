@@ -138,6 +138,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             else {
                 if (checkString(mUserData.getAppImagePath())) {
                     cvHolder.aq.view(cvHolder.profileImage).image(mUserData.getAppImagePath());
+                    cvHolder.profileImage.setColorFilter(null);
                 } else {
                     cvHolder.aq.view(cvHolder.profileImage).image(DEFAULT_PROFILE);
                     cvHolder.profileImage.setColorFilter(cvHolder.profileName.getTextColors().getDefaultColor());
@@ -197,6 +198,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             else {
                 if (checkString(mUserData.getAppImagePath())) {
                     cmvHolder.aq.view(cmvHolder.profileImage).image(mUserData.getAppImagePath());
+                    cmvHolder.profileImage.setColorFilter(null);
                 } else {
                     cmvHolder.aq.view(cmvHolder.profileImage).image(DEFAULT_PROFILE);
                     cmvHolder.profileImage.setColorFilter(cmvHolder.profileName.getTextColors().getDefaultColor());
@@ -289,6 +291,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             else {
                 if (checkString(mUserData.getAppImagePath())) {
                     cpvHolder.aq.view(cpvHolder.profileImage).image(mUserData.getAppImagePath());
+                    cpvHolder.profileImage.setColorFilter(null);
                 } else {
                     cpvHolder.aq.view(cpvHolder.profileImage).image(DEFAULT_PROFILE);
                     cpvHolder.profileImage.setColorFilter(cpvHolder.profileName.getTextColors().getDefaultColor());

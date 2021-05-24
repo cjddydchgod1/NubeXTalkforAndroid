@@ -123,7 +123,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             if (mIsRadio)
                 radioButton.setVisibility(View.VISIBLE);
             profileName.setText(user.getAppName());
-            if (URLUtil.isValidUrl(user.getAppImagePath())) { ;
+            if (URLUtil.isValidUrl(user.getAppImagePath())) {
+                profileImage.setColorFilter(null);
                 mAquery.view(profileImage).image(user.getAppImagePath());
             } else {
                 mAquery.view(profileImage).image(DEFAULT_PROFILE);

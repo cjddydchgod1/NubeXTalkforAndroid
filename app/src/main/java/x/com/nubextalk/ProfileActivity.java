@@ -97,9 +97,9 @@ public class ProfileActivity extends AppCompatActivity {
         }
         /** 상태 설정 **/
         mStatus = mUser.getAppStatus();
-        rb_busy.setChecked(mUser.getAppStatus().equals("0"));
-        rb_exit.setChecked(mUser.getAppStatus().equals("1"));
-        rb_vacation.setChecked(mUser.getAppStatus().equals("2"));
+        rb_busy.setChecked(mStatus.equals("0"));
+        rb_exit.setChecked(mStatus.equals("1"));
+        rb_vacation.setChecked(mStatus.equals("2"));
 
         /** 이미지 클릭시 이벤트 **/
         mProfileImage.setOnClickListener(v -> {

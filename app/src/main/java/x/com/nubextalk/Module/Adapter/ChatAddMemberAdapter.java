@@ -59,11 +59,12 @@ public class ChatAddMemberAdapter extends RecyclerView.Adapter<RecyclerView.View
 
             mHolder.profileName.setText(user.getAppName());
 
+            mHolder.profileImage.setColorFilter(null);
             if (URLUtil.isValidUrl(mUserList.get(position).getUser().getAppImagePath())) {
                 mAquery.view(mHolder.profileImage).image(user.getAppImagePath());
             } else {
-                Drawable drawable = mHolder.profileImage.getContext().getResources().getDrawable(DEFAULT_PROFILE, null);
-                mAquery.view(mHolder.profileImage).image(drawable);
+                mAquery.view(mHolder.profileImage).image(DEFAULT_PROFILE);
+                mHolder.profileImage.setColorFilter((mHolder.profileName.getTextColors().getDefaultColor()));
             }
 
             //기존 채팅방에서 가져온 사용자인 경우 아이템 삭제 버튼 사라짐

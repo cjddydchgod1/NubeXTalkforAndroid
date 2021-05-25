@@ -7,16 +7,12 @@ package x.com.nubextalk;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -47,7 +43,7 @@ import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE1;
 import static x.com.nubextalk.Module.CodeResources.PATH_STORAGE2;
 import static x.com.nubextalk.Module.CodeResources.TITLE_MODIFY_PROFILE;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileModificationActivity extends AppCompatActivity {
     private Realm mRealm;
     private AQuery mAquery;
     private User mUser;
@@ -66,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_profile_modification);
         Intent intent = getIntent();
         String uid = intent.getStringExtra("uid");
 
@@ -193,11 +189,11 @@ public class ProfileActivity extends AppCompatActivity {
             mUser.setAppStatus(mStatus);
             mUser.setAppImagePath(imgUri.toString());
         });
-        ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
+        ApiManager apiManager = new ApiManager(ProfileModificationActivity.this, mRealm);
         apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
-                Toast.makeText(ProfileActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileModificationActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         });
@@ -210,11 +206,11 @@ public class ProfileActivity extends AppCompatActivity {
                 mUser.setAppImagePath("");
             }
         });
-        ApiManager apiManager = new ApiManager(ProfileActivity.this, mRealm);
+        ApiManager apiManager = new ApiManager(ProfileModificationActivity.this, mRealm);
         apiManager.setEmployeeAppInfo(mUser, new ApiManager.onApiListener() {
             @Override
             public void onSuccess(Response response, String body) {
-                Toast.makeText(ProfileActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileModificationActivity.this, "프로필이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         });
@@ -263,7 +259,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void exitActivity() {
-        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+        Intent intent = new Intent(ProfileModificationActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }

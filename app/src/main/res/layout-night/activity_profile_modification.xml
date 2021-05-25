@@ -10,7 +10,7 @@
     android:layout_height="match_parent"
     android:background="@color/cBackground"
     android:orientation="vertical"
-    tools:context=".ProfileActivity">
+    tools:context=".ProfileModificationActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="2.7">
+        android:layout_weight="2.5">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/change_profile_image"
@@ -40,7 +40,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.4">
+        android:layout_weight="1.5">
 
         <TextView
             android:id="@+id/change_profile_text"

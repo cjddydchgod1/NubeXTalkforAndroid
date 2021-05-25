@@ -57,7 +57,8 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
-import x.com.nubextalk.ProfileActivity;
+import x.com.nubextalk.ProfileImageViewActivity;
+import x.com.nubextalk.ProfileModificationActivity;
 import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.COMPLETE;
@@ -69,7 +70,6 @@ import static x.com.nubextalk.Module.CodeResources.SEARCH;
 import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
 import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
 import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
-import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm mRealm;
@@ -365,7 +365,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         mAdapter.notifyDataSetChanged();
     }
-
     @Override
     public void onSelected(User user) {
         initBottomsheet(user);
@@ -427,7 +426,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // Profile Image 선택시 확대된 사진 띄우기
         mProfileImage.setOnClickListener(v ->{
-            Intent intent = new Intent(mContext, ProfileActivity.class);
+            Intent intent = new Intent(mContext, ProfileImageViewActivity.class);
             intent.putExtra("uid", user.getUid());
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             mContext.startActivity(intent);
@@ -439,7 +438,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         });
         // 전체적인 myProfile변경
         mMyProfileMod.setOnClickListener(v -> {
-            Intent intent = new Intent(mContext, ProfileActivity.class);
+            Intent intent = new Intent(mContext, ProfileModificationActivity.class);
             intent.putExtra("uid", user.getUid());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             mContext.startActivity(intent);

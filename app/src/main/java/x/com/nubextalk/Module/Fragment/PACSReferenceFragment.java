@@ -28,6 +28,7 @@ import x.com.nubextalk.SharePACSActivity;
 
 import static x.com.nubextalk.Module.CodeResources.PATH_PACS_HOME;
 import static x.com.nubextalk.Module.CodeResources.PATH_PACS_VIEWER;
+import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
 
 public class PACSReferenceFragment extends Fragment implements PacsWebView.onJavaScriptListener {
 
@@ -72,7 +73,7 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
         mApiManager = new ApiManager(mContext, mRealm);
 
         if (!UtilityManager.isTablet(mActivity)) {
-//            mActivity.setTitle(TITLE_PACS);
+            mActivity.setTitle(TITLE_PACS);
         }
 
         mRootview = (ViewGroup) inflater.inflate(R.layout.fragment_pacs_reference, container, false);
@@ -102,6 +103,16 @@ public class PACSReferenceFragment extends Fragment implements PacsWebView.onJav
             }
         }
         return mRootview;
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            if (!UtilityManager.isTablet(mContext)) {
+                mActivity.setTitle(TITLE_PACS);
+            }
+        }
     }
 
     @Override

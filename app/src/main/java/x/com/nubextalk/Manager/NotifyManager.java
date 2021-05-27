@@ -106,7 +106,7 @@ public class NotifyManager {
     private NotificationCompat.Builder createSummaryBuilder() {
         NotificationCompat.Builder summaryBuilder = new NotificationCompat.Builder(mContext, ID_NOTIFICATION_CHANNEL);
         summaryBuilder.setContentTitle(TAG)
-                .setSmallIcon(R.drawable.ic_nube_x_logo)
+                .setSmallIcon(R.mipmap.ic_app_icon_round)
                 .setGroup(ID_NOTIFICATION_GROUP)
                 .setGroupSummary(true)
                 .setAutoCancel(true)

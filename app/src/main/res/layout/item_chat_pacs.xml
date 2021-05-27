@@ -34,12 +34,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/other_chat_pacs"
-        android:layout_width="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_m"
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
-        android:minHeight="96dp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/layout_profile_image">
@@ -48,9 +47,8 @@
             android:id="@+id/other_pacs_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="96dp"
+            android:maxWidth="170dp"
             android:padding="@dimen/padding_l"
-            android:text=""
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -88,7 +86,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/my_chat_pacs"
-        android:layout_width="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_s"
         android:layout_marginEnd="@dimen/margin_m"
@@ -103,9 +101,8 @@
             android:id="@+id/my_pacs_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="96dp"
+            android:maxWidth="170dp"
             android:padding="@dimen/padding_l"
-            android:text=""
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

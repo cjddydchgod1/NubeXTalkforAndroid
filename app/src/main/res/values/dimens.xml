@@ -4,6 +4,7 @@
   -->
 
 <resources>
+    <dimen name="profile_image_xxs">38dp</dimen>
     <dimen name="profile_image_xs">54dp</dimen>
     <dimen name="profile_image_s">64dp</dimen>
     <dimen name="profile_image_m">72dp</dimen>

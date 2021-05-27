@@ -88,7 +88,7 @@ public class NotifyManager {
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, new Random().nextInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Bitmap largeIcon = new ImageManager(mContext).getImageFromURL(mUser.getAppImagePath());
         builder.setContentTitle(mChatRoom.getRoomName())
-                .setSmallIcon(R.drawable.ic_nube_x_logo)
+                .setSmallIcon(R.mipmap.ic_app_icon_round)
                 .setLargeIcon(largeIcon)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setChannelId(ID_NOTIFICATION_CHANNEL)

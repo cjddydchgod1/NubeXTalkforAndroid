@@ -49,8 +49,8 @@
         android:layout_marginStart="@dimen/margin_m"
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
-        android:maxWidth="200dp"
-        android:padding="@dimen/padding_s"
+        android:maxWidth="170dp"
+        android:padding="@dimen/padding_m"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/layout_profile_image" />
 
@@ -72,11 +72,10 @@
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
         android:maxWidth="200dp"
-        android:padding="@dimen/padding_s"
-        app:layout_constraintTop_toBottomOf="@+id/chat_date"
+        android:padding="@dimen/padding_m"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/chat_date" />
 
     <TextView
         android:id="@+id/my_time"

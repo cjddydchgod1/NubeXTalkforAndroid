@@ -72,7 +72,7 @@
         android:background="@drawable/bg_chat_text"
         android:gravity="center_vertical"
         android:maxWidth="200dp"
-        android:padding="@dimen/padding_s"
+        android:padding="@dimen/padding_m"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat_date" />

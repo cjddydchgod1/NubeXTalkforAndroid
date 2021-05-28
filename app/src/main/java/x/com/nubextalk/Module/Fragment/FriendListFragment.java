@@ -537,6 +537,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void refreshFragment() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(this).attach(this).commit();
+        getDataFromPACS();
     }
 
     public void updateNickname(User user, String name) {

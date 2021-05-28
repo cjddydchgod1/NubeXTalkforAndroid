@@ -5,8 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -22,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -40,6 +45,7 @@ import com.joanzapata.iconify.widget.IconButton;
 
 import org.json.JSONArray;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,9 +65,11 @@ import x.com.nubextalk.Model.ChatRoomMember;
 import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.ChatAdapter;
+import x.com.nubextalk.Module.CodeResources;
 import x.com.nubextalk.Module.Fragment.PACSReferenceFragment;
 import x.com.nubextalk.Module.Fragment.RoomNameModificationDialogFragment;
 
+import static android.os.Environment.DIRECTORY_DCIM;
 import static x.com.nubextalk.Module.CodeResources.EMPTY;
 import static x.com.nubextalk.Module.CodeResources.EMPTY_IMAGE;
 import static x.com.nubextalk.Module.CodeResources.HOSPITAL_ID;
@@ -90,6 +98,7 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     private RealmResults<ChatContent> mChatContents;
     private ChatRoom mChatRoom;
     private int mChatContentsIndex;
+    private File mFile;
 
     private RecyclerView mRecyclerView;
     private DrawerLayout mDrawerLayout;
@@ -389,7 +398,9 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                     UploadTask uploadTask = FirebaseStorageManager.uploadFile(file, PATH_STORAGE1 + mHid + PATH_STORAGE3 + mRid + "/" + cid + "_" + mUid);
                 }
             } else if (requestCode == 2) {
-                Bitmap file = (Bitmap) data.getExtras().get("data");
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 1;
+                Bitmap file = BitmapFactory.decodeFile(mFile.getAbsolutePath(), options);
                 Date date = new Date();
 
                 //realm 에 사진 채팅 추가
@@ -541,7 +552,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         } else {
+            Date date = new Date();
+            mFile = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DCIM) + "/camera", date.toString() + ".jpg");
+            Uri uri = FileProvider.getUriForFile(getBaseContext(), "nubextalk.fileprovider", mFile);
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
             startActivityForResult(intent, 2);
         }
     }

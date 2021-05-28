@@ -104,7 +104,7 @@ public class ImageManager {
         try {
             tempFile.createNewFile();
             FileOutputStream out = new FileOutputStream(tempFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, out);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,7 +125,7 @@ public class ImageManager {
         try {
             tempFile.createNewFile();
             FileOutputStream out = new FileOutputStream(tempFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             path = getExternalStoragePath(name);
             out.close();
         } catch (Exception e) {

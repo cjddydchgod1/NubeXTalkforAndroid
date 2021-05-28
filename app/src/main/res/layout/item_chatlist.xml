@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:maxWidth="140dp"
+        android:maxWidth="130dp"
         android:maxHeight="22dp"
         android:singleLine="true"
         android:text="Person Namasdfasdfasdfse"

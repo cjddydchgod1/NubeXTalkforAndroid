@@ -252,7 +252,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     public void onBackPressed() {
         super.onBackPressed();
         setChatContentRead(mChatContents, mChatContentsIndex);
-        mRealm.close();
+//         if (mRealm != null) {
+//            mRealm.removeAllChangeListeners();
+//            mRealm.close();
+//            mRealm = null;
+//        }
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.putExtra("requestChatList", RESULT_OK);
@@ -264,7 +268,11 @@ public class ChatRoomActivity extends AppCompatActivity implements NavigationVie
     protected void onDestroy() {
         super.onDestroy();
         setChatContentRead(mChatContents, mChatContentsIndex);
-        mRealm.close();
+        if (mRealm != null) {
+            mRealm.removeAllChangeListeners();
+            mRealm.close();
+            mRealm = null;
+        }
     }
 
     @Override // Option Item Selected Listener

@@ -155,7 +155,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-        getDataFromPACS();
+//        getDataFromPACS();
 
         /**
          * recyclerview 애니매이션
@@ -198,6 +198,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
             }
         } else {
             mActivity.setTitle(TITLE_FRIEND_LIST);
+            mUserList.clear();
+            getDataFromPACS();
         }
     }
 

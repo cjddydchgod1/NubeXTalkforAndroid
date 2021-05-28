@@ -104,7 +104,7 @@ public class ImageManager {
         try {
             tempFile.createNewFile();
             FileOutputStream out = new FileOutputStream(tempFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, out);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();

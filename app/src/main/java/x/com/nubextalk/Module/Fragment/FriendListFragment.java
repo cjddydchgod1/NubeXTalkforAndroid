@@ -57,7 +57,8 @@ import x.com.nubextalk.Model.Config;
 import x.com.nubextalk.Model.User;
 import x.com.nubextalk.Module.Adapter.FriendListAdapter;
 import x.com.nubextalk.PACS.ApiManager;
-import x.com.nubextalk.ProfileActivity;
+import x.com.nubextalk.ProfileImageViewActivity;
+import x.com.nubextalk.ProfileModificationActivity;
 import x.com.nubextalk.R;
 
 import static x.com.nubextalk.Module.CodeResources.COMPLETE;
@@ -154,7 +155,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-        getDataFromPACS();
+//        getDataFromPACS();
 
         /**
          * recyclerview 애니매이션
@@ -195,6 +196,10 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 ).start(AnimManager.TOGETHER);
                 mExitWrapper.setVisibility(View.GONE);
             }
+        } else {
+            mActivity.setTitle(TITLE_FRIEND_LIST);
+            mUserList.clear();
+            getDataFromPACS();
         }
     }
 
@@ -365,7 +370,6 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         mAdapter.notifyDataSetChanged();
     }
-
     @Override
     public void onSelected(User user) {
         initBottomsheet(user);
@@ -427,7 +431,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
 
         // Profile Image 선택시 확대된 사진 띄우기
         mProfileImage.setOnClickListener(v ->{
-            Intent intent = new Intent(mContext, ProfileActivity.class);
+            Intent intent = new Intent(mContext, ProfileImageViewActivity.class);
             intent.putExtra("uid", user.getUid());
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             mContext.startActivity(intent);
@@ -439,7 +443,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
         });
         // 전체적인 myProfile변경
         mMyProfileMod.setOnClickListener(v -> {
-            Intent intent = new Intent(mContext, ProfileActivity.class);
+            Intent intent = new Intent(mContext, ProfileModificationActivity.class);
             intent.putExtra("uid", user.getUid());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             mContext.startActivity(intent);
@@ -467,7 +471,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                             @Override
                             public void onCreate(String rid) {
                                 intent.putExtra("rid", rid);
-                                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                                ((MainActivity) mActivity).startChatRoomActivity(intent);
                             }
                         });
 
@@ -533,6 +537,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
     public void refreshFragment() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(this).attach(this).commit();
+        getDataFromPACS();
     }
 
     public void updateNickname(User user, String name) {

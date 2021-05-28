@@ -24,6 +24,7 @@ import com.joanzapata.iconify.widget.IconTextView;
 
 import io.realm.Realm;
 import x.com.nubextalk.LoginActivity;
+import x.com.nubextalk.MainActivity;
 import x.com.nubextalk.Manager.FcmTokenRefreshService;
 import x.com.nubextalk.Manager.FireBase.FirebaseStoreManager;
 import x.com.nubextalk.Manager.UtilityManager;
@@ -40,6 +41,7 @@ import static x.com.nubextalk.Module.CodeResources.EXE_THEME;
 import static x.com.nubextalk.Module.CodeResources.EXE_VERSION_INFO;
 import static x.com.nubextalk.Module.CodeResources.LOGOUT;
 import static x.com.nubextalk.Module.CodeResources.SETTING_THEME;
+import static x.com.nubextalk.Module.CodeResources.TITLE_SETTING;
 import static x.com.nubextalk.Module.CodeResources.VERSION;
 
 public class SettingFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -94,6 +96,14 @@ public class SettingFragment extends Fragment implements View.OnClickListener, C
     public void onDetach() {
         mRealm.close();
         super.onDetach();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            mActivity.setTitle(TITLE_SETTING);
+        }
     }
 
     private void cleanView(LinearLayout linearLayout) {

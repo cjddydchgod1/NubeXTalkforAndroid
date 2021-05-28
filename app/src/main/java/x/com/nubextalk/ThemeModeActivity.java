@@ -8,6 +8,7 @@ package x.com.nubextalk;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.RadioButton;
@@ -47,6 +48,14 @@ public class ThemeModeActivity extends AppCompatActivity {
         rb_3.setChecked(theme_mode.equals(USER_MODE));
         changeTheme();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("requestChatList", RESULT_FIRST_USER);
+        startActivity(intent);
     }
 
     public void changeTheme() {

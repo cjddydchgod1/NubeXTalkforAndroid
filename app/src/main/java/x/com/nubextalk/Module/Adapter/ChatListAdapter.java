@@ -6,7 +6,6 @@
 package x.com.nubextalk.Module.Adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -274,15 +273,20 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     if (!user.getUid().equals(myAccount.getUid())) {
                         // profilestatus
                         User anotherUser = mRealm.where(User.class).equalTo("uid", user.getUid()).findFirst();
-                        switch (anotherUser.getAppStatus()) {
+                        mAquery.view(statusImg).hide();
+                        String status = anotherUser.getAppStatus();
+                        switch (status) {
                             case "1":
                                 mAquery.view(statusImg).image(STATUS_BUSY);
+                                mAquery.view(statusImg).show();
                                 break;
                             case "2":
                                 mAquery.view(statusImg).image(STATUS_OFF);
+                                mAquery.view(statusImg).show();
                                 break;
                             default: // 0과 기본으로 되어있는 설정
                                 mAquery.view(statusImg).image(STATUS_ON);
+                                mAquery.view(statusImg).show();
                                 break;
                         }
                     }
@@ -324,8 +328,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /** Modified By Jongho Lee*/
     public void updateData(RealmResults<ChatRoom> dataSet){
         this.mDataset = dataSet;
-        sortChatRoomByDate();
         notifyDataSetChanged();
+        sortChatRoomByDate();
     }
 
     /**

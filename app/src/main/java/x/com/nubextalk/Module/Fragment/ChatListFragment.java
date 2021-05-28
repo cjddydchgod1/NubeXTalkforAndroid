@@ -120,6 +120,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         if (!hidden) {
             mChatRoomList = ChatRoom.getAll(mRealm);
             mAdapter.updateData(mChatRoomList);
+            mActivity.setTitle(TITLE_CHAT_LIST);
         }
     }
 
@@ -143,6 +144,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                         switch (pos) {
                             case 0: /**채팅방 알림 설정 이벤트**/
                                 updateChatRoomAlarm(chatRoom);
+                                refreshChatList();
                                 break;
                             case 1: /**대화상대 추가 이벤트**/
                                 startActivity(new Intent(mContext, ChatAddActivity.class)
@@ -150,12 +152,14 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
                                 break;
                             case 2: /**채팅방 상단 고정 이벤트**/
                                 updateChatRoomFixTop(chatRoom);
+                                refreshChatList();
                                 break;
                             case 3: /**채팅방 이름 편집 이벤트**/
                                 openDialog(chatRoom.getRid());
                                 break;
                             case 4: /**채팅방 나가기 이벤트**/
                                 ChatRoom.deleteChatRoom(mRealm, chatRoom.getRid());
+                                refreshChatList();
                                 break;
                         }
                     }

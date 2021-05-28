@@ -75,7 +75,10 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/txt_Ml"
                 android:textStyle="bold"
-                android:visibility="visible" />
+                android:textColor="@color/cContentText"
+                android:visibility="visible"
+                android:maxWidth="120dp"
+                android:singleLine="true"/>
 
             <EditText
                 android:id="@+id/modifyName"
@@ -90,6 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/padding_l"
+                android:textColor="@color/cContentText"
                 android:text="@string/modify" />
         </LinearLayout>
 
@@ -170,6 +174,7 @@
                 android:paddingStart="@dimen/padding_l"
                 android:text="@string/Chatting"
                 android:textSize="@dimen/txt_xl"
+                android:textColor="@color/cChatBtn"
                 android:visibility="visible" />
         </FrameLayout>
 

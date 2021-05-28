@@ -120,6 +120,7 @@ public class ChatListFragment extends Fragment implements ChatListAdapter.OnItem
         if (!hidden) {
             mChatRoomList = ChatRoom.getAll(mRealm);
             mAdapter.updateData(mChatRoomList);
+            mActivity.setTitle(TITLE_CHAT_LIST);
         }
     }
 

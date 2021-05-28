@@ -70,6 +70,7 @@ import static x.com.nubextalk.Module.CodeResources.SEARCH;
 import static x.com.nubextalk.Module.CodeResources.STATUS_BUSY;
 import static x.com.nubextalk.Module.CodeResources.STATUS_OFF;
 import static x.com.nubextalk.Module.CodeResources.STATUS_ON;
+import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
 
 public class FriendListFragment extends Fragment implements FriendListAdapter.onItemSelectedListener {
     private Realm mRealm;
@@ -195,6 +196,8 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                 ).start(AnimManager.TOGETHER);
                 mExitWrapper.setVisibility(View.GONE);
             }
+        } else {
+            mActivity.setTitle(TITLE_FRIEND_LIST);
         }
     }
 
@@ -466,7 +469,7 @@ public class FriendListFragment extends Fragment implements FriendListAdapter.on
                             @Override
                             public void onCreate(String rid) {
                                 intent.putExtra("rid", rid);
-                                ((MainActivity) getActivity()).startChatRoomActivity(intent);
+                                ((MainActivity) mActivity).startChatRoomActivity(intent);
                             }
                         });
 

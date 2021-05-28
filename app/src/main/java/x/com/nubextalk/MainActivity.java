@@ -6,18 +6,12 @@
 package x.com.nubextalk;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -41,10 +35,6 @@ import x.com.nubextalk.Module.Fragment.SettingFragment;
 
 import static x.com.nubextalk.Module.CodeResources.CHAT_ADD;
 import static x.com.nubextalk.Module.CodeResources.MOVE_TO_CHAT_ROOM;
-import static x.com.nubextalk.Module.CodeResources.TITLE_CHAT_LIST;
-import static x.com.nubextalk.Module.CodeResources.TITLE_FRIEND_LIST;
-import static x.com.nubextalk.Module.CodeResources.TITLE_PACS;
-import static x.com.nubextalk.Module.CodeResources.TITLE_SETTING;
 
 /**
  * Github Commint Message는 다음을 따라주시길 바랍니다.
@@ -90,13 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Setting bottom navigation
         mBottomNavigationView = findViewById(R.id.bottom_nav);
-        initBottomNavigation(this);
+        initBottomNavigation();
 
         /** Modified By Jongho Lee */
         //Init Fragment
         FragmentTransaction transaction = mFragManager.beginTransaction();
         transaction.add(R.id.main_frame_layout, mFriendListFrag).hide(mFriendListFrag);
         transaction.add(R.id.main_frame_layout, mChatListFrag).hide(mChatListFrag);
+        transaction.add(R.id.main_frame_layout, mSettingFrag).hide(mSettingFrag);
 
         //Tablet PACS reference fragment control
         if (UtilityManager.isTablet(this)) {
@@ -105,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             transaction.add(R.id.main_frame_layout, mPacsReferenceFrag).hide(mPacsReferenceFrag);
         }
-
-        transaction.add(R.id.main_frame_layout, mSettingFrag).hide(mSettingFrag);
 
         int requestChatList = getIntent().getIntExtra("requestChatList", RESULT_CANCELED);
         if (requestChatList == RESULT_OK) {
@@ -117,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
 
-        toolbar.setTitle(TITLE_FRIEND_LIST);
-        mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         transaction.commitAllowingStateLoss();
     }
 
@@ -133,20 +120,17 @@ public class MainActivity extends AppCompatActivity {
         int requestChatList = intent.getIntExtra("requestChatList", RESULT_CANCELED);
         if (requestChatList == RESULT_OK) {
             transaction.show(mChatListFrag).commitAllowingStateLoss();
-            this.setTitle(TITLE_CHAT_LIST);
             mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
         } else {
             transaction.show(mFriendListFrag).commitAllowingStateLoss();
-            this.setTitle(TITLE_FRIEND_LIST);
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }
     }
 
-
     /**
      * 초기 하단 네비게이션 설정 및 프래그먼트 전환 리스너 설정
      **/
-    private void initBottomNavigation(Activity activity) {
+    private void initBottomNavigation() {
         //네비게이션 버튼 해당 프래그먼트로 전환
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -158,19 +142,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 switch (item.getItemId()) {
                     case R.id.nav_friend_list:
-                        activity.setTitle(TITLE_FRIEND_LIST);
                         fragTransaction.show(mFriendListFrag);
                         break;
                     case R.id.nav_chat_list:
-                        activity.setTitle(TITLE_CHAT_LIST);
                         fragTransaction.show(mChatListFrag);
                         break;
                     case R.id.nav_calendar:
-                        activity.setTitle(TITLE_PACS);
                         fragTransaction.show(mPacsReferenceFrag);
                         break;
                     case R.id.nav_setting:
-                        activity.setTitle(TITLE_SETTING);
                         fragTransaction.show(mSettingFrag);
                         break;
                 }
@@ -201,9 +181,7 @@ public class MainActivity extends AppCompatActivity {
                     startChatRoomActivity(data);
                 }
             }
-        }
 
-        if (resultCode == RESULT_OK) {
             if (requestCode == MOVE_TO_CHAT_ROOM) {
                 /** Modified By Jongho Lee*/
                 FragmentTransaction fragTransaction = mFragManager.beginTransaction();

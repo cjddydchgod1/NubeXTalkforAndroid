@@ -121,7 +121,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestChatList == RESULT_OK) {
             transaction.show(mChatListFrag).commitAllowingStateLoss();
             mBottomNavigationView.setSelectedItemId(R.id.nav_chat_list);
-        } else {
+        } else if (requestChatList == RESULT_FIRST_USER) {
+            transaction.show(mSettingFrag).commitAllowingStateLoss();
+            mBottomNavigationView.setSelectedItemId(R.id.nav_setting);
+        }
+        else {
             transaction.show(mFriendListFrag).commitAllowingStateLoss();
             mBottomNavigationView.setSelectedItemId(R.id.nav_friend_list);
         }

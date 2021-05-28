@@ -54,7 +54,7 @@ public class ThemeModeActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("requestChatList", RESULT_FIRST_USER);
         startActivity(intent);
     }
 

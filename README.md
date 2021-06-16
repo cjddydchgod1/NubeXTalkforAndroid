@@ -41,7 +41,7 @@ Tanks goes to Hanyang Univiersity students team:
      <a href="https://github.com/JeongGod">
      <img src="https://avatars.githubusercontent.com/u/22341452?v=4" width="100px;" alt=""/>
       <br />
-      <sub><b>Jae Young Choi (Jay)</b></sub>
+      <sub><b>JeongGod</b></sub>
      </a>
     </td>
  </tr>

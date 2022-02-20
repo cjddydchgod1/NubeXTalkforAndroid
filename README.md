@@ -24,7 +24,7 @@ Tanks goes to Hanyang Univiersity students team:
 <table>
   <tr>
     <td align="center">
-     <a href="https://github.com/wntjq68">
+     <a href="https://github.com/JuseobJang">
      <img src="https://avatars.githubusercontent.com/u/22047374?v=4" width="100px;" alt=""/>
       <br />
       <sub><b>JuseobJang</b></sub>
